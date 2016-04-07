@@ -68,7 +68,7 @@ describe("Example page", function() {
 
     it("should match the title", function () {
         expect(browser.pixdiff.checkRegion(element(By.id('title')), 'example-page-title', {
-            blockOut: {x: 10, y: 132, width: 100, height: 50}})).toMatchScreen();
+            blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
     });
 });
 ```
@@ -78,6 +78,7 @@ describe("Example page", function() {
 * ```basePath``` Defines the path to the reference images that are to be compared.
 * ```width``` Browser width (default: 1280)
 * ```height``` Browser height (default: 1024)
+* ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
 
 ####Function options:
 
@@ -99,21 +100,28 @@ path
 └── to
     └── screenshots
         ├── diff
-        │   └── example-page-chrome-1280x1024.png
-        ├── example-page-chrome-800x600.png
-        ├── example-page-chrome-1280x1024.png
-        ├── example-page-title-chrome-800x600.png
-        └── example-page-title-chrome-1280x1024.png
+        │   └── examplePage-chrome-1280x1024.png
+        ├── examplePage-chrome-800x600.png
+        ├── examplePage-chrome-1280x1024.png
+        ├── examplePage-title-chrome-800x600.png
+        └── examplePage-title-chrome-1280x1024.png
 ```
 The ```basePath``` directory must contain all the *approved* images. You may create subdirectories for better organisation, but the relative path should then be given in the test spec method. Failed comparisons generate a diff image under the **diff** folder.
 
 **Image naming**
 
-Images should obey the following format:
+Images should obey the following default format:
 
 ```text
-{descriptive_name}-{browserName}-{browserWidth}x{browserHeight}.png
+{descriptionInCamelCase}-{browserName}-{browserWidth}x{browserHeight}.png
 ```
+
+The naming convention can be customized by passing the parameter ```formatImageName``` with a format string like:
+
+```text
+{browserName}_{tag}__{width}-{height}
+```
+
 Images specified via name in the spec method will be selected according to the browsers current resolution. That is to say that multiple images can share the same name differentated by resolution.
 
 ##Documentation
@@ -130,6 +138,7 @@ npm run test
 ###Dependencies
 * [blink-diff](https://github.com/yahoo/blink-diff)
 * [png-image](https://github.com/koola/png-image)
+* [camel-case](https://github.com/blakeembrey/camel-case)
 
 ###Dev-Dependencies
 * [grunt](https://github.com/gruntjs/grunt)

@@ -1,5 +1,10 @@
 Changelog
 =========
+v1.0.8 - Fixed protractors capabilities issues (credit to msviha)
+       - Added formatImageName option for custom image naming
+       - Diff directory now created automatically
+       - Image tag is now strict camel case for better readability (7/4/2016)
+
 v1.0.7 - Merged PR #5 to resolve issue on SauceLabs (18/12/2015)
 
 v1.0.6 - Rename custom matchers to avoid naming conflict with Jasmine toMatch (04/11/2015)

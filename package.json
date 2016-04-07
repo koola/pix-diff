@@ -8,12 +8,13 @@
     "png-image": "1.0.0"
   },
   "devDependencies": {
+    "camel-case": "^1.2.2",
     "grunt": "^0.4.2",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-run": "^0.3.0",
     "load-grunt-tasks": "^0.6.0",
-    "protractor": "2.1.0"
+    "protractor": "3.2.2"
   },
   "scripts": {
     "wd-update": "node_modules/.bin/webdriver-manager update",

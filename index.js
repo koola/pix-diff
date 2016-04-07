@@ -2,7 +2,9 @@ var BlinkDiff = require('blink-diff'),
     PNGImage = require('png-image'),
     assert = require('assert'),
     path = require('path'),
-    util = require('util');
+    util = require('util'),
+    fs = require('fs'),
+    camelCase = require('camel-case');
 
 /**
  * Pix-diff protractor plugin class
@@ -13,6 +15,7 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.basePath Path to screenshots folder
  * @param {string} options.width Width of browser
  * @param {string} options.height Height of browser
+ * @param {string} options.formatImageName Custom format image name
  *
  * @property {string} _basePath
  * @property {int} _width
@@ -24,20 +27,25 @@ function PixDiff(options) {
     this._basePath = options.basePath;
     assert.ok(options.basePath, "Image base path not given.");
 
+    if (!fs.existsSync(options.basePath + '/diff') || !fs.statSync(options.basePath + '/diff').isDirectory()) {
+        fs.mkdirSync(options.basePath + '/diff');
+    }
+
     this._width = options.width || 1280;
     this._height = options.height || 1024;
 
-    this._capabilities = null;
+    this._formatString = options.formatImageName || "{tag}-{browserName}-{width}x{height}";
 
     this._flow = browser.controlFlow();
 
     // init
     browser.driver.manage().window().setSize(this._width, this._height)
-        .then(function() {
-            return browser.getCapabilities()
+        .then(function () {
+            return browser.getProcessedConfig()
         })
-        .then(function(data) {
-            return this._capabilities = data.caps_;
+        .then(function (data) {
+            this._capabilities = data.capabilities;
+            assert.ok(this._capabilities.browserName, "Browser name is undefined.");
         }.bind(this));
 }
 
@@ -52,17 +60,38 @@ PixDiff.prototype = {
      * @return {object}
      * @private
      */
-    _mergeDefaultOptions: function (optionsA, optionsB) {
-        var option;
-
+    _mergeDefaultOptions: function(optionsA, optionsB) {
         optionsB = (typeof optionsB === 'object') ? optionsB : {};
 
-        for (option in optionsB) {
+        for (var option in optionsB) {
             if (!optionsA.hasOwnProperty(option)) {
                 optionsA[option] = optionsB[option];
             }
         }
         return optionsA;
+    },
+
+    /**
+     * Format string with description and capabilities
+     *
+     * @method _format
+     * @param {string} formatString
+     * @param {string} description
+     * @return {string}
+     * @private
+     */
+    _format: function(formatString, description) {
+        var formatOptions = {
+            'tag': camelCase(description),
+            'browserName': this._capabilities.browserName,
+            'width': this._width,
+            'height': this._height
+        };
+
+        for (var option in formatOptions ) {
+            formatString = formatString.replace('{' + option + '}', formatOptions[option]);
+        }
+        return formatString + '.png';
     },
 
     /**
@@ -79,10 +108,9 @@ PixDiff.prototype = {
         return this._flow.execute(function() {
             return browser.takeScreenshot()
                 .then(function(image) {
-                    tag = util.format('%s-%s-%sx%s.png', tag, this._capabilities.browserName, this._width, this._height);
                     return new PNGImage({
                         imagePath: new Buffer(image, 'base64'),
-                        imageOutputPath: path.join(this._basePath, tag)
+                        imageOutputPath: path.join(this._basePath, this._format(this._formatString, tag))
                     }).runWithPromise();
                 }.bind(this));
         }.bind(this));
@@ -114,10 +142,9 @@ PixDiff.prototype = {
                     return browser.takeScreenshot();
                 })
                 .then(function(image) {
-                    tag = util.format('%s-%s-%sx%s.png', tag, this._capabilities.browserName, this._width, this._height);
                     return new PNGImage({
                         imagePath: new Buffer(image, 'base64'),
-                        imageOutputPath: path.join(this._basePath, tag),
+                        imageOutputPath: path.join(this._basePath, this._format(this._formatString, tag)),
                         cropImage: rect
                     }).runWithPromise();
                 }.bind(this));
@@ -142,7 +169,7 @@ PixDiff.prototype = {
         return this._flow.execute(function() {
             return browser.takeScreenshot()
                 .then(function(image) {
-                    tag = util.format('%s-%s-%sx%s.png', tag, this._capabilities.browserName, this._width, this._height);
+                    tag = this._format(this._formatString, tag);
                     defaults = {
                         imageAPath: path.join(this._basePath, tag),
                         imageB: new Buffer(image, 'base64'),
@@ -186,7 +213,7 @@ PixDiff.prototype = {
                     return browser.takeScreenshot();
                 })
                 .then(function(image) {
-                    tag = util.format('%s-%s-%sx%s.png', tag, this._capabilities.browserName, this._width, this._height);
+                    tag = this._format(this._formatString, tag);
                     defaults = {
                         imageAPath: path.join(this._basePath, tag),
                         imageB: new Buffer(image, 'base64'),
@@ -251,11 +278,7 @@ PixDiff.prototype = {
         };
 
     beforeEach(function() {
-        if (/^2/.test(jasmine.version)) {
-            jasmine.addMatchers(v2);
-        } else {
-            this.addMatchers(v1);
-        }
+        (/^2/.test(jasmine.version)) ? jasmine.addMatchers(v2) : this.addMatchers(v1);
     });
 })();
 

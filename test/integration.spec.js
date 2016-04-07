@@ -10,7 +10,7 @@ describe("Pix-Diff", function() {
     });
 
     it("should save the screen", function () {
-        var tagName = 'example-page';
+        var tagName = 'examplePage';
 
         browser.pixDiff.saveScreen(tagName).then(function() {
             expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-chrome-800x600.png')).toBe(true);

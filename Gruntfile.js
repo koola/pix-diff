@@ -10,8 +10,7 @@ module.exports = function(grunt) {
             screens: {
                 src: [
                     "test/screenshots/*",
-                    "!test/screenshots/diff/**",
-                    "!test/screenshots/example-fail*.png",
+                    "!test/screenshots/exampleFail*.png",
                     "test/screenshots/diff/*.png"
                 ]
             }
