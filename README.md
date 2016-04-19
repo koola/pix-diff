@@ -103,8 +103,8 @@ path
         │   └── examplePage-chrome-1280x1024.png
         ├── examplePage-chrome-800x600.png
         ├── examplePage-chrome-1280x1024.png
-        ├── examplePage-title-chrome-800x600.png
-        └── examplePage-title-chrome-1280x1024.png
+        ├── examplePageTitle-chrome-800x600.png
+        └── examplePageTitle-chrome-1280x1024.png
 ```
 The ```basePath``` directory must contain all the *approved* images. You may create subdirectories for better organisation, but the relative path should then be given in the test spec method. Failed comparisons generate a diff image under the **diff** folder.
 
