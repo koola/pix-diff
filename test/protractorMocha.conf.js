@@ -15,6 +15,8 @@ exports.config = {
         }
     },
 
+    directConnect: true,
+
     onPrepare: function() {
         var chai = require('chai').use(require('chai-as-promised'));
         chai.config.truncateThreshold = 0;

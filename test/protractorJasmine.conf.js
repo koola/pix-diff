@@ -15,6 +15,8 @@ exports.config = {
         }
     },
 
+    directConnect: true,
+
     onPrepare: function() {
         var PixDiff = require('../');
         browser.pixDiff = new PixDiff({
