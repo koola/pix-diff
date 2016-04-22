@@ -6,7 +6,7 @@ exports.config = {
 
     baseUrl: 'http://www.example.com',
 
-    specs: ['*.spec.js'],
+    specs: ['jasmine.spec.js'],
 
     capabilities: {
         browserName: 'chrome',

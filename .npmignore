@@ -3,4 +3,4 @@
 node_modules/
 npm-debug.log
 tmp/
-screenshots/diff
+test/screenshots/

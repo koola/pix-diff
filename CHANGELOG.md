@@ -1,5 +1,7 @@
 Changelog
 =========
+v1.0.9 - Add Mocha chai matcher (22/04/2016)
+
 v1.0.8 - Fixed protractors capabilities issues (credit to msviha)
        - Added formatImageName option for custom image naming
        - Diff directory now created automatically

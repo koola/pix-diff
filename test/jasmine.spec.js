@@ -34,6 +34,6 @@ describe("Pix-Diff", function() {
     });
 
     it("should not match the page with custom matcher", function () {
-        expect(browser.pixDiff.checkScreen('example-fail', {threshold:1})).toNotMatchScreen();
+        expect(browser.pixDiff.checkScreen('example-fail', {threshold:1})).not.toMatchScreen();
     });
 });

@@ -6,14 +6,17 @@
   "dependencies": {
     "blink-diff": "1.0.7",
     "png-image": "1.0.0",
-    "camel-case": "^1.2.2"
+    "camel-case": "1.2.2"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
     "grunt": "^0.4.2",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-run": "^0.3.0",
     "load-grunt-tasks": "^0.6.0",
+    "mocha": "^2.4.5",
     "protractor": "3.2.2"
   },
   "scripts": {

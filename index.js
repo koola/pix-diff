@@ -1,5 +1,5 @@
-var BlinkDiff = require('blink-diff'),
-    PNGImage = require('png-image'),
+var blinkDiff = require('blink-diff'),
+    pngImage = require('png-image'),
     assert = require('assert'),
     path = require('path'),
     util = require('util'),
@@ -46,6 +46,8 @@ function PixDiff(options) {
         .then(function (data) {
             this._capabilities = data.capabilities;
             assert.ok(this._capabilities.browserName, "Browser name is undefined.");
+            // Require PixDiff matchers
+            require(path.resolve('framework', data.framework));
         }.bind(this));
 }
 
@@ -108,7 +110,7 @@ PixDiff.prototype = {
         return this._flow.execute(function() {
             return browser.takeScreenshot()
                 .then(function(image) {
-                    return new PNGImage({
+                    return new pngImage({
                         imagePath: new Buffer(image, 'base64'),
                         imageOutputPath: path.join(this._basePath, this._format(this._formatString, tag))
                     }).runWithPromise();
@@ -142,7 +144,7 @@ PixDiff.prototype = {
                     return browser.takeScreenshot();
                 })
                 .then(function(image) {
-                    return new PNGImage({
+                    return new pngImage({
                         imagePath: new Buffer(image, 'base64'),
                         imageOutputPath: path.join(this._basePath, this._format(this._formatString, tag)),
                         cropImage: rect
@@ -174,9 +176,9 @@ PixDiff.prototype = {
                         imageAPath: path.join(this._basePath, tag),
                         imageB: new Buffer(image, 'base64'),
                         imageOutputPath: path.join(this._basePath, 'diff', path.basename(tag)),
-                        imageOutputLimit: BlinkDiff.OUTPUT_DIFFERENT
+                        imageOutputLimit: blinkDiff.OUTPUT_DIFFERENT
                     };
-                    return new BlinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+                    return new blinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
                 }.bind(this))
                 .then(function(result) {
                     return result;
@@ -218,10 +220,10 @@ PixDiff.prototype = {
                         imageAPath: path.join(this._basePath, tag),
                         imageB: new Buffer(image, 'base64'),
                         imageOutputPath: path.join(this._basePath, 'diff', path.basename(tag)),
-                        imageOutputLimit: BlinkDiff.OUTPUT_DIFFERENT,
+                        imageOutputLimit: blinkDiff.OUTPUT_DIFFERENT,
                         cropImageB: rect
                     };
-                    return new BlinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+                    return new blinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
                 }.bind(this))
                 .then(function(result) {
                     return result;
@@ -229,57 +231,5 @@ PixDiff.prototype = {
         }.bind(this));
     }
 };
-
-/**
- * Jasmine PixDiff matchers
- */
-(function() {
-    var v1 = {
-            toMatchScreen: function() {
-                var result = this.actual,
-                    percent = +((result.differences / result.dimension) * 100).toFixed(2);
-                this.message = function() {
-                    return util.format("Image is visibly different by %s pixels, %s %", result.differences, percent);
-                };
-                return ((result.code === BlinkDiff.RESULT_IDENTICAL) || (result.code === BlinkDiff.RESULT_SIMILAR));
-            },
-
-            toNotMatchScreen: function() {
-                var result = this.actual;
-                this.message = function() {
-                    return "Image is identical or near identical";
-                };
-                return ((result.code === BlinkDiff.RESULT_DIFFERENT) && (result.code !== BlinkDiff.RESULT_UNKNOWN));
-            }
-        },
-        v2 = {
-            toMatchScreen: function() {
-                return {
-                    compare: function(actual, expected) {
-                        var percent = +((actual.differences / actual.dimension) * 100).toFixed(2);
-                        return {
-                            pass: ((actual.code === BlinkDiff.RESULT_IDENTICAL) || (actual.code === BlinkDiff.RESULT_SIMILAR)),
-                            message: util.format("Image is visibly different by %s pixels, %s %", actual.differences, percent)
-                        };
-                    }
-                }
-            },
-
-            toNotMatchScreen: function() {
-                return {
-                    compare: function(actual, expected) {
-                        return {
-                            pass: ((actual.code === BlinkDiff.RESULT_DIFFERENT) && (actual.code !== BlinkDiff.RESULT_UNKNOWN)),
-                            message: "Image is identical or near identical"
-                        };
-                    }
-                }
-            }
-        };
-
-    beforeEach(function() {
-        (/^2/.test(jasmine.version)) ? jasmine.addMatchers(v2) : this.addMatchers(v1);
-    });
-})();
 
 module.exports = PixDiff;

@@ -17,10 +17,16 @@ module.exports = function(grunt) {
         },
 
         run: {
-            protractor: {
+            jasmine: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
-                    'test/protractor.conf.js'
+                    'test/protractorJasmine.conf.js'
+                ]
+            },
+            mocha: {
+                cmd: 'node_modules/.bin/protractor',
+                args: [
+                    'test/protractorMocha.conf.js'
                 ]
             }
         }
@@ -28,6 +34,7 @@ module.exports = function(grunt) {
     });
 
     //tasks
-    grunt.registerTask('test', 'Run integration tests', ['clean:screens', 'run:protractor']);
-    grunt.registerTask('default', ['test']);
+    grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
+    grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
+    grunt.registerTask('default', ['jasmine', 'mocha']);
 };
