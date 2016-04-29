@@ -41,13 +41,13 @@ function PixDiff(options) {
     // init
     browser.driver.manage().window().setSize(this._width, this._height)
         .then(function () {
-            return browser.getProcessedConfig()
+            return browser.getProcessedConfig();
         })
         .then(function (data) {
             this._capabilities = data.capabilities;
             assert.ok(this._capabilities.browserName, "Browser name is undefined.");
             // Require PixDiff matchers
-            require(path.resolve('framework', data.framework));
+            require(path.resolve(__dirname, 'framework', data.framework));
         }.bind(this));
 }
 
