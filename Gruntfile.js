@@ -29,6 +29,20 @@ module.exports = function(grunt) {
                     'test/protractorMocha.conf.js'
                 ]
             }
+        },
+
+        bump: {
+            options: {
+                files: ['package.json'],
+                commit: true,
+                commitMessage: 'Release v%VERSION%',
+                commitFiles: ['package.json', 'CHANGELOG.md'],
+                createTag: true,
+                tagName: 'v%VERSION%',
+                tagMessage: 'Version %VERSION%',
+                push: true,
+                pushTo: 'origin'
+            }
         }
 
     });
@@ -36,5 +50,6 @@ module.exports = function(grunt) {
     //tasks
     grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
     grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
+    grunt.registerTask('release', ['bump']);
     grunt.registerTask('default', ['jasmine', 'mocha']);
 };
