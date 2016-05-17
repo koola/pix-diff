@@ -1,5 +1,8 @@
 Changelog
 =========
+v1.0.10 - Fix not resolving path to framework during initialisation #14
+        - Update dependencies
+
 v1.0.9 - Add Mocha chai matcher (22/04/2016)
 
 v1.0.8 - Fixed protractors capabilities issues (credit to msviha)
