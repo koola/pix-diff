@@ -9,10 +9,17 @@ module.exports = function(grunt) {
         clean: {
             screens: {
                 src: [
-                    "test/screenshots/*",
-                    "!test/screenshots/exampleFail*.png",
-                    "test/screenshots/diff/*.png"
+                    'test/screenshots/*',
+                    '!test/screenshots/exampleFail*.png'
                 ]
+            }
+        },
+
+        jshint: {
+            all: ['index.js', 'test/**/*.spec.js'],
+            options: {
+                jshintrc: '.jshintrc',
+                ignores: ['node_modules/', 'framework/']
             }
         },
 
@@ -50,6 +57,7 @@ module.exports = function(grunt) {
     //tasks
     grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
     grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
+    grunt.registerTask('build', ['jshint:all']);
     grunt.registerTask('release', ['bump']);
     grunt.registerTask('default', ['jasmine', 'mocha']);
 };

@@ -1,8 +1,9 @@
-var blinkDiff = require('blink-diff'),
-    pngImage = require('png-image'),
+'use strict';
+
+var BlinkDiff = require('blink-diff'),
+    PngImage = require('png-image'),
     assert = require('assert'),
     path = require('path'),
-    util = require('util'),
     fs = require('fs'),
     camelCase = require('camel-case');
 
@@ -20,34 +21,42 @@ var blinkDiff = require('blink-diff'),
  * @property {string} _basePath
  * @property {int} _width
  * @property {int} _height
+ * @property {string} formatString
  * @property {object} _capabilities
  * @property {webdriver|promise} _flow
+ * @property {int} _devicePixelRatio
  */
 function PixDiff(options) {
-    this._basePath = options.basePath;
-    assert.ok(options.basePath, "Image base path not given.");
+    this.basePath = options.basePath;
+    assert.ok(options.basePath, 'Image base path not given.');
 
     if (!fs.existsSync(options.basePath + '/diff') || !fs.statSync(options.basePath + '/diff').isDirectory()) {
         fs.mkdirSync(options.basePath + '/diff');
     }
 
-    this._width = options.width || 1280;
-    this._height = options.height || 1024;
+    this.width = options.width || 1280;
+    this.height = options.height || 1024;
 
-    this._formatString = options.formatImageName || "{tag}-{browserName}-{width}x{height}";
+    this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
 
-    this._flow = browser.controlFlow();
+    this.flow = browser.controlFlow();
+
+    this.devicePixelRatio = 1;
 
     // init
-    browser.driver.manage().window().setSize(this._width, this._height)
+    browser.driver.manage().window().setSize(this.width, this.height)
         .then(function () {
             return browser.getProcessedConfig();
         })
         .then(function (data) {
-            this._capabilities = data.capabilities;
-            assert.ok(this._capabilities.browserName, "Browser name is undefined.");
+            this.capabilities = data.capabilities;
+            assert.ok(this.capabilities.browserName, 'Browser name is undefined.');
             // Require PixDiff matchers
             require(path.resolve(__dirname, 'framework', data.framework));
+            return browser.driver.executeScript('return window.devicePixelRatio;');
+        }.bind(this))
+        .then(function (ratio) {
+            this.devicePixelRatio = Math.floor(ratio);
         }.bind(this));
 }
 
@@ -56,43 +65,43 @@ PixDiff.prototype = {
     /**
      * Merges non-default options from optionsB into optionsA
      *
-     * @method _mergeDefaultOptions
+     * @method mergeDefaultOptions
      * @param {object} optionsA
      * @param {object} optionsB
      * @return {object}
      * @private
      */
-    _mergeDefaultOptions: function(optionsA, optionsB) {
+    mergeDefaultOptions: function (optionsA, optionsB) {
         optionsB = (typeof optionsB === 'object') ? optionsB : {};
 
-        for (var option in optionsB) {
+        Object.keys(optionsB).forEach(function (option) {
             if (!optionsA.hasOwnProperty(option)) {
                 optionsA[option] = optionsB[option];
             }
-        }
+        });
         return optionsA;
     },
 
     /**
      * Format string with description and capabilities
      *
-     * @method _format
+     * @method format
      * @param {string} formatString
      * @param {string} description
      * @return {string}
      * @private
      */
-    _format: function(formatString, description) {
+    format: function (formatString, description) {
         var formatOptions = {
             'tag': camelCase(description),
-            'browserName': this._capabilities.browserName,
-            'width': this._width,
-            'height': this._height
+            'browserName': this.capabilities.browserName,
+            'width': this.width,
+            'height': this.height
         };
 
-        for (var option in formatOptions ) {
+        Object.keys(formatOptions).forEach(function (option) {
             formatString = formatString.replace('{' + option + '}', formatOptions[option]);
-        }
+        });
         return formatString + '.png';
     },
 
@@ -106,13 +115,13 @@ PixDiff.prototype = {
      * @param {string} tag
      * @public
      */
-    saveScreen: function(tag) {
-        return this._flow.execute(function() {
+    saveScreen: function (tag) {
+        return this.flow.execute(function () {
             return browser.takeScreenshot()
-                .then(function(image) {
-                    return new pngImage({
+                .then(function (image) {
+                    return new PngImage({
                         imagePath: new Buffer(image, 'base64'),
-                        imageOutputPath: path.join(this._basePath, this._format(this._formatString, tag))
+                        imageOutputPath: path.join(this.basePath, this.format(this.formatString, tag))
                     }).runWithPromise();
                 }.bind(this));
         }.bind(this));
@@ -129,24 +138,29 @@ PixDiff.prototype = {
      * @param {string} tag
      * @public
      */
-    saveRegion: function(element, tag) {
+    saveRegion: function (element, tag) {
         var size,
             rect;
 
-        return this._flow.execute(function() {
+        return this.flow.execute(function () {
             return element.getSize()
-                .then(function(elementSize) {
+                .then(function (elementSize) {
                     size = elementSize;
                     return element.getLocation();
                 })
-                .then(function(point) {
+                .then(function (point) {
                     rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
                     return browser.takeScreenshot();
                 })
-                .then(function(image) {
-                    return new pngImage({
+                .then(function (image) {
+                    if (this.devicePixelRatio > 1) {
+                        Object.keys(rect).forEach(function (item) {
+                            rect[item] *= this.devicePixelRatio;
+                        }.bind(this));
+                    }
+                    return new PngImage({
                         imagePath: new Buffer(image, 'base64'),
-                        imageOutputPath: path.join(this._basePath, this._format(this._formatString, tag)),
+                        imageOutputPath: path.join(this.basePath, this.format(this.formatString, tag)),
                         cropImage: rect
                     }).runWithPromise();
                 }.bind(this));
@@ -165,22 +179,22 @@ PixDiff.prototype = {
      * @return {object} result
      * @public
      */
-    checkScreen: function(tag, options) {
+    checkScreen: function (tag, options) {
         var defaults;
 
-        return this._flow.execute(function() {
+        return this.flow.execute(function () {
             return browser.takeScreenshot()
-                .then(function(image) {
-                    tag = this._format(this._formatString, tag);
+                .then(function (image) {
+                    tag = this.format(this.formatString, tag);
                     defaults = {
-                        imageAPath: path.join(this._basePath, tag),
+                        imageAPath: path.join(this.basePath, tag),
                         imageB: new Buffer(image, 'base64'),
-                        imageOutputPath: path.join(this._basePath, 'diff', path.basename(tag)),
-                        imageOutputLimit: blinkDiff.OUTPUT_DIFFERENT
+                        imageOutputPath: path.join(this.basePath, 'diff', path.basename(tag)),
+                        imageOutputLimit: BlinkDiff.OUTPUT_DIFFERENT
                     };
-                    return new blinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+                    return new BlinkDiff(this.mergeDefaultOptions(defaults, options)).runWithPromise();
                 }.bind(this))
-                .then(function(result) {
+                .then(function (result) {
                     return result;
                 });
         }.bind(this));
@@ -199,33 +213,33 @@ PixDiff.prototype = {
      * @return {object}
      * @public
      */
-    checkRegion: function(element, tag, options) {
+    checkRegion: function (element, tag, options) {
         var size,
             rect,
             defaults;
 
-        return this._flow.execute(function() {
+        return this.flow.execute(function () {
             return element.getSize()
-                .then(function(elementSize) {
+                .then(function (elementSize) {
                     size = elementSize;
                     return element.getLocation();
                 })
-                .then(function(point) {
+                .then(function (point) {
                     rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
                     return browser.takeScreenshot();
                 })
-                .then(function(image) {
-                    tag = this._format(this._formatString, tag);
+                .then(function (image) {
+                    tag = this.format(this.formatString, tag);
                     defaults = {
-                        imageAPath: path.join(this._basePath, tag),
+                        imageAPath: path.join(this.basePath, tag),
                         imageB: new Buffer(image, 'base64'),
-                        imageOutputPath: path.join(this._basePath, 'diff', path.basename(tag)),
-                        imageOutputLimit: blinkDiff.OUTPUT_DIFFERENT,
+                        imageOutputPath: path.join(this.basePath, 'diff', path.basename(tag)),
+                        imageOutputLimit: BlinkDiff.OUTPUT_DIFFERENT,
                         cropImageB: rect
                     };
-                    return new blinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+                    return new BlinkDiff(this.mergeDefaultOptions(defaults, options)).runWithPromise();
                 }.bind(this))
-                .then(function(result) {
+                .then(function (result) {
                     return result;
                 });
         }.bind(this));

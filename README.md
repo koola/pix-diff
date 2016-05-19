@@ -126,13 +126,18 @@ Images specified via name in the spec method will be selected according to the b
 
 ##Documentation
 
-Todo
+todo
 
 ##Tests
 
-Run the tests with the following command:
+Run all tests with the following command:
 ```shell
-npm run test
+npm test
+```
+
+Run all tests by framework:
+```shell
+npm test -- jasmine/mocha
 ```
 
 ###Dependencies
