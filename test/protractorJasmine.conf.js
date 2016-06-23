@@ -18,13 +18,6 @@ exports.config = {
     directConnect: true,
 
     onPrepare: function() {
-        var PixDiff = require('../');
-        browser.pixDiff = new PixDiff({
-            basePath: 'test/screenshots',
-            width: 800,
-            height: 600
-        });
-
         browser.ignoreSynchronization = true;
     },
 

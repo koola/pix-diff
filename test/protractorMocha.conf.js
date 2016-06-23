@@ -18,15 +18,8 @@ exports.config = {
     directConnect: true,
 
     onPrepare: function() {
-        var chai = require('chai').use(require('chai-as-promised'));
+        var chai = require('chai');
         chai.config.truncateThreshold = 0;
-
-        var PixDiff = require('../');
-        browser.pixDiff = new PixDiff({
-            basePath: 'test/screenshots',
-            width: 800,
-            height: 600
-        });
 
         browser.ignoreSynchronization = true;
     },
