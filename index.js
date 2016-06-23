@@ -16,15 +16,17 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.basePath Path to screenshots folder
  * @param {string} options.width Width of browser
  * @param {string} options.height Height of browser
+ * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
  *
- * @property {string} _basePath
- * @property {int} _width
- * @property {int} _height
+ * @property {string} basePath
+ * @property {int} width
+ * @property {int} height
+ * @property {string} formatOptions
  * @property {string} formatString
- * @property {object} _capabilities
- * @property {webdriver|promise} _flow
- * @property {int} _devicePixelRatio
+ * @property {object} capabilities
+ * @property {webdriver|promise} flow
+ * @property {int} devicePixelRatio
  */
 function PixDiff(options) {
     this.basePath = options.basePath;
@@ -37,6 +39,7 @@ function PixDiff(options) {
     this.width = options.width || 1280;
     this.height = options.height || 1024;
 
+    this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
 
     this.flow = browser.controlFlow();
@@ -92,15 +95,17 @@ PixDiff.prototype = {
      * @private
      */
     format: function (formatString, description) {
-        var formatOptions = {
+        var defaults = {
             'tag': camelCase(description),
             'browserName': this.capabilities.browserName,
             'width': this.width,
             'height': this.height
         };
 
-        Object.keys(formatOptions).forEach(function (option) {
-            formatString = formatString.replace('{' + option + '}', formatOptions[option]);
+        defaults = this.mergeDefaultOptions(defaults, this.formatOptions);
+
+        Object.keys(defaults).forEach(function (option) {
+            formatString = formatString.replace('{' + option + '}', defaults[option]);
         });
         return formatString + '.png';
     },
