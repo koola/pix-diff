@@ -32,7 +32,7 @@ exports.config = {
 
     onPrepare: function() {
         var PixDiff = require('pix-diff');
-        browser.pixdiff = new PixDiff(
+        browser.pixDiff = new PixDiff(
             {
                 basePath: 'path/to/screenshots/',
                 width: 1280,
@@ -54,20 +54,20 @@ describe("Example page", function() {
     });
 
     it("should match the page", function () {
-        expect(browser.pixdiff.checkScreen('examplePage')).toMatchScreen();
+        expect(browser.pixDiff.checkScreen('examplePage')).toMatchScreen();
     });
 
     it("should not match the page", function () {
         element(By.buttonText('yes')).click();
-        expect(browser.pixdiff.checkScreen('examplePage')).not.toMatchScreen();
+        expect(browser.pixDiff.checkScreen('examplePage')).not.toMatchScreen();
     });
 
     it("should match the title", function () {
-        expect(browser.pixdiff.checkRegion(element(By.id('title')), 'example page title')).toMatchScreen();
+        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'example page title')).toMatchScreen();
     });
 
     it("should match the title", function () {
-        expect(browser.pixdiff.checkRegion(element(By.id('title')), 'example page title', {
+        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'example page title', {
             blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
     });
 });
