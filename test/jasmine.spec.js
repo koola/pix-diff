@@ -55,6 +55,18 @@ describe('Pix-Diff', function() {
         it('should not match the page with custom matcher', function () {
             expect(browser.pixDiff.checkScreen('exampleFail', {threshold: 1})).not.toMatchScreen();
         });
+
+        it('should not crash with image not found', function () {
+            var errorThrown = false;
+            browser.pixDiff.checkScreen('imagenotexst', {threshold: 1}).then(function (result) {
+                fail('must not do a comparison.');
+            }).catch(function (error) {
+                // good
+                errorThrown = true;
+            }).then(function () {
+                expect(errorThrown).toBe(true);
+            });
+        });
     });
 
     describe('format image name', function() {

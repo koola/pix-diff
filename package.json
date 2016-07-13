@@ -4,7 +4,7 @@
   "description": "Protractor plugin for image comparison",
   "main": "index.js",
   "dependencies": {
-    "blink-diff": "1.0.7",
+    "blink-diff": "1.0.12",
     "png-image": "1.0.1",
     "camel-case": "1.2.2"
   },
