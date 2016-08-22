@@ -54,8 +54,10 @@ function PixDiff(options) {
         .then(function (data) {
             this.capabilities = data.capabilities;
             assert.ok(this.capabilities.browserName, 'Browser name is undefined.');
-            // Require PixDiff matchers
-            require(path.resolve(__dirname, 'framework', data.framework));
+            // Require PixDiff matchers for jasmine(2)/mocha
+            if (data.framework !== 'custom') {
+                require(path.resolve(__dirname, 'framework', data.framework));
+            }
             return browser.driver.executeScript('return window.devicePixelRatio;');
         }.bind(this))
         .then(function (ratio) {
