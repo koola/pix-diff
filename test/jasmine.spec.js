@@ -58,9 +58,9 @@ describe('Pix-Diff', function() {
 
         it('should not crash with image not found', function () {
             var errorThrown = false;
-            browser.pixDiff.checkScreen('imagenotexst', {threshold: 1}).then(function (result) {
+            browser.pixDiff.checkScreen('imagenotexst', {threshold: 1}).then(function () {
                 fail('must not do a comparison.');
-            }).catch(function (error) {
+            }).catch(function () {
                 // good
                 errorThrown = true;
             }).then(function () {
