@@ -44,6 +44,7 @@ exports.config = {
 ```
 
 PixDiff provides two comparison methods ```checkScreen``` and ```checkRegion``` along with Jasmine ```toMatchScreen``` and Mocha ```matchScreen``` matchers. Two helper methods ```saveScreen``` and ```saveRegion``` are provided for saving images.
+PixDiff can also work with Cucumber.js. There are no comparison methods provided for Cucumber.js because Cucumber.js doesn't have its own ```expect``` methods.
 
 **Jasmine Example:**
 ```javascript
@@ -71,6 +72,53 @@ describe("Example page", function() {
             blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
     });
 });
+```
+
+**Cucumber Example:**
+```javascript
+var chai = require('chai'),
+    chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+var expect = chai.expect;
+
+function CucumberSteps() {
+    this.Given(/^I load the url$/, function () {
+        return browser.get('http://www.example.com/');
+    });
+
+    this.Then(/^Pix\-Diff should match the page$/, function () {
+        return browser.pixDiff.checkScreen('examplePage')
+            .then(function (result) {
+                return expect(result.differences).to.equal(0);
+            });
+    });
+
+    this.Then(/^Pix\-Diff should not match the page$/, function () {
+        element(By.buttonText('yes')).click();
+        return browser.pixDiff.checkScreen('examplePage')
+            .then(function (result) {
+                return expect(result.differences).to.not.equal(0);
+            });
+    });
+
+    this.Then(/^Pix\-Diff should match the title$/, function () {
+        return browser.pixDiff.checkRegion(element(By.id('title')), 'example page title')
+            .then(function (result) {
+                return expect(result.differences).to.equal(0);
+            });
+    });
+
+    this.Then(/^Pix\-Diff should match the title with blockout$/, function () {
+        return browser.pixDiff.checkRegion(element(By.id('title')), 'example page title', {
+            blockOut: [{x: 10, y: 132, width: 100, height: 50}]})
+            .then(function (result) {
+                return expect(result.differences).to.equal(0);
+            });
+    });
+}
+
+module.exports = CucumberSteps;
 ```
 
 ####PixDiff Parameters:
@@ -137,7 +185,7 @@ npm test
 
 Run all tests by framework:
 ```shell
-npm test -- jasmine/mocha
+npm test -- jasmine/mocha/cucumber
 ```
 
 ###Dependencies
@@ -155,6 +203,8 @@ npm test -- jasmine/mocha
 * [mocha](https://github.com/mochajs/mocha)
 * [chai](https://github.com/chaijs/chai)
 * [chai-as-promised](https://github.com/domenic/chai-as-promised)
+* [cucumber](https://github.com/cucumber/cucumber-js)
+* [protractor-cucumber-framework](https://github.com/mattfritz/protractor-cucumber-framework)
 
 ##License
 

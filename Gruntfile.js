@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         },
 
         jshint: {
-            all: ['index.js', 'test/**/*.spec.js'],
+            all: ['index.js', 'test/**/*.spec.js', 'test/**/*.steps.js'],
             options: {
                 jshintrc: '.jshintrc',
                 ignores: ['node_modules/', 'framework/']
@@ -24,6 +24,12 @@ module.exports = function(grunt) {
         },
 
         run: {
+            cucumber: {
+                cmd: 'node_modules/.bin/protractor',
+                args: [
+                    'test/protractorCucumber.conf.js'
+                ]
+            },
             jasmine: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
@@ -55,9 +61,10 @@ module.exports = function(grunt) {
     });
 
     //tasks
+    grunt.registerTask('cucumber', 'Run cucumber integration tests', ['clean:screens', 'run:cucumber']);
     grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
     grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
     grunt.registerTask('build', ['jshint:all']);
     grunt.registerTask('release', ['bump']);
-    grunt.registerTask('default', ['jasmine', 'mocha']);
+    grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber']);
 };
