@@ -1,5 +1,7 @@
 Changelog
 =========
+v1.0.11 - Merged PR #19 to add cucumber support
+
 v1.0.10 - Fix not resolving path to framework during initialisation #14
         - Update dependencies
 
