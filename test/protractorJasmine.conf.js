@@ -8,17 +8,26 @@ exports.config = {
 
     specs: ['jasmine.spec.js'],
 
-    capabilities: {
-        browserName: 'chrome',
-        chromeOptions: {
-            args: ['--no-sandbox']
-        }
-    },
+    multiCapabilities: [
+        {
+            browserName: 'chrome',
+            chromeOptions: {
+                args: ['--no-sandbox']
+            }
+        },
+        {
+            browserName: 'firefox',
+        }],
 
     directConnect: true,
 
-    onPrepare: function() {
+    onPrepare: function () {
         browser.ignoreSynchronization = true;
+
+        return browser.getProcessedConfig()
+            .then(function(config){
+                browser.browserName = config.capabilities.browserName.toLowerCase();
+            });
     },
 
     jasmineNodeOpts: {

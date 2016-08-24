@@ -12,7 +12,7 @@ describe('Pix-Diff', function () {
         browser.get(browser.baseUrl);
     });
 
-    describe('mathod matchers', function () {
+    describe('method matchers', function () {
 
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
@@ -89,6 +89,36 @@ describe('Pix-Diff', function () {
             browser.pixDiff.saveScreen(tagName).then(function () {
                 expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_' + browserName + '_800-600.png')).toBe(true);
             });
+        });
+    });
+
+    describe('scroll into view', function () {
+        beforeEach(function () {
+            browser.pixDiff = new PixDiff({
+                basePath: 'test/screenshots',
+                width: 800,
+                height: 200
+            });
+        });
+
+        it('should save a scrolled screen', function () {
+            var tagName = 'scrolledPage',
+                headerElement = element(by.css('div h1'));
+
+            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+                .then(function () {
+                    browser.pixDiff.saveScreen(tagName);
+                });
+        });
+
+        it('should save a scrolled screen region', function () {
+            var tagName = 'scrolledPageRegion',
+                headerElement = element(by.css('div h1'));
+
+            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+                .then(function () {
+                    browser.pixDiff.saveRegion(element(by.css('div h1')), tagName);
+                });
         });
     });
 });

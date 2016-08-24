@@ -54,14 +54,15 @@ function PixDiff(options) {
         .then(function (data) {
             this.capabilities = data.capabilities;
             assert.ok(this.capabilities.browserName, 'Browser name is undefined.');
+            this.browserName = this.capabilities.browserName.toLowerCase();
             // Require PixDiff matchers for jasmine(2)/mocha
             if (data.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', data.framework));
             }
-            return browser.driver.executeScript('return window.devicePixelRatio;');
+            return this.getPixelDeviceRatio();
         }.bind(this))
         .then(function (ratio) {
-            this.devicePixelRatio = Math.floor(ratio);
+            this.devicePixelRatio = ratio;
         }.bind(this));
 }
 
@@ -99,7 +100,7 @@ PixDiff.prototype = {
     format: function (formatString, description) {
         var defaults = {
             'tag': camelCase(description),
-            'browserName': this.capabilities.browserName,
+            'browserName': this.browserName,
             'width': this.width,
             'height': this.height
         };
@@ -110,6 +111,90 @@ PixDiff.prototype = {
             formatString = formatString.replace('{' + option + '}', defaults[option]);
         });
         return formatString + '.png';
+    },
+
+    /**
+     * Check if browser is firefox
+     *
+     * @method isFirefox
+     * @return {boolean}
+     * @private
+     */
+    isFirefox: function () {
+        return this.browserName === 'firefox';
+    },
+
+    /**
+     * Check if browser is internet explorer
+     *
+     * @method isFirefox
+     * @return {boolean}
+     * @private
+     */
+    isInternetExplorer: function () {
+        return this.browserName === 'internet explorer';
+    },
+
+    /**
+     * Return the device pixel ratio
+     *
+     * @method getPixelDeviceRatio
+     * @private
+     */
+    getPixelDeviceRatio: function () {
+        return this.flow.execute(function () {
+            return browser.executeScript('return window.devicePixelRatio;')
+                .then(function (devicePixelRatio) {
+                    // Firefox creates screenshots in a different way. Although it could be taken on a Retina screen,
+                    // the screenshot is returned in its original (no factor x is used) dimensions
+                    devicePixelRatio = this.isFirefox() ? 1 : devicePixelRatio;
+                    return Math.floor(devicePixelRatio);
+                }.bind(this));
+        }.bind(this));
+    },
+
+    /**
+     * Get the position of the element
+     * Firefox and IE make a screenshot of the complete page, not of the visbile part. The rest of the browsers make a
+     * screenshot of the visible part
+     *
+     * @method getElementPosition
+     * @param {promise} element
+     * @return {promise}
+     * @private
+     */
+    getElementPosition: function (element) {
+        return (this.isFirefox() || this.isInternetExplorer()) ? this.getElementPositionTopPage(element) : this.getElementPositionTopWindow(element);
+    },
+
+    /**
+     * Get the position of a given element according to the TOP of the PAGE
+     *
+     * @method getElementPositionTopPage
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
+    getElementPositionTopPage: function (element) {
+        return browser.executeScript('var x = arguments[0].offsetLeft, y = arguments[0].offsetTop; return {x:x, y:y};', element.getWebElement());
+    },
+
+    /**
+     * Get the position of a given element according to the TOP of the WINDOW
+     *
+     * @method getElementPositionTopWindow
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
+    getElementPositionTopWindow: function (element) {
+        return browser.executeScript('return arguments[0].getBoundingClientRect();', element.getWebElement())
+            .then(function (position) {
+                return {
+                    x: position.left,
+                    y: position.top
+                };
+            });
     },
 
     /**
@@ -153,8 +238,9 @@ PixDiff.prototype = {
             return element.getSize()
                 .then(function (elementSize) {
                     size = elementSize;
-                    return element.getLocation();
-                })
+                    // return element.getLocation();
+                    return this.getElementPosition(element);
+                }.bind(this))
                 .then(function (point) {
                     rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
                     return browser.takeScreenshot();
