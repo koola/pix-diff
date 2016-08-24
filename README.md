@@ -139,6 +139,10 @@ Images can be cropped before they are compared by using the ```checkRegion``` fu
 ####Block-Out
 Sometimes, it is necessary to block-out some specific areas in an image that should be ignored for comparisons. For example, this can be IDs or even time-labels that change with the time. Adding block-outs to images may decrease false positives and therefore stabilizes these comparisons (see example above).
 
+####Different webdriver implementation
+There is a difference in the webdriver implementation in taking screenshots. Firefox and Internet Explorer (not tested Edge yet) take a screenshot of the complete page, even if the page needs to be scrolled. Chrome and Safari only take a screenshot of the visible portion of the page.
+Keep this in mind when comparing screenshots of screens with each other.
+
 ## Conventions
 There are directory and naming conventions that must be met.
 
