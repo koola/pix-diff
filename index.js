@@ -238,7 +238,6 @@ PixDiff.prototype = {
             return element.getSize()
                 .then(function (elementSize) {
                     size = elementSize;
-                    // return element.getLocation();
                     return this.getElementPosition(element);
                 }.bind(this))
                 .then(function (point) {
@@ -315,7 +314,7 @@ PixDiff.prototype = {
             return element.getSize()
                 .then(function (elementSize) {
                     size = elementSize;
-                    return element.getLocation();
+                    return this.getElementPosition(element);
                 })
                 .then(function (point) {
                     rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
