@@ -4,13 +4,15 @@ var BlinkDiff = require('blink-diff'),
     fs = require('fs'),
     PixDiff = require('../');
 
-describe('Pix-Diff', function() {
+describe('Pix-Diff', function () {
+
+    var browserName = browser.browserName;
 
     beforeEach(function () {
         browser.get(browser.baseUrl);
     });
 
-    describe('mathod matchers', function() {
+    describe('method matchers', function () {
 
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
@@ -24,7 +26,7 @@ describe('Pix-Diff', function() {
             var tagName = 'examplePage';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-chrome-800x600.png')).toBe(true);
+                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-' + browserName + '-800x600.png')).toBe(true);
             });
         });
 
@@ -32,7 +34,7 @@ describe('Pix-Diff', function() {
             var tagName = 'examplePageRegion';
 
             browser.pixDiff.saveRegion(element(by.css('div h1')), tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-chrome-800x600.png')).toBe(true);
+                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-' + browserName + '-800x600.png')).toBe(true);
             });
         });
 
@@ -69,7 +71,7 @@ describe('Pix-Diff', function() {
         });
     });
 
-    describe('format image name', function() {
+    describe('format image name', function () {
 
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
@@ -85,8 +87,38 @@ describe('Pix-Diff', function() {
             var tagName = 'customName';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_chrome_800-600.png')).toBe(true);
+                expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_' + browserName + '_800-600.png')).toBe(true);
             });
+        });
+    });
+
+    describe('scroll into view', function () {
+        beforeEach(function () {
+            browser.pixDiff = new PixDiff({
+                basePath: 'test/screenshots',
+                width: 800,
+                height: 200
+            });
+        });
+
+        it('should save a scrolled screen', function () {
+            var tagName = 'scrolledPage',
+                headerElement = element(by.css('div h1'));
+
+            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+                .then(function () {
+                    browser.pixDiff.saveScreen(tagName);
+                });
+        });
+
+        it('should save a scrolled screen region', function () {
+            var tagName = 'scrolledPageRegion',
+                headerElement = element(by.css('div h1'));
+
+            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+                .then(function () {
+                    browser.pixDiff.saveRegion(element(by.css('div h1')), tagName);
+                });
         });
     });
 });
