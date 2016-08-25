@@ -59,7 +59,8 @@ function PixDiff(options) {
             if (data.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', data.framework));
             }
-            return this.getPixelDeviceRatio();
+            if (!this.isFirefox())
+                return this.getPixelDeviceRatio();
         }.bind(this))
         .then(function (ratio) {
             this.devicePixelRatio = ratio;
@@ -139,15 +140,13 @@ PixDiff.prototype = {
      * Return the device pixel ratio
      *
      * @method getPixelDeviceRatio
+     * @return {integer}
      * @private
      */
     getPixelDeviceRatio: function () {
         return this.flow.execute(function () {
             return browser.executeScript('return window.devicePixelRatio;')
                 .then(function (devicePixelRatio) {
-                    // Firefox creates screenshots in a different way. Although it could be taken on a Retina screen,
-                    // the screenshot is returned in its original (no factor x is used) dimensions
-                    devicePixelRatio = this.isFirefox() ? 1 : devicePixelRatio;
                     return Math.floor(devicePixelRatio);
                 }.bind(this));
         }.bind(this));
@@ -164,7 +163,12 @@ PixDiff.prototype = {
      * @private
      */
     getElementPosition: function (element) {
-        return (this.isFirefox() || this.isInternetExplorer()) ? this.getElementPositionTopPage(element) : this.getElementPositionTopWindow(element);
+        // Firefox creates screenshots in a different way. Although it could be taken on a Retina screen,
+        // the screenshot is returned in its original (no factor x is used) dimensions
+        if (this.isFirefox() || this.isInternetExplorer())
+            return this.getElementPositionTopPage(element);
+
+        return this.getElementPositionTopWindow(element);
     },
 
     /**
@@ -176,7 +180,13 @@ PixDiff.prototype = {
      * @private
      */
     getElementPositionTopPage: function (element) {
-        return browser.executeScript('var x = arguments[0].offsetLeft, y = arguments[0].offsetTop; return {x:x, y:y};', element.getWebElement());
+        return element.getLocation().then(function (point) {
+            return {
+                x: point.x,
+                y: point.y
+            };
+        });
+//        return browser.executeScript('var el = arguments[0]; return {x:el.offsetLeft, y:el.offsetTop};', element.getWebElement());
     },
 
     /**
