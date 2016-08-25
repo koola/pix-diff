@@ -59,8 +59,9 @@ function PixDiff(options) {
             if (data.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', data.framework));
             }
-            if (!this.isFirefox())
+            if (!this.isFirefox()) {
                 return this.getPixelDeviceRatio();
+            }
         }.bind(this))
         .then(function (ratio) {
             this.devicePixelRatio = ratio;
@@ -165,8 +166,9 @@ PixDiff.prototype = {
     getElementPosition: function (element) {
         // Firefox creates screenshots in a different way. Although it could be taken on a Retina screen,
         // the screenshot is returned in its original (no factor x is used) dimensions
-        if (this.isFirefox() || this.isInternetExplorer())
+        if (this.isFirefox() || this.isInternetExplorer()) {
             return this.getElementPositionTopPage(element);
+        }
 
         return this.getElementPositionTopWindow(element);
     },
