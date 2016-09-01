@@ -20,6 +20,7 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.formatImageName Custom format image name
  *
  * @property {string} basePath
+ * @property {bool} baseline
  * @property {int} width
  * @property {int} height
  * @property {string} formatOptions
@@ -35,6 +36,8 @@ function PixDiff(options) {
     if (!fs.existsSync(options.basePath + '/diff') || !fs.statSync(options.basePath + '/diff').isDirectory()) {
         fs.mkdirSync(options.basePath + '/diff');
     }
+
+    this.baseline = options.baseline || false;
 
     this.width = options.width || 1280;
     this.height = options.height || 1024;
@@ -82,9 +85,9 @@ PixDiff.prototype = {
     mergeDefaultOptions: function (optionsA, optionsB) {
         optionsB = (typeof optionsB === 'object') ? optionsB : {};
 
-        Object.keys(optionsB).forEach(function (option) {
-            if (!optionsA.hasOwnProperty(option)) {
-                optionsA[option] = optionsB[option];
+        Object.keys(optionsB).forEach(function (value) {
+            if (!optionsA.hasOwnProperty(value)) {
+                optionsA[value] = optionsB[value];
             }
         });
         return optionsA;
@@ -109,8 +112,8 @@ PixDiff.prototype = {
 
         defaults = this.mergeDefaultOptions(defaults, this.formatOptions);
 
-        Object.keys(defaults).forEach(function (option) {
-            formatString = formatString.replace('{' + option + '}', defaults[option]);
+        Object.keys(defaults).forEach(function (value) {
+            formatString = formatString.replace('{' + value + '}', defaults[value]);
         });
         return formatString + '.png';
     },
@@ -164,12 +167,8 @@ PixDiff.prototype = {
      * @private
      */
     getElementPosition: function (element) {
-        // Firefox creates screenshots in a different way. Although it could be taken on a Retina screen,
-        // the screenshot is returned in its original (no factor x is used) dimensions
-        if (this.isFirefox() || this.isInternetExplorer()) {
+        if (this.isFirefox() || this.isInternetExplorer())
             return this.getElementPositionTopPage(element);
-        }
-
         return this.getElementPositionTopWindow(element);
     },
 
@@ -188,7 +187,6 @@ PixDiff.prototype = {
                 y: point.y
             };
         });
-//        return browser.executeScript('var el = arguments[0]; return {x:el.offsetLeft, y:el.offsetTop};', element.getWebElement());
     },
 
     /**
@@ -207,6 +205,29 @@ PixDiff.prototype = {
                     y: position.top
                 };
             });
+    },
+
+    /**
+     * Checks if image exists as baseline
+     *
+     * @method checkImageExists
+     * @param {string} tag
+     * @return {promise}
+     * @private
+     */
+    checkImageExists: function (tag) {
+        var deferred = protractor.promise.defer();
+
+        fs.access(path.join(this.basePath, this.format(this.formatString, tag)), fs.F_OK, function (err) {
+            if (err) {
+                if (!this.baseline) deferred.reject(new Error(err.message));
+                else deferred.reject(new Error('Image not found, saving current image as new baseline.'));
+            } else {
+                deferred.fulfill();
+            }
+        }.bind(this));
+
+        return deferred.promise;
     },
 
     /**
@@ -287,7 +308,15 @@ PixDiff.prototype = {
         var defaults;
 
         return this.flow.execute(function () {
-            return browser.takeScreenshot()
+            return this.checkImageExists(tag)
+                .catch(function (err) {
+                    if (this.baseline)
+                        this.saveScreen(tag);
+                    else throw err;
+                }.bind(this))
+                .then(function () {
+                    return browser.takeScreenshot();
+                })
                 .then(function (image) {
                     tag = this.format(this.formatString, tag);
                     defaults = {
@@ -323,16 +352,29 @@ PixDiff.prototype = {
             defaults;
 
         return this.flow.execute(function () {
-            return element.getSize()
+            return this.checkImageExists(tag)
+                .catch(function (err) {
+                    if (this.baseline)
+                        this.saveRegion(element, tag);
+                    else throw err;
+                }.bind(this))
+                .then(function () {
+                    return element.getSize()
+                })
                 .then(function (elementSize) {
                     size = elementSize;
                     return this.getElementPosition(element);
-                })
+                }.bind(this))
                 .then(function (point) {
                     rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
                     return browser.takeScreenshot();
                 })
                 .then(function (image) {
+                    if (this.devicePixelRatio > 1) {
+                        Object.keys(rect).forEach(function (item) {
+                            rect[item] *= this.devicePixelRatio;
+                        }.bind(this));
+                    }
                     tag = this.format(this.formatString, tag);
                     defaults = {
                         imageAPath: path.join(this.basePath, tag),

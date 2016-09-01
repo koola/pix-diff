@@ -60,10 +60,9 @@ describe('Pix-Diff', function () {
 
         it('should not crash with image not found', function () {
             var errorThrown = false;
-            browser.pixDiff.checkScreen('imagenotexst', {threshold: 1}).then(function () {
+            browser.pixDiff.checkScreen('imageNotExist', {threshold: 1}).then(function () {
                 fail('must not do a comparison.');
             }).catch(function () {
-                // good
                 errorThrown = true;
             }).then(function () {
                 expect(errorThrown).toBe(true);
@@ -119,6 +118,41 @@ describe('Pix-Diff', function () {
                 .then(function () {
                     browser.pixDiff.saveRegion(element(by.css('div h1')), tagName);
                 });
+        });
+    });
+
+    describe('baseline', function () {
+        beforeEach(function () {
+            browser.pixDiff = new PixDiff({
+                basePath: 'test/screenshots',
+                baseline: true,
+                width: 800,
+                height: 600
+            });
+        });
+
+        it('should save a screen when baseline image not found', function () {
+            browser.pixDiff.checkScreen('baselineScreen').catch(function (err) {
+                expect(err.message).toContain('Image not found');
+            });
+        });
+
+        it('should use existing baseline image', function () {
+            expect(browser.pixDiff.checkScreen('baselineScreen')).toMatchScreen();
+        });
+
+        it('should save a screen region when baseline image not found', function () {
+            var headerElement = element(by.css('div h1'));
+
+            browser.pixDiff.checkRegion(headerElement, 'baselineRegion').catch(function (err) {
+                expect(err.message).toContain('Image not found');
+            });
+        });
+
+        it('should use existing baseline image', function () {
+            var headerElement = element(by.css('div h1'));
+
+            expect(browser.pixDiff.checkRegion(headerElement, 'baselineRegion')).toMatchScreen();
         });
     });
 });

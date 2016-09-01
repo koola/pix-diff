@@ -16,7 +16,7 @@ exports.config = {
             }
         },
         {
-            browserName: 'firefox',
+            browserName: 'firefox'
         }],
 
     directConnect: true,
