@@ -68,12 +68,11 @@ function CucumberSteps() {
     this.Then(/^Pix\-Diff should not crash with image not found$/, function () {
         var errorThrown = false;
 
-        return browser.pixDiff.checkScreen('imagenotexst', {threshold: 1})
+        return browser.pixDiff.checkScreen('imageNotExist', {threshold: 1})
             .then(function () {
                 fail('must not do a comparison.');
             })
             .catch(function () {
-                // good
                 errorThrown = true;
             })
             .then(function () {
