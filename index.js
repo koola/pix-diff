@@ -167,8 +167,9 @@ PixDiff.prototype = {
      * @private
      */
     getElementPosition: function (element) {
-        if (this.isFirefox() || this.isInternetExplorer())
+        if (this.isFirefox() || this.isInternetExplorer()) {
             return this.getElementPositionTopPage(element);
+        }
         return this.getElementPositionTopWindow(element);
     },
 
@@ -220,8 +221,12 @@ PixDiff.prototype = {
 
         fs.access(path.join(this.basePath, this.format(this.formatString, tag)), fs.F_OK, function (err) {
             if (err) {
-                if (!this.baseline) deferred.reject(new Error(err.message));
-                else deferred.reject(new Error('Image not found, saving current image as new baseline.'));
+                if (!this.baseline) {
+                    deferred.reject(new Error(err.message));
+                }
+                else {
+                    deferred.reject(new Error('Image not found, saving current image as new baseline.'));
+                }
             } else {
                 deferred.fulfill();
             }
@@ -310,9 +315,12 @@ PixDiff.prototype = {
         return this.flow.execute(function () {
             return this.checkImageExists(tag)
                 .catch(function (err) {
-                    if (this.baseline)
+                    if (this.baseline) {
                         this.saveScreen(tag);
-                    else throw err;
+                    }
+                    else {
+                        throw err;
+                    }
                 }.bind(this))
                 .then(function () {
                     return browser.takeScreenshot();
@@ -354,12 +362,15 @@ PixDiff.prototype = {
         return this.flow.execute(function () {
             return this.checkImageExists(tag)
                 .catch(function (err) {
-                    if (this.baseline)
+                    if (this.baseline) {
                         this.saveRegion(element, tag);
-                    else throw err;
+                    }
+                    else {
+                        throw err;
+                    }
                 }.bind(this))
                 .then(function () {
-                    return element.getSize()
+                    return element.getSize();
                 })
                 .then(function (elementSize) {
                     size = elementSize;
