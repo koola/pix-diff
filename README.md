@@ -124,6 +124,7 @@ module.exports = CucumberSteps;
 ####PixDiff Parameters:
 
 * ```basePath``` Defines the path to the reference images that are to be compared.
+* ```baseline``` Toggles saving the screen when not found in reference images (default: false)
 * ```width``` Browser width (default: 1280)
 * ```height``` Browser height (default: 1024)
 * ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
