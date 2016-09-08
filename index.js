@@ -16,6 +16,7 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.basePath Path to screenshots folder
  * @param {string} options.width Width of browser
  * @param {string} options.height Height of browser
+ * @param {boolean} options.autoResize Automatically resize the browser
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
  *
@@ -26,6 +27,9 @@ var BlinkDiff = require('blink-diff'),
  * @property {string} formatOptions
  * @property {string} formatString
  * @property {object} capabilities
+ * @property {string} browserName
+ * @property {string} platformName
+ * @property {string} deviceName
  * @property {webdriver|promise} flow
  * @property {int} devicePixelRatio
  */
@@ -42,6 +46,8 @@ function PixDiff(options) {
     this.width = options.width || 1280;
     this.height = options.height || 1024;
 
+    this.autoResize = typeof options.autoResize === 'boolean' ? options.autoResize : true;
+
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
 
@@ -50,14 +56,13 @@ function PixDiff(options) {
     this.devicePixelRatio = 1;
 
     // init
-    browser.driver.manage().window().setSize(this.width, this.height)
-        .then(function () {
-            return browser.getProcessedConfig();
-        })
+    browser.getProcessedConfig()
         .then(function (data) {
             this.capabilities = data.capabilities;
             assert.ok(this.capabilities.browserName, 'Browser name is undefined.');
             this.browserName = this.capabilities.browserName.toLowerCase();
+            this.platformName = this.capabilities.platformName ? this.capabilities.platformName.toLowerCase() : null;
+            this.deviceName = this.capabilities.deviceName ? this.capabilities.deviceName : null;
             // Require PixDiff matchers for jasmine(2)/mocha
             if (data.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', data.framework));
@@ -67,7 +72,18 @@ function PixDiff(options) {
             }
         }.bind(this))
         .then(function (ratio) {
-            this.devicePixelRatio = ratio;
+            this.devicePixelRatio = typeof ratio !== 'undefined' ? ratio : this.devicePixelRatio;
+        }.bind(this))
+        .then(function () {
+            return this.getBrowserDimensions();
+        }.bind(this))
+        .then(function (dimensions) {
+            this.height = this.platformName ? dimensions.height : this.height;
+            this.width = this.platformName ? dimensions.width : this.width;
+
+            if (this.autoResize && !this.platformName) {
+                browser.driver.manage().window().setSize(this.width, this.height);
+            }
         }.bind(this));
 }
 
@@ -106,6 +122,8 @@ PixDiff.prototype = {
         var defaults = {
             'tag': camelCase(description),
             'browserName': this.browserName,
+            'deviceName': this.deviceName ? this.deviceName.replace(' ', '_') : 'deviceName',
+            'dpr': this.devicePixelRatio,
             'width': this.width,
             'height': this.height
         };
@@ -141,6 +159,28 @@ PixDiff.prototype = {
     },
 
     /**
+     * Check if platformName is Android
+     *
+     * @method isAndroid
+     * @return {boolean}
+     * @private
+     */
+    isAndroid: function () {
+        return this.platformName === 'android';
+    },
+
+    /**
+     * Check if platformName is iOS
+     *
+     * @method isIOS
+     * @return {boolean}
+     * @private
+     */
+    isIOS: function () {
+        return this.platformName === 'ios';
+    },
+
+    /**
      * Return the device pixel ratio
      *
      * @method getPixelDeviceRatio
@@ -169,6 +209,8 @@ PixDiff.prototype = {
     getElementPosition: function (element) {
         if (this.isFirefox() || this.isInternetExplorer()) {
             return this.getElementPositionTopPage(element);
+        } else if (this.isIOS()) {
+            return this.getIOSPosition(element);
         }
         return this.getElementPositionTopWindow(element);
     },
@@ -206,6 +248,53 @@ PixDiff.prototype = {
                     y: position.top
                 };
             });
+    },
+
+    /**
+     * Get the height and width of the browser
+     *
+     * @method getDeviceDimensions
+     * @returns {promise}
+     * @private
+     */
+    getBrowserDimensions: function () {
+        return browser.executeScript('return { height: window.screen.height, width: window.screen.width};');
+    },
+
+    /**
+     * Get the position of a given element within the safari browser
+     *
+     * @method getIOSPosition
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
+    getIOSPosition: function (element) {
+        return browser.executeScript(getDataObject, element.getWebElement());
+        function getDataObject() {
+            var STATUSBAR_HEIGHT = 20,
+                NAVIGATIONBAR_HEIGHT = 44,
+                TOOLBAR_HEIGHT = 44,
+                screenHeight = window.screen.height,
+                windowInnerHeight = window.innerHeight,
+                elementPosition,
+                y;
+
+            elementPosition = arguments[0].getBoundingClientRect();
+            /* safari */
+            if ((STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT + TOOLBAR_HEIGHT + windowInnerHeight) === screenHeight) {
+                /* Navigationbar and Toolbar are still there due to not scrolling, or due to JS scrolling */
+                y = STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT + elementPosition.top;
+            }else{
+                /* Navigationbar got smaller and Toolbar disappeared due to (manual) scrolling */
+                y = (screenHeight - windowInnerHeight)+ elementPosition.top;
+            }
+
+            return {
+                x: elementPosition.left,
+                y: y
+            };
+        }
     },
 
     /**

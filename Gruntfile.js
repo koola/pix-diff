@@ -41,6 +41,18 @@ module.exports = function(grunt) {
                 args: [
                     'test/protractorMocha.conf.js'
                 ]
+            },
+            iosSim: {
+                cmd: 'node_modules/.bin/protractor',
+                args: [
+                    'test/protractorSimulator.ios.conf.js'
+                ]
+            },
+            androidEm: {
+                cmd: 'node_modules/.bin/protractor',
+                args: [
+                    'test/protractorEmulator.android.conf.js'
+                ]
             }
         },
 
@@ -64,6 +76,8 @@ module.exports = function(grunt) {
     grunt.registerTask('cucumber', 'Run cucumber integration tests', ['clean:screens', 'run:cucumber']);
     grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
     grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
+    grunt.registerTask('iosSim', 'Run Appium iOS Simulator integration tests', ['clean:screens', 'run:iosSim']);
+    grunt.registerTask('androidEm', 'Run Appium Android emulator integration tests', ['clean:screens', 'run:androidEm']);
     grunt.registerTask('build', ['jshint:all']);
     grunt.registerTask('release', ['bump']);
     grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber']);

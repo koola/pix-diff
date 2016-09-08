@@ -127,6 +127,7 @@ module.exports = CucumberSteps;
 * ```baseline``` Toggles saving the screen when not found in reference images (default: false)
 * ```width``` Browser width (default: 1280)
 * ```height``` Browser height (default: 1024)
+* ```autoResize``` Auto (re)size the browser (default: true)
 * ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
 
 ####Function options:
@@ -173,7 +174,13 @@ The naming convention can be customized by passing the parameter ```formatImageN
 
 ```text
 {browserName}_{tag}__{width}-{height}
+{deviceName}_{tag}__{dpr}_{width}-{height}
 ```
+
+The following variables can be passed to format the string
+* ```browserName``` The browserName property from the capabilities (available for desktop and Appium)
+* ```deviceName``` The deviceName property from the capabilities (only default available for Appium, or manually added for desktop)
+* ```dpr``` The devicePixelRatio (available for desktop and Appium)
 
 Images specified via name in the spec method will be selected according to the browsers current resolution. That is to say that multiple images can share the same name differentated by resolution.
 
