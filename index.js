@@ -65,7 +65,7 @@ function PixDiff(options) {
             return this.getPixelDeviceRatio();
         }.bind(this))
         .then(function (ratio) {
-            this.devicePixelRatio = ratio;
+            this.devicePixelRatio = typeof ratio !== 'undefined' ? ratio : this.devicePixelRatio;
         }.bind(this));
 }
 
