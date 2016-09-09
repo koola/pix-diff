@@ -62,9 +62,7 @@ function PixDiff(options) {
             if (data.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', data.framework));
             }
-            if (!this.isFirefox()) {
-                return this.getPixelDeviceRatio();
-            }
+            return this.getPixelDeviceRatio();
         }.bind(this))
         .then(function (ratio) {
             this.devicePixelRatio = ratio;
@@ -141,17 +139,20 @@ PixDiff.prototype = {
     },
 
     /**
-     * Return the device pixel ratio
+     * Return the device pixel ratio (firefox always equals 1)
      *
      * @method getPixelDeviceRatio
      * @return {integer}
      * @private
      */
     getPixelDeviceRatio: function () {
+        var ratio;
+
         return this.flow.execute(function () {
             return browser.executeScript('return window.devicePixelRatio;')
                 .then(function (devicePixelRatio) {
-                    return Math.floor(devicePixelRatio);
+                    ratio = Math.floor(devicePixelRatio);
+                    return (ratio > 1 && !this.isFirefox()) ? ratio : this.devicePixelRatio;
                 }.bind(this));
         }.bind(this));
     },

@@ -22,6 +22,10 @@ describe('Pix-Diff', function () {
             });
         });
 
+        it('should get a device pixel ratio', function () {
+            expect(browser.pixDiff.devicePixelRatio).not.toBeUndefined();
+        });
+
         it('should save the screen', function () {
             var tagName = 'examplePage';
 
