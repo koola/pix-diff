@@ -64,11 +64,11 @@ describe("Example page", function() {
     });
 
     it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'example page title')).toMatchScreen();
+        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')).toMatchScreen();
     });
 
     it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'example page title', {
+        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
             blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
     });
 });
@@ -76,11 +76,7 @@ describe("Example page", function() {
 
 **Cucumber Example:**
 ```javascript
-var chai = require('chai'),
-    chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-var expect = chai.expect;
+var expect = require('chai').expect;
 
 function CucumberSteps() {
     this.Given(/^I load the url$/, function () {
@@ -103,14 +99,14 @@ function CucumberSteps() {
     });
 
     this.Then(/^Pix\-Diff should match the title$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'example page title')
+        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')
             .then(function (result) {
                 return expect(result.differences).to.equal(0);
             });
     });
 
     this.Then(/^Pix\-Diff should match the title with blockout$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'example page title', {
+        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
             blockOut: [{x: 10, y: 132, width: 100, height: 50}]})
             .then(function (result) {
                 return expect(result.differences).to.equal(0);
@@ -127,6 +123,7 @@ module.exports = CucumberSteps;
 * ```baseline``` Toggles saving the screen when not found in reference images (default: false)
 * ```width``` Browser width (default: 1280)
 * ```height``` Browser height (default: 1024)
+* ```autoResize``` Auto (re)size the browser (default: true)
 * ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
 
 ####Function options:
@@ -174,6 +171,9 @@ The naming convention can be customized by passing the parameter ```formatImageN
 ```text
 {browserName}_{tag}__{width}-{height}
 ```
+The following variables can be passed to format the string
+* ```browserName``` The browser name property from the capabilities
+* ```dpr``` The device pixel ratio
 
 Images specified via name in the spec method will be selected according to the browsers current resolution. That is to say that multiple images can share the same name differentated by resolution.
 
@@ -207,7 +207,6 @@ npm test -- jasmine/mocha/cucumber
 * [protractor](https://github.com/angular/protractor)
 * [mocha](https://github.com/mochajs/mocha)
 * [chai](https://github.com/chaijs/chai)
-* [chai-as-promised](https://github.com/domenic/chai-as-promised)
 * [cucumber](https://github.com/cucumber/cucumber-js)
 * [protractor-cucumber-framework](https://github.com/mattfritz/protractor-cucumber-framework)
 

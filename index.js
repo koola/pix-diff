@@ -16,13 +16,15 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.basePath Path to screenshots folder
  * @param {string} options.width Width of browser
  * @param {string} options.height Height of browser
+ * @param {boolean} options.autoResize Automatically resize the browser
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
  *
  * @property {string} basePath
- * @property {bool} baseline
+ * @property {boolean} baseline
  * @property {int} width
  * @property {int} height
+ * @property {boolean} autoResize
  * @property {string} formatOptions
  * @property {string} formatString
  * @property {object} capabilities
@@ -37,10 +39,12 @@ function PixDiff(options) {
         fs.mkdirSync(options.basePath + '/diff');
     }
 
-    this.baseline = options.baseline || false;
+    this.baseline = options.baseline === true || false;
 
     this.width = options.width || 1280;
     this.height = options.height || 1024;
+
+    this.autoResize = options.autoResize === false || true;
 
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
@@ -49,24 +53,35 @@ function PixDiff(options) {
 
     this.devicePixelRatio = 1;
 
-    // init
-    browser.driver.manage().window().setSize(this.width, this.height)
-        .then(function () {
-            return browser.getProcessedConfig();
-        })
-        .then(function (data) {
-            this.capabilities = data.capabilities;
-            assert.ok(this.capabilities.browserName, 'Browser name is undefined.');
-            this.browserName = this.capabilities.browserName.toLowerCase();
+    // initialize
+    browser.getProcessedConfig().then(function (_) {
+        assert.ok(_.capabilities.browserName, 'Browser name is undefined.');
+
+        this.browserName = camelCase(_.capabilities.browserName);
+        this.platformName = _.capabilities.platformName ? camelCase(_.capabilities.platformName) : '';
+        this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
+
+        if (_.framework !== 'custom') {
             // Require PixDiff matchers for jasmine(2)/mocha
-            if (data.framework !== 'custom') {
-                require(path.resolve(__dirname, 'framework', data.framework));
-            }
-            return this.getPixelDeviceRatio();
-        }.bind(this))
-        .then(function (ratio) {
-            this.devicePixelRatio = ratio;
-        }.bind(this));
+            require(path.resolve(__dirname, 'framework', _.framework));
+        }
+
+        return this.getPixelDeviceRatio();
+
+    }.bind(this)).then(function (ratio) {
+        this.devicePixelRatio = ratio;
+
+        return this.getBrowserDimensions();
+
+    }.bind(this)).then(function (dimensions) {
+        if (this.platformName) {
+            this.height = dimensions.height;
+            this.width = dimensions.width;
+        }
+        else if (this.autoResize) {
+            browser.driver.manage().window().setSize(this.width, this.height);
+        }
+    }.bind(this));
 }
 
 PixDiff.prototype = {
@@ -104,6 +119,8 @@ PixDiff.prototype = {
         var defaults = {
             'tag': camelCase(description),
             'browserName': this.browserName,
+            'deviceName': this.deviceName,
+            'dpr': this.devicePixelRatio,
             'width': this.width,
             'height': this.height
         };
@@ -207,6 +224,17 @@ PixDiff.prototype = {
                     y: position.top
                 };
             });
+    },
+
+    /**
+     * Get the height and width of the browser
+     *
+     * @method getDeviceDimensions
+     * @returns {promise}
+     * @private
+     */
+    getBrowserDimensions: function () {
+        return browser.executeScript('return { height: window.screen.height, width: window.screen.width};');
     },
 
     /**
@@ -321,7 +349,7 @@ PixDiff.prototype = {
                         if (this.baseline) {
                             return this.saveScreen(tag).then(function () {
                                 throw e;
-                            })
+                            });
                         }
                         throw e;
                     }.bind(this))
@@ -367,7 +395,7 @@ PixDiff.prototype = {
                     if (this.baseline) {
                         return this.saveRegion(element, tag).then(function () {
                             throw e;
-                        })
+                        });
                     }
                     throw e;
                 }.bind(this))
