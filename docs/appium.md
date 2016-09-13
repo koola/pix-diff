@@ -36,22 +36,28 @@ When the scroll is automated with a "native Appium" command the real use scroll 
 
 ## saveScreen / checkScreen
 **Not scrolled:** 
+
 ![Safari saveScreen / checkScreen](./images/TEST_appium_iPhone_6_dpr_2_375-667.png "Safari saveScreen / checkScreen")
 
 **Manual / Simulated scroll:** 
+
 ![Safari saveScreen / checkScreen, manual / simulated scroll](./images/scrolledPage-safari-375x667-manual.png "Safari saveScreen / checkScreen, manual / simulated scroll")
 
 **Javascript scroll:** 
+
 ![Safari saveScreen / checkScreen,  JS scroll](./images/scrolledPage-safari-375x667.png "Safari saveScreen / checkScreen,  JS scroll")
 
 ## saveScreen / checkRegion
 **Not scrolled:** 
+
 ![Safari saveRegion / checkRegion](./images/scrolledPageRegion-safari-375x667.png "Safari saveRegion / checkRegion")
 
 **Manual / Simulated scroll:** 
+
 ![Safari saveRegion / checkRegion, manual / simulated scroll](./images/scrolledPageRegion-safari-375x667-manual-scroll.png "Safari saveRegion / checkRegion, manual / simulated scroll")
 
 **Javascript scroll:** 
+
 ![Safari saveRegion / checkRegion,  JS scroll](./images/scrolledPageRegion-safari-375x667-JS-scroll.png "Safari saveRegion / checkRegion,  JS scroll")
 
 ## Capabilities iOS
@@ -72,6 +78,7 @@ Appium can create 2 types of screenshots for Android based on:
 
 ### Chromedriver (default)
 Chromedriver creates a screenshot of the **(visible)viewport**
+
 ![Chromedriver saveScreen / checkScreen] (./images/avdForNexus6ByGoogle_examplePage_ChromeDriver.png "Chromedriver saveScreen / checkScreen") 
 
 ### ADB (Appium >= 1.5.3)
