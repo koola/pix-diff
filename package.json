@@ -21,7 +21,7 @@
     "jshint": "^2.9.2",
     "load-grunt-tasks": "^3.5.0",
     "mocha": "^2.4.5",
-    "protractor": "^3.2.2",
+    "protractor": "^4.0.5",
     "protractor-cucumber-framework": "^0.6.0"
   },
   "scripts": {

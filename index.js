@@ -21,9 +21,10 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.formatImageName Custom format image name
  *
  * @property {string} basePath
- * @property {bool} baseline
+ * @property {boolean} baseline
  * @property {int} width
  * @property {int} height
+ * @property {boolean} autoResize
  * @property {string} formatOptions
  * @property {string} formatString
  * @property {object} capabilities
@@ -41,12 +42,12 @@ function PixDiff(options) {
         fs.mkdirSync(options.basePath + '/diff');
     }
 
-    this.baseline = options.baseline || false;
+    this.baseline = options.baseline === true || false;
 
     this.width = options.width || 1280;
     this.height = options.height || 1024;
 
-    this.autoResize = options.autoResize === 'boolean' ? options.autoResize : true;
+    this.autoResize = options.autoResize === false || true;
 
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
@@ -55,32 +56,35 @@ function PixDiff(options) {
 
     this.devicePixelRatio = 1;
 
-    // init
-    browser.getProcessedConfig()
-        .then(function (data) {
-            this.capabilities = data.capabilities;
-            assert.ok(this.capabilities.browserName, 'Browser name is undefined.');
-            this.browserName = this.capabilities.browserName.toLowerCase();
-            this.platformName = this.capabilities.platformName ? this.capabilities.platformName.toLowerCase() : null;
-            this.deviceName = this.capabilities.deviceName ? this.capabilities.deviceName : null;
-            // Require PixDiff matchers for jasmine(2)/mocha
-            if (data.framework !== 'custom') {
-                require(path.resolve(__dirname, 'framework', data.framework));
-            }
-            return this.getPixelDeviceRatio();
-        }.bind(this))
-        .then(function (ratio) {
-            this.devicePixelRatio = typeof ratio !== 'undefined' ? ratio : this.devicePixelRatio;
-            return this.getBrowserDimensions();
-        }.bind(this))
-        .then(function (dimensions) {
-            this.height = this.platformName ? dimensions.height : this.height;
-            this.width = this.platformName ? dimensions.width : this.width;
+    // initialize
+    browser.getProcessedConfig().then(function (_) {
+        assert.ok(_.capabilities.browserName, 'Browser name is undefined.');
 
-            if (this.autoResize && !this.platformName) {
-                browser.driver.manage().window().setSize(this.width, this.height);
-            }
-        }.bind(this));
+        this.browserName = camelCase(_.capabilities.browserName);
+        this.platformName = _.capabilities.platformName ? camelCase(_.capabilities.platformName) : '';
+        this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
+
+        if (_.framework !== 'custom') {
+            // Require PixDiff matchers for jasmine(2)/mocha
+            require(path.resolve(__dirname, 'framework', _.framework));
+        }
+
+        return this.getPixelDeviceRatio();
+
+    }.bind(this)).then(function (ratio) {
+        this.devicePixelRatio = ratio;
+
+        return this.getBrowserDimensions();
+
+    }.bind(this)).then(function (dimensions) {
+        if (this.platformName) {
+            this.height = dimensions.height;
+            this.width = dimensions.width;
+        }
+        else if (this.autoResize) {
+            browser.driver.manage().window().setSize(this.width, this.height);
+        }
+    }.bind(this));
 }
 
 PixDiff.prototype = {
@@ -118,7 +122,7 @@ PixDiff.prototype = {
         var defaults = {
             'tag': camelCase(description),
             'browserName': this.browserName,
-            'deviceName': this.deviceName ? camelCase(this.deviceName) : 'deviceName',
+            'deviceName': this.deviceName,
             'dpr': this.devicePixelRatio,
             'width': this.width,
             'height': this.height
@@ -337,10 +341,10 @@ PixDiff.prototype = {
     checkImageExists: function (tag) {
         var deferred = protractor.promise.defer();
 
-        fs.access(path.join(this.basePath, this.format(this.formatString, tag)), fs.F_OK, function (err) {
-            if (err) {
+        fs.access(path.join(this.basePath, this.format(this.formatString, tag)), fs.F_OK, function (e) {
+            if (e) {
                 if (!this.baseline) {
-                    deferred.reject(new Error(err.message));
+                    deferred.reject(new Error(e.message));
                 }
                 else {
                     deferred.reject(new Error('Image not found, saving current image as new baseline.'));
@@ -435,17 +439,16 @@ PixDiff.prototype = {
 
         return this.flow.execute(function () {
             return this.checkImageExists(tag)
-                .catch(function (err) {
-                    if (this.baseline) {
-                        this.saveScreen(tag);
-                    }
-                    else {
-                        throw err;
-                    }
-                }.bind(this))
                 .then(function () {
                     return browser.takeScreenshot();
-                })
+                }, function (e) {
+                        if (this.baseline) {
+                            return this.saveScreen(tag).then(function () {
+                                throw e;
+                            });
+                        }
+                        throw e;
+                    }.bind(this))
                 .then(function (image) {
                     tag = this.format(this.formatString, tag);
                     defaults = {
@@ -482,17 +485,16 @@ PixDiff.prototype = {
 
         return this.flow.execute(function () {
             return this.checkImageExists(tag)
-                .catch(function (err) {
-                    if (this.baseline) {
-                        this.saveRegion(element, tag);
-                    }
-                    else {
-                        throw err;
-                    }
-                }.bind(this))
                 .then(function () {
                     return element.getSize();
-                })
+                }, function (e) {
+                    if (this.baseline) {
+                        return this.saveRegion(element, tag).then(function () {
+                            throw e;
+                        });
+                    }
+                    throw e;
+                }.bind(this))
                 .then(function (elementSize) {
                     size = elementSize;
                     return this.getElementPosition(element);

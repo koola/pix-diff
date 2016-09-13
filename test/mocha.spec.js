@@ -7,6 +7,8 @@ var expect = require('chai').expect,
 
 describe('Pix-Diff', function() {
 
+    var headerElement = element(by.css('div h1'));
+
     beforeEach(function () {
         browser.get(browser.baseUrl);
     });
@@ -32,19 +34,19 @@ describe('Pix-Diff', function() {
         it('should save the screen region', function () {
             var tagName = 'examplePageRegionMocha';
 
-            browser.pixDiff.saveRegion(element(by.css('div h1')), tagName).then(function () {
+            browser.pixDiff.saveRegion(headerElement, tagName).then(function () {
                 expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-chrome-800x600.png')).to.be.true;
             });
         });
 
         it('should match the page', function () {
-            browser.pixDiff.checkScreen('example-page-mocha').then(function (result) {
+            browser.pixDiff.checkScreen('examplePageMocha').then(function (result) {
                 expect(result.code).to.equal(blinkDiff.RESULT_IDENTICAL);
             });
         });
 
         it('should match the page with custom matcher', function () {
-            expect(browser.pixDiff.checkScreen('example-page-mocha')).to.matchScreen();
+            expect(browser.pixDiff.checkScreen('examplePageMocha')).to.matchScreen();
         });
 
         it('should not match the page', function () {
@@ -54,38 +56,14 @@ describe('Pix-Diff', function() {
         });
 
         it('should not match the page with custom matcher', function () {
-            expect(browser.pixDiff.checkScreen('example-fail', {threshold: 1})).not.to.matchScreen();
+            expect(browser.pixDiff.checkScreen('exampleFail', {threshold: 1})).not.to.matchScreen();
         });
 
         it('should not crash with image not found', function () {
-            var errorThrown = false;
             browser.pixDiff.checkScreen('imageNotExist', {threshold: 1}).then(function () {
-                expect.fail();
-            }).catch(function () {
-                errorThrown = true;
-            }).then(function () {
-                expect(errorThrown).to.be.true;
-            });
-        });
-    });
-
-    describe('format image name', function() {
-
-        beforeEach(function () {
-            browser.pixDiff = new PixDiff({
-                basePath: 'test/screenshots',
-                width: 800,
-                height: 600,
-                formatImageOptions: {'env': 'TEST'},
-                formatImageName: '{env}_{tag}_{browserName}_{width}-{height}'
-            });
-        });
-
-        it('should save screen with formatted basename', function () {
-            var tagName = 'customName';
-
-            browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_chrome_800-600.png')).to.be.true;
+                fail('should not be called');
+            }, function (error) {
+                expect(error.message).to.contain('no such file or directory');
             });
         });
     });

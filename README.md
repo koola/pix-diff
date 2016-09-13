@@ -64,11 +64,11 @@ describe("Example page", function() {
     });
 
     it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'example page title')).toMatchScreen();
+        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')).toMatchScreen();
     });
 
     it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'example page title', {
+        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
             blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
     });
 });
@@ -76,11 +76,7 @@ describe("Example page", function() {
 
 **Cucumber Example:**
 ```javascript
-var chai = require('chai'),
-    chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-var expect = chai.expect;
+var expect = require('chai').expect;
 
 function CucumberSteps() {
     this.Given(/^I load the url$/, function () {
@@ -103,14 +99,14 @@ function CucumberSteps() {
     });
 
     this.Then(/^Pix\-Diff should match the title$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'example page title')
+        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')
             .then(function (result) {
                 return expect(result.differences).to.equal(0);
             });
     });
 
     this.Then(/^Pix\-Diff should match the title with blockout$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'example page title', {
+        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
             blockOut: [{x: 10, y: 132, width: 100, height: 50}]})
             .then(function (result) {
                 return expect(result.differences).to.equal(0);
@@ -176,6 +172,9 @@ The naming convention can be customized by passing the parameter ```formatImageN
 {browserName}_{tag}__{width}-{height}
 {deviceName}_{tag}__{dpr}_{width}-{height}
 ```
+The following variables can be passed to format the string
+* ```browserName``` The browser name property from the capabilities
+* ```dpr``` The device pixel ratio
 
 The following variables can be passed to format the string
 * ```browserName``` The browserName property from the capabilities (available for desktop and Appium)
@@ -214,7 +213,6 @@ npm test -- jasmine/mocha/cucumber
 * [protractor](https://github.com/angular/protractor)
 * [mocha](https://github.com/mochajs/mocha)
 * [chai](https://github.com/chaijs/chai)
-* [chai-as-promised](https://github.com/domenic/chai-as-promised)
 * [cucumber](https://github.com/cucumber/cucumber-js)
 * [protractor-cucumber-framework](https://github.com/mattfritz/protractor-cucumber-framework)
 
