@@ -6,7 +6,8 @@ var BlinkDiff = require('blink-diff'),
 
 describe('Pix-Diff', function () {
 
-    var browserName = browser.browserName;
+    var browserName = browser.browserName,
+        headerElement = element(by.css('div h1'));
 
     beforeEach(function () {
         browser.get(browser.baseUrl);
@@ -37,7 +38,7 @@ describe('Pix-Diff', function () {
         it('should save the screen region', function () {
             var tagName = 'examplePageRegion';
 
-            browser.pixDiff.saveRegion(element(by.css('div h1')), tagName).then(function () {
+            browser.pixDiff.saveRegion(headerElement, tagName).then(function () {
                 expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-' + browserName + '-800x600.png')).toBe(true);
             });
         });
@@ -53,7 +54,7 @@ describe('Pix-Diff', function () {
         });
 
         it('should not match the page', function () {
-            browser.pixDiff.checkScreen('example-fail', {threshold: 1}).then(function (result) {
+            browser.pixDiff.checkScreen('exampleFail', {threshold: 1}).then(function (result) {
                 expect(result.code).toEqual(BlinkDiff.RESULT_DIFFERENT);
             });
         });
@@ -63,13 +64,10 @@ describe('Pix-Diff', function () {
         });
 
         it('should not crash with image not found', function () {
-            var errorThrown = false;
             browser.pixDiff.checkScreen('imageNotExist', {threshold: 1}).then(function () {
-                fail('must not do a comparison.');
-            }).catch(function () {
-                errorThrown = true;
-            }).then(function () {
-                expect(errorThrown).toBe(true);
+                fail('should not be called');
+            }, function (error) {
+                expect(error.message).toContain('no such file or directory');
             });
         });
     });
@@ -87,7 +85,7 @@ describe('Pix-Diff', function () {
         });
 
         it('should save screen with formatted basename', function () {
-            var tagName = 'customName';
+            var tagName = 'customImageName';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
                 expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_' + browserName + '_800-600.png')).toBe(true);
@@ -96,36 +94,32 @@ describe('Pix-Diff', function () {
     });
 
     describe('scroll into view', function () {
+
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
                 width: 800,
                 height: 200
             });
+
+            browser.scrolledPage = browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement());
         });
 
         it('should save a scrolled screen', function () {
-            var tagName = 'scrolledPage',
-                headerElement = element(by.css('div h1'));
-
-            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
-                .then(function () {
-                    browser.pixDiff.saveScreen(tagName);
-                });
+            browser.scrolledPage.then(function () {
+                browser.pixDiff.saveScreen('scrolledPage');
+            });
         });
 
         it('should save a scrolled screen region', function () {
-            var tagName = 'scrolledPageRegion',
-                headerElement = element(by.css('div h1'));
-
-            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
-                .then(function () {
-                    browser.pixDiff.saveRegion(element(by.css('div h1')), tagName);
-                });
+            browser.scrolledPage.then(function () {
+                browser.pixDiff.saveRegion(headerElement, 'scrolledPageRegion');
+            });
         });
     });
 
     describe('baseline', function () {
+
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
@@ -136,8 +130,10 @@ describe('Pix-Diff', function () {
         });
 
         it('should save a screen when baseline image not found', function () {
-            browser.pixDiff.checkScreen('baselineScreen').catch(function (err) {
-                expect(err.message).toContain('Image not found');
+            browser.pixDiff.checkScreen('baselineScreen').then(function () {
+                fail('should not be called');
+            }, function (error) {
+                expect(error.message).toContain('Image not found');
             });
         });
 
@@ -146,16 +142,14 @@ describe('Pix-Diff', function () {
         });
 
         it('should save a screen region when baseline image not found', function () {
-            var headerElement = element(by.css('div h1'));
-
-            browser.pixDiff.checkRegion(headerElement, 'baselineRegion').catch(function (err) {
-                expect(err.message).toContain('Image not found');
+            browser.pixDiff.checkRegion(headerElement, 'baselineRegion').then(function () {
+                fail('should not be called');
+            }, function (error) {
+                expect(error.message).toContain('Image not found');
             });
         });
 
         it('should use existing baseline image', function () {
-            var headerElement = element(by.css('div h1'));
-
             expect(browser.pixDiff.checkRegion(headerElement, 'baselineRegion')).toMatchScreen();
         });
     });

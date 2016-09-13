@@ -220,10 +220,10 @@ PixDiff.prototype = {
     checkImageExists: function (tag) {
         var deferred = protractor.promise.defer();
 
-        fs.access(path.join(this.basePath, this.format(this.formatString, tag)), fs.F_OK, function (err) {
-            if (err) {
+        fs.access(path.join(this.basePath, this.format(this.formatString, tag)), fs.F_OK, function (e) {
+            if (e) {
                 if (!this.baseline) {
-                    deferred.reject(new Error(err.message));
+                    deferred.reject(new Error(e.message));
                 }
                 else {
                     deferred.reject(new Error('Image not found, saving current image as new baseline.'));
@@ -315,17 +315,16 @@ PixDiff.prototype = {
 
         return this.flow.execute(function () {
             return this.checkImageExists(tag)
-                .catch(function (err) {
-                    if (this.baseline) {
-                        this.saveScreen(tag);
-                    }
-                    else {
-                        throw err;
-                    }
-                }.bind(this))
                 .then(function () {
                     return browser.takeScreenshot();
-                })
+                }, function (e) {
+                        if (this.baseline) {
+                            return this.saveScreen(tag).then(function () {
+                                throw e;
+                            })
+                        }
+                        throw e;
+                    }.bind(this))
                 .then(function (image) {
                     tag = this.format(this.formatString, tag);
                     defaults = {
@@ -362,17 +361,16 @@ PixDiff.prototype = {
 
         return this.flow.execute(function () {
             return this.checkImageExists(tag)
-                .catch(function (err) {
-                    if (this.baseline) {
-                        this.saveRegion(element, tag);
-                    }
-                    else {
-                        throw err;
-                    }
-                }.bind(this))
                 .then(function () {
                     return element.getSize();
-                })
+                }, function (e) {
+                    if (this.baseline) {
+                        return this.saveRegion(element, tag).then(function () {
+                            throw e;
+                        })
+                    }
+                    throw e;
+                }.bind(this))
                 .then(function (elementSize) {
                     size = elementSize;
                     return this.getElementPosition(element);

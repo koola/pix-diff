@@ -19,7 +19,3 @@ Feature: Pix-Diff
   Scenario: Method matchers image not found
     Given I set up the matchers environment
     Then Pix-Diff should not crash with image not found
-
-  Scenario: Format image name
-    Given I set up the format image name environment
-    Then Pix-Diff should save screen with formatted basename
