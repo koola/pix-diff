@@ -46,7 +46,7 @@ function PixDiff(options) {
     this.width = options.width || 1280;
     this.height = options.height || 1024;
 
-    this.autoResize = typeof options.autoResize === 'boolean' ? options.autoResize : true;
+    this.autoResize = options.autoResize === 'boolean' ? options.autoResize : true;
 
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
@@ -67,14 +67,10 @@ function PixDiff(options) {
             if (data.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', data.framework));
             }
-            if (!this.isFirefox()) {
-                return this.getPixelDeviceRatio();
-            }
+            return this.getPixelDeviceRatio();
         }.bind(this))
         .then(function (ratio) {
             this.devicePixelRatio = typeof ratio !== 'undefined' ? ratio : this.devicePixelRatio;
-        }.bind(this))
-        .then(function () {
             return this.getBrowserDimensions();
         }.bind(this))
         .then(function (dimensions) {
@@ -122,7 +118,7 @@ PixDiff.prototype = {
         var defaults = {
             'tag': camelCase(description),
             'browserName': this.browserName,
-            'deviceName': this.deviceName ? this.deviceName.replace(' ', '_') : 'deviceName',
+            'deviceName': this.deviceName ? camelCase(this.deviceName) : 'deviceName',
             'dpr': this.devicePixelRatio,
             'width': this.width,
             'height': this.height
@@ -133,6 +129,7 @@ PixDiff.prototype = {
         Object.keys(defaults).forEach(function (value) {
             formatString = formatString.replace('{' + value + '}', defaults[value]);
         });
+
         return formatString + '.png';
     },
 
@@ -181,17 +178,19 @@ PixDiff.prototype = {
     },
 
     /**
-     * Return the device pixel ratio
+     * Return the device pixel ratio (firefox always equals 1)
      *
      * @method getPixelDeviceRatio
      * @return {integer}
      * @private
      */
     getPixelDeviceRatio: function () {
+        // var ratio;
+
         return this.flow.execute(function () {
             return browser.executeScript('return window.devicePixelRatio;')
                 .then(function (devicePixelRatio) {
-                    return Math.floor(devicePixelRatio);
+                    return (devicePixelRatio > 1 && !this.isFirefox()) ? devicePixelRatio : this.devicePixelRatio;
                 }.bind(this));
         }.bind(this));
     },
@@ -212,6 +211,11 @@ PixDiff.prototype = {
         } else if (this.isIOS()) {
             return this.getIOSPosition(element);
         }
+        // else if (this.isAndroid()) {
+        //     // return this.getAndroidPosition(element);
+        //     return this.getElementPositionTopPage(element);
+        // }
+
         return this.getElementPositionTopWindow(element);
     },
 
@@ -285,14 +289,39 @@ PixDiff.prototype = {
             if ((STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT + TOOLBAR_HEIGHT + windowInnerHeight) === screenHeight) {
                 /* Navigationbar and Toolbar are still there due to not scrolling, or due to JS scrolling */
                 y = STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT + elementPosition.top;
-            }else{
+            } else {
                 /* Navigationbar got smaller and Toolbar disappeared due to (manual) scrolling */
-                y = (screenHeight - windowInnerHeight)+ elementPosition.top;
+                y = (screenHeight - windowInnerHeight) + elementPosition.top;
             }
 
             return {
                 x: elementPosition.left,
                 y: y
+            };
+        }
+    },
+
+    /**
+     * Get the position of a given element within the chrome browser
+     *
+     * @method getIOSPosition
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
+    getAndroidPosition: function (element) {
+        return browser.executeScript(getDataObject, element.getWebElement());
+        function getDataObject() {
+            var STATUSBAR_HEIGHT = 24,
+                devicePixelRatio = window.devicePixelRatio,
+                elementPosition = arguments[0].getBoundingClientRect(),
+                screenHeight = window.screen.height,
+                windowInnerHeight = window.innerHeight,
+                toolbarHeight = (screenHeight === (windowInnerHeight + STATUSBAR_HEIGHT )) ? 0 : screenHeight - windowInnerHeight - STATUSBAR_HEIGHT;
+
+            return {
+                x: elementPosition.left,
+                y: STATUSBAR_HEIGHT + elementPosition.top
             };
         }
     },
@@ -368,7 +397,9 @@ PixDiff.prototype = {
                     return this.getElementPosition(element);
                 }.bind(this))
                 .then(function (point) {
-                    rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
+                    // @TODO: we need to use floats, but this conflicts with https://github.com/koola/pix-diff/pull/5
+                    // @TODO: Need to find a different way
+                    rect = {height: size.height, width: size.width, x: point.x, y: point.y};
                     return browser.takeScreenshot();
                 })
                 .then(function (image) {
@@ -377,6 +408,7 @@ PixDiff.prototype = {
                             rect[item] *= this.devicePixelRatio;
                         }.bind(this));
                     }
+
                     return new PngImage({
                         imagePath: new Buffer(image, 'base64'),
                         imageOutputPath: path.join(this.basePath, this.format(this.formatString, tag)),
