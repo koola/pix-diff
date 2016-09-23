@@ -71,6 +71,24 @@ When the scroll is automated with a "native Appium" command the real use scroll 
 }
 ```
 # Android
+## Browser
+Appium can **ONLY** automate **Chrome** on Android. The stockbrowser **CAN"T** be used. When an Emulator is used Chrome is only default provided from Android > 7.0.
+If an older version of Android needs to be used Chrome needs to be manually installed. Execute the following steps to install Chrome on Android < 7.0
+
+* Download a Chrome APK from (APKMirror)[http://www.apkmirror.com/apk/google-inc/chrome/], check which processor is used in the Emulator (ARM or X86, X86 is faster).
+* Open the Emulator
+* Install the `chrome.apk` from the folder where it is saved with the following command `adb install chrome.apk`. 
+
+`````
+[100%] /data/local/tmp/chrome.apk
+       	pkg: /data/local/tmp/chrome.apk
+Success
+`````
+
+* When the message `Success` is shown `Chrome` is installed on the device.
+
+
+
 ## How screenshots work on Android
 Appium can create 2 types of screenshots for Android based on:
 - Chromedriver (default)
@@ -79,7 +97,7 @@ Appium can create 2 types of screenshots for Android based on:
 ### Chromedriver (default)
 Chromedriver creates a screenshot of the **(visible)viewport**
 
-![Chromedriver saveScreen / checkScreen] (./images/avdForNexus6ByGoogle_examplePage_ChromeDriver.png "Chromedriver saveScreen / checkScreen") 
+![Chromedriver saveScreen / checkScreen] (./images/avdForNexus5ByGoogle_examplePage_ChromeDriver.png "Chromedriver saveScreen / checkScreen") 
 
 ### ADB (Appium >= 1.5.3)
 ADB creates a screenshot of the **complete screen** (as iOS does with Safari).
@@ -91,16 +109,19 @@ This can be compared with the Native screenshot that can be made with a device. 
 
 To use ADB screenshots add this in this capability in the capabilities `nativeWebScreenshot: true`, see "Capabilities Android" example below.
 
-![ADB saveScreen / checkScreen] (./images/avdForNexus6ByGoogle_examplePage_ADB.png "ADB saveScreen / checkScreen") 
+![ADB saveScreen / checkScreen] (./images/avdForNexus5ByGoogle_examplePage_ADB.png "ADB saveScreen / checkScreen") 
+
+#### Note
+It looks like taking a screenshot with ADB reacts different on a scroll (`elm.scrollIntoView()` seems to take more time). This is why a sleep is added after scrolling to be sure the screenshot is taken of the correct screen state
 
 ## Capabilities Android
 
 ```
 {
     browserName: 'chrome',                      // {mandatory} not case sensitive
-    deviceName: 'AVD_for_Nexus_6_by_Google',    // {mandatory} Needs to be form the list of available devices
+    deviceName: 'AVD_for_Nexus_5_by_Google',    // {mandatory} Needs to be form the list of available devices
     platformName: 'android'                     // {mandatory} not case sensitive
     platformVersion: '7.0',                     // {optional} needed for specific Android version,
-    nativeWebScreenshot: true                   // to use adb screenshots (complete screenshot), default ChromeDriver
+    nativeWebScreenshot: true                   // to use adb screenshots (complete screenshot), default is ChromeDriver
 }
 ```

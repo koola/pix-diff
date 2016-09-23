@@ -2,16 +2,28 @@
 
 var BlinkDiff = require('blink-diff'),
     fs = require('fs'),
-    PixDiff = require('../');
+    PixDiff = require('../../index'),
+    path = require('path'),
+    screenshotPath = path.resolve(__dirname, '../screenshots/');
 
-describe('Pix-Diff', function() {
+describe('Pix-Diff', function () {
+    var bannerHeader = element(by.css('h1.page-header')),
+        alertSuccessSmall = element(by.css('.uk-alert-success')),
+        ADBScreenshot;
 
     beforeEach(function () {
-        browser.get(browser.baseUrl);
+        browser.get(browser.baseUrl)
+            .then(function () {
+                // Needed to be sure that the scrollbar is gone
+                browser.sleep(1000);
+                return browser.getProcessedConfig();
+            })
+            .then(function(_){
+                ADBScreenshot = _.capabilities.nativeWebScreenshot || false;
+            });
     });
 
-    describe('method matchers', function() {
-
+    describe('method matchers', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots'
@@ -21,23 +33,25 @@ describe('Pix-Diff', function() {
         it('should save the screen', function () {
             var tagName = 'examplePage';
 
-            browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-chrome-412x732.png')).toBe(true);
-            });
+            browser.pixDiff.saveScreen(tagName)
+                .then(function () {
+                    expect(fs.existsSync(screenshotPath + '/' + tagName + '-chrome-360x640.png')).toBe(true);
+                });
         });
 
         it('should save the screen region', function () {
             var tagName = 'examplePageRegion';
 
-            browser.pixDiff.saveRegion(element(by.css('div h1')), tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-chrome-412x732.png')).toBe(true);
+            browser.pixDiff.saveRegion(bannerHeader, tagName).then(function () {
+                expect(fs.existsSync(screenshotPath + '/' + tagName + '-chrome-360x640.png')).toBe(true);
             });
         });
 
         it('should match the page', function () {
-            browser.pixDiff.checkScreen('examplePage').then(function (result) {
-                expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL);
-            });
+            return browser.pixDiff.checkScreen('examplePage')
+                .then(function (result) {
+                    expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL);
+                });
         });
 
         it('should match the page with custom matcher', function () {
@@ -67,8 +81,7 @@ describe('Pix-Diff', function() {
         });
     });
 
-    describe('format image name', function() {
-
+    describe('format image name', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
@@ -81,53 +94,39 @@ describe('Pix-Diff', function() {
             var tagName = 'appium';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_AVD_for_Nexus_6_by_Google_dpr_3_412-732.png')).toBe(true);
+                expect(fs.existsSync(screenshotPath + '/TEST_' + tagName + '_avdForNexus5ByGoogle_dpr_3_360-640.png')).toBe(true);
             });
         });
     });
 
-    describe('scroll into view', function () {
+    fdescribe('scroll into view', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
             });
-
-            browser.executeScript(changeMarginTop);
-
-            /**
-             * changeMarginTop
-             * Add extra margin to top to be able to scroll
-             */
-            function changeMarginTop() {
-                var css = 'div h1 {' +
-                        'margin-top: 1200px !important;' +
-                        '}',
-                    head = document.head || document.getElementsByTagName('head')[0],
-                    style = document.createElement('style');
-
-                style.type = 'text/css';
-                style.appendChild(document.createTextNode(css));
-                head.appendChild(style);
-            }
         });
 
         it('should save a scrolled screen', function () {
-            var tagName = 'scrolledPage',
-                headerElement = element(by.css('div h1'));
+            var tagName = 'scrolledPage';
 
-            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+            browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement())
                 .then(function () {
+                    if(ADBScreenshot) {
+                        browser.sleep(1000);
+                    }
                     browser.pixDiff.saveScreen(tagName);
                 });
         });
 
         it('should save a scrolled screen region', function () {
-            var tagName = 'scrolledPageRegion',
-                headerElement = element(by.css('div h1'));
+            var tagName = 'scrolledPageRegion';
 
-            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+            browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement())
                 .then(function () {
-                    browser.pixDiff.saveRegion(element(by.css('div h1')), tagName);
+                    if(ADBScreenshot) {
+                        browser.sleep(1000);
+                    }
+                    browser.pixDiff.saveRegion(alertSuccessSmall, tagName);
                 });
         });
     });

@@ -2,7 +2,7 @@
 
 var BlinkDiff = require('blink-diff'),
     fs = require('fs'),
-    PixDiff = require('../');
+    PixDiff = require('../../index');
 
 describe('Pix-Diff', function() {
 

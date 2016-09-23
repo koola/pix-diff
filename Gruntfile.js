@@ -45,13 +45,19 @@ module.exports = function(grunt) {
             iosSim: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
-                    'test/protractorSimulator.ios.conf.js'
+                    'test/appium/protractorSimulator.ios.conf.js'
                 ]
             },
-            androidEm: {
+            androidEmChromeDriver: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
-                    'test/protractorEmulator.android.conf.js'
+                    'test/appium/protractorEmulator.android.chromedriver.conf.js'
+                ]
+            },
+            androidEmADB: {
+                cmd: 'node_modules/.bin/protractor',
+                args: [
+                    'test/appium/protractorEmulator.android.adb.conf.js'
                 ]
             }
         },
@@ -77,7 +83,8 @@ module.exports = function(grunt) {
     grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
     grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
     grunt.registerTask('iosSim', 'Run Appium iOS Simulator integration tests', ['clean:screens', 'run:iosSim']);
-    grunt.registerTask('androidEm', 'Run Appium Android emulator integration tests', ['clean:screens', 'run:androidEm']);
+    grunt.registerTask('androidEmChromeDriver', 'Run Appium Android emulator integration tests with chromedriver', ['clean:screens', 'run:androidEmChromeDriver']);
+    grunt.registerTask('androidEmADB', 'Run Appium Android emulator integration tests with native webscreenshots', ['clean:screens', 'run:androidEmADB']);
     grunt.registerTask('build', ['jshint:all']);
     grunt.registerTask('release', ['bump']);
     grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber']);
