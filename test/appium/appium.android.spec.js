@@ -26,7 +26,8 @@ describe('Pix-Diff', function () {
     describe('method matchers', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
-                basePath: 'test/screenshots'
+                basePath: 'test/screenshots',
+                androidNative: ADBScreenshot
             });
         });
 
@@ -39,7 +40,7 @@ describe('Pix-Diff', function () {
                 });
         });
 
-        it('should save the screen region', function () {
+        fit('should save the screen region', function () {
             var tagName = 'examplePageRegion';
 
             browser.pixDiff.saveRegion(bannerHeader, tagName).then(function () {
@@ -86,7 +87,8 @@ describe('Pix-Diff', function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
                 formatImageOptions: {'env': 'TEST'},
-                formatImageName: '{env}_{tag}_{deviceName}_dpr_{dpr}_{width}-{height}'
+                formatImageName: '{env}_{tag}_{deviceName}_dpr_{dpr}_{width}-{height}',
+                androidNative: ADBScreenshot
             });
         });
 
@@ -99,10 +101,11 @@ describe('Pix-Diff', function () {
         });
     });
 
-    fdescribe('scroll into view', function () {
+    describe('scroll into view', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
+                androidNative: ADBScreenshot
             });
         });
 
@@ -118,7 +121,7 @@ describe('Pix-Diff', function () {
                 });
         });
 
-        it('should save a scrolled screen region', function () {
+        fit('should save a scrolled screen region', function () {
             var tagName = 'scrolledPageRegion';
 
             browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement())

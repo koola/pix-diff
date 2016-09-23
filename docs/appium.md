@@ -28,35 +28,35 @@ The iOS method is smart enough to detect the way of scrolling and the position o
 
 ## Scrolling
 ### Manually
-When a user scrolls the screen manually the the addressbar and the Toolbar are influenced by this behaviour. For Safari and Chrome the addressbar is made smaller and the toolbar is minimized.
+When a user scrolls the screen manually the the addressbar and the Toolbar are influenced by this behaviour. For Safari the addressbar is made smaller and the toolbar is minimized.
 ### Javascript
 When the scroll is automated with a Javascript scroll `browser.executeScript('arguments[0].scrollIntoView();', element(by.css('div h1')).getWebElement());` the view is scrolled, but the addressbar AND the toolbar **ARE NOT INFLUENCED** BY THIS BEHAVIOUR.
 ### Simulate
 When the scroll is automated with a "native Appium" command the real use scroll is simulated and the behaviour of the addressbar and toolbar is the same as the manual scroll
 
 ## saveScreen / checkScreen
-**Not scrolled:** 
+###### Not scrolled:
 
 ![Safari saveScreen / checkScreen](./images/TEST_appium_iPhone_6_dpr_2_375-667.png "Safari saveScreen / checkScreen")
 
-**Manual / Simulated scroll:** 
+###### Manual / Simulated scroll:
 
 ![Safari saveScreen / checkScreen, manual / simulated scroll](./images/scrolledPage-safari-375x667-manual.png "Safari saveScreen / checkScreen, manual / simulated scroll")
 
-**Javascript scroll:** 
+###### Javascript scroll: 
 
 ![Safari saveScreen / checkScreen,  JS scroll](./images/scrolledPage-safari-375x667.png "Safari saveScreen / checkScreen,  JS scroll")
 
 ## saveScreen / checkRegion
-**Not scrolled:** 
+###### Not scrolled:
 
 ![Safari saveRegion / checkRegion](./images/scrolledPageRegion-safari-375x667.png "Safari saveRegion / checkRegion")
 
-**Manual / Simulated scroll:** 
+###### Manual / Simulated scroll:
 
 ![Safari saveRegion / checkRegion, manual / simulated scroll](./images/scrolledPageRegion-safari-375x667-manual-scroll.png "Safari saveRegion / checkRegion, manual / simulated scroll")
 
-**Javascript scroll:** 
+###### Javascript scroll:
 
 ![Safari saveRegion / checkRegion,  JS scroll](./images/scrolledPageRegion-safari-375x667-JS-scroll.png "Safari saveRegion / checkRegion,  JS scroll")
 
@@ -87,8 +87,6 @@ Success
 
 * When the message `Success` is shown `Chrome` is installed on the device.
 
-
-
 ## How screenshots work on Android
 Appium can create 2 types of screenshots for Android based on:
 - Chromedriver (default)
@@ -105,14 +103,51 @@ This can be compared with the Native screenshot that can be made with a device. 
 * Statusbar (the "small" top bar that will hold time, wifi, battery, ...)
 * Addressbar (the bar that will hold the url)
 * View (the actual view of the page you are visiting)
-* Toolbar (will hold additional buttons for the browser) 
+* Toolbar (optional, will hold additional Android buttons, like home, back and menu) 
 
 To use ADB screenshots add this in this capability in the capabilities `nativeWebScreenshot: true`, see "Capabilities Android" example below.
 
 ![ADB saveScreen / checkScreen] (./images/avdForNexus5ByGoogle_examplePage_ADB.png "ADB saveScreen / checkScreen") 
 
-#### Note
+#### Note 1
 It looks like taking a screenshot with ADB reacts different on a scroll (`elm.scrollIntoView()` seems to take more time). This is why a sleep is added after scrolling to be sure the screenshot is taken of the correct screen state
+
+#### Note 2
+See "Scrolling" for the behaviour of Chrome and the screenshots below for the influence
+
+#### Scrolling with Chrome and ADB native screenshot
+
+##### Manually
+When a user scrolls the screen manually the the addressbar is influenced by this behaviour. For Chrome the addressbar is made smaller and the toolbar is minimized.
+##### Javascript
+When the scroll is automated with a Javascript scroll `browser.executeScript('arguments[0].scrollIntoView();', element(by.css('div h1')).getWebElement());` the view is scrolled, but the addressbar **IS NOT INFLUENCED** BY THIS BEHAVIOUR.
+##### Simulate
+When the scroll is automated with a "native Appium" command the real use scroll is simulated and the behaviour of the addressbar is the same as the manual scroll
+
+##### saveScreen / checkScreen with ADB
+###### Not scrolled:
+
+![Chrome saveScreen / checkScreen](./images/avdForNexus5ByGoogle_examplePage_ChromeDriver.png "Chrome saveScreen / checkScreen")
+
+###### Manual / Simulated scroll: 
+
+![Chrome saveScreen / checkScreen, manual / simulated scroll](./images/avdForNexus5ByGoogle-scrolledPage-chrome-360x640-manual-scroll.png "Chrome saveScreen / checkScreen, manual / simulated scroll")
+
+###### Javascript scroll:
+
+![Chrome saveScreen / checkScreen,  JS scroll](./images/avdForNexus5ByGoogle-chrome-360x640-JS-scroll.png "Chrome saveScreen / checkScreen,  JS scroll")
+
+##### saveScreen / checkRegion
+###### Not scrolled:
+![Chrome saveRegion / checkRegion](./images/avdForNexus5ByGoogle-examplePageRegion-chrome-360x640.png "Chrome saveRegion / checkRegion")
+
+###### Manual / Simulated scroll: 
+
+![Chrome saveRegion / checkRegion, manual / simulated scroll](./images/avdForNexus5ByGoogle-scrolledPageRegion-chrome-360x640-manual-scroll.png "Chrome saveRegion / checkRegion, manual / simulated scroll")
+
+###### Javascript scroll:
+
+![Chrome saveRegion / checkRegion,  JS scroll](./images/avdForNexus5ByGoogle-scrolledPageRegion-chrome-360x640-JS-scroll.png "Chrome saveRegion / checkRegion,  JS scroll")
 
 ## Capabilities Android
 

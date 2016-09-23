@@ -17,6 +17,7 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.width Width of browser
  * @param {string} options.height Height of browser
  * @param {boolean} options.autoResize Automatically resize the browser
+ * @param {boolean} options.androidNative If a screenshot is taken like a native full screenshot
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
  *
@@ -25,6 +26,7 @@ var BlinkDiff = require('blink-diff'),
  * @property {int} width
  * @property {int} height
  * @property {boolean} autoResize
+ * @property {boolean} androidNative
  * @property {string} formatOptions
  * @property {string} formatString
  * @property {object} capabilities
@@ -48,6 +50,7 @@ function PixDiff(options) {
     this.height = options.height || 1024;
 
     this.autoResize = options.autoResize === false || true;
+    this.androidNative = options.androidNative || false;
 
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
@@ -215,10 +218,9 @@ PixDiff.prototype = {
         } else if (this.isIOS()) {
             return this.getIOSPosition(element);
         }
-        // else if (this.isAndroid()) {
-        //     // return this.getAndroidPosition(element);
-        //     return this.getElementPositionTopPage(element);
-        // }
+        else if (this.isAndroid() && this.androidNative) {
+            return this.getAndroidPosition(element);
+        }
 
         return this.getElementPositionTopWindow(element);
     },
@@ -315,17 +317,20 @@ PixDiff.prototype = {
      */
     getAndroidPosition: function (element) {
         return browser.executeScript(getDataObject, element.getWebElement());
+
         function getDataObject() {
-            var STATUSBAR_HEIGHT = 24,
-                devicePixelRatio = window.devicePixelRatio,
+            var ADDRESSBAR_HEIGHT = 56,
+                STATUSBAR_HEIGHT = 24,
+                TOOLBAR_HEIGHT = 48,
                 elementPosition = arguments[0].getBoundingClientRect(),
                 screenHeight = window.screen.height,
                 windowInnerHeight = window.innerHeight,
-                toolbarHeight = (screenHeight === (windowInnerHeight + STATUSBAR_HEIGHT )) ? 0 : screenHeight - windowInnerHeight - STATUSBAR_HEIGHT;
+                addressbar_current_height = (screenHeight === (STATUSBAR_HEIGHT + ADDRESSBAR_HEIGHT + windowInnerHeight + TOOLBAR_HEIGHT )) ? ADDRESSBAR_HEIGHT : 0,
+                y = STATUSBAR_HEIGHT + addressbar_current_height + elementPosition.top;
 
             return {
                 x: elementPosition.left,
-                y: STATUSBAR_HEIGHT + elementPosition.top
+                y: y
             };
         }
     },
