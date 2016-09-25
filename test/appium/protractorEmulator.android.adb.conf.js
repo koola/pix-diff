@@ -16,7 +16,7 @@ exports.config = {
         nativeWebScreenshot: true
 
     },
-    seleniumAddress: 'http://localhost:4726/wd/hub',
+    seleniumAddress: 'http://localhost:4727/wd/hub',
 
     onPrepare: function () {
         browser.ignoreSynchronization = true;

@@ -15,7 +15,7 @@ exports.config = {
         platformName: 'android',                    // not case sensitive
 
     },
-    seleniumAddress: 'http://localhost:4726/wd/hub',
+    seleniumAddress: 'http://localhost:4728/wd/hub',
 
     onPrepare: function () {
         browser.ignoreSynchronization = true;

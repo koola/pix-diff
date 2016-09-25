@@ -40,7 +40,7 @@ describe('Pix-Diff', function () {
                 });
         });
 
-        fit('should save the screen region', function () {
+        it('should save the screen region', function () {
             var tagName = 'examplePageRegion';
 
             browser.pixDiff.saveRegion(bannerHeader, tagName).then(function () {
@@ -121,7 +121,7 @@ describe('Pix-Diff', function () {
                 });
         });
 
-        fit('should save a scrolled screen region', function () {
+        it('should save a scrolled screen region', function () {
             var tagName = 'scrolledPageRegion';
 
             browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement())

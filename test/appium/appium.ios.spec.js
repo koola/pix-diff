@@ -2,16 +2,19 @@
 
 var BlinkDiff = require('blink-diff'),
     fs = require('fs'),
-    PixDiff = require('../../index');
+    PixDiff = require('../../index'),
+    path = require('path'),
+    screenshotPath = path.resolve(__dirname, '../screenshots/');
 
-describe('Pix-Diff', function() {
+describe('Pix-Diff', function () {
+    var bannerHeader = element(by.css('h1.page-header')),
+        alertSuccessSmall = element(by.css('.uk-alert-success'));
 
     beforeEach(function () {
         browser.get(browser.baseUrl);
     });
 
-    describe('method matchers', function() {
-
+    describe('method matchers', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots'
@@ -22,15 +25,15 @@ describe('Pix-Diff', function() {
             var tagName = 'examplePage';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-safari-375x667.png')).toBe(true);
+                expect(fs.existsSync(screenshotPath + '/' + tagName + '-safari-375x667.png')).toBe(true);
             });
         });
 
         it('should save the screen region', function () {
             var tagName = 'examplePageRegion';
 
-            browser.pixDiff.saveRegion(element(by.css('div h1')), tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/' + tagName + '-safari-375x667.png')).toBe(true);
+            browser.pixDiff.saveRegion(bannerHeader, tagName).then(function () {
+                expect(fs.existsSync(screenshotPath + '/' + tagName + '-safari-375x667.png')).toBe(true);
             });
         });
 
@@ -67,8 +70,7 @@ describe('Pix-Diff', function() {
         });
     });
 
-    describe('format image name', function() {
-
+    describe('format image name', function () {
         beforeEach(function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
@@ -81,7 +83,7 @@ describe('Pix-Diff', function() {
             var tagName = 'appium';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/screenshots/TEST_' + tagName + '_iPhone_6_dpr_2_375-667.png')).toBe(true);
+                expect(fs.existsSync(screenshotPath + '/TEST_' + tagName + '_iPhone6_dpr_2_375-667.png')).toBe(true);
             });
         });
     });
@@ -91,43 +93,22 @@ describe('Pix-Diff', function() {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
             });
-
-            browser.executeScript(changeMarginTop);
-
-            /**
-             * changeMarginTop
-             * Add extra margin to top to be able to scroll
-             */
-            function changeMarginTop() {
-                var css = 'div h1 {' +
-                        'margin-top: 1200px !important;' +
-                        '}',
-                    head = document.head || document.getElementsByTagName('head')[0],
-                    style = document.createElement('style');
-
-                style.type = 'text/css';
-                style.appendChild(document.createTextNode(css));
-                head.appendChild(style);
-            }
         });
 
         it('should save a scrolled screen', function () {
-            var tagName = 'scrolledPage',
-                headerElement = element(by.css('div h1'));
-
-            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+            var tagName = 'scrolledPage';
+            browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement())
                 .then(function () {
                     browser.pixDiff.saveScreen(tagName);
                 });
         });
 
         it('should save a scrolled screen region', function () {
-            var tagName = 'scrolledPageRegion',
-                headerElement = element(by.css('div h1'));
+            var tagName = 'scrolledPageRegion';
 
-            browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement())
+            browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement())
                 .then(function () {
-                    browser.pixDiff.saveRegion(element(by.css('div h1')), tagName);
+                    browser.pixDiff.saveRegion(alertSuccessSmall, tagName);
                 });
         });
     });

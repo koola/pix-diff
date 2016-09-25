@@ -4,7 +4,7 @@ exports.config = {
 
     framework: 'jasmine2',
 
-    baseUrl: 'http://www.example.com',
+    baseUrl: 'http://example.wswebcreation.nl',
 
     specs: ['appium.ios.spec.js'],
 
@@ -12,8 +12,8 @@ exports.config = {
         browserName: 'safari',   // not case sensitive
         deviceName: 'iPhone 6',  // Needs to be form the list of available devices
         platformName: 'ios',     // not case sensitive
-        platformVersion: '9.3',  // needed for specific ios version
-
+        platformVersion: '10.0' // needed for specific ios version
+        // automationName: 'XCUITest'
     },
     seleniumAddress: 'http://localhost:4726/wd/hub',
 
