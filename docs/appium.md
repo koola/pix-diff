@@ -115,6 +115,8 @@ When the scroll is automated with a Javascript scroll `browser.executeScript('ar
 ```
 
 # Screenshots
+Hover over the screenshots to see which screenshot belongs to Safari, Android ChromeDriver of Android ADB.
+
 ## saveScreen / checkScreen
 ### Not scrolled:
 ![Safari saveScreen / checkScreen](./images/iPhone6-examplePage-safari-375x667.png "Safari saveScreen / checkScreen") ![Chrome ChromeDriver saveScreen / checkScreen](./images/avdForNexus5ByGoogle_examplePage_ChromeDriver.png "Chrome ChromeDriver saveScreen / checkScreen") ![Chrome ADB saveScreen / checkScreen](./images/avdForNexus5ByGoogle_examplePage_ADB.png "Chrome ADB saveScreen / checkScreen")
@@ -130,4 +132,4 @@ When the scroll is automated with a Javascript scroll `browser.executeScript('ar
 ![Safari saveRegion / checkRegion](./images/iPhone6-examplePageRegion-safari-375x667.png "Safari saveRegion / checkRegion") ![Chrome saveRegion / checkRegion](./images/avdForNexus5ByGoogle-examplePageRegion-chrome-360x640.png "Chrome saveRegion / checkRegion")
 
 ### Manual / Simulated / JS scroll:
-![Safari saveRegion / checkRegion, manual / simulated / JS scroll](./images/iPhone6-scrolledPageRegion-safari-375x667-manual-scroll.png "Safari saveRegion / checkRegion, manual / simulated / JS scroll") ![Chrome saveRegion / checkRegion, manual / simulated / JS scroll](./images/avdForNexus5ByGoogle-scrolledPageRegion-chrome-360x640.png "Chrome saveRegion / checkRegion, manual / simulated / JS scroll")
+![Safari saveRegion / checkRegion, manual / simulated / JS scroll](./images/iPhone6-scrolledPageRegion-safari-375x667-JS-scroll.png "Safari saveRegion / checkRegion, manual / simulated / JS scroll") ![Chrome saveRegion / checkRegion, manual / simulated / JS scroll](./images/avdForNexus5ByGoogle-scrolledPageRegion-chrome-360x640.png "Chrome saveRegion / checkRegion, manual / simulated / JS scroll")
