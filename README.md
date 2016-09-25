@@ -57,7 +57,7 @@ exports.config = {
 PixDiff provides two comparison methods ```checkScreen``` and ```checkRegion``` along with Jasmine ```toMatchScreen``` and Mocha ```matchScreen``` matchers. 
 Two helper methods ```saveScreen``` and ```saveRegion``` are provided for saving images.
 PixDiff can also work with Cucumber.js. There are no comparison methods provided for Cucumber.js because Cucumber.js doesn't have its own ```expect``` methods.
-See [Examples](./images/examples.md) for the Jasmine and CucumberJS implementation.
+See [Examples](./docs/examples.md) for the Jasmine and CucumberJS implementation.
 
 ####PixDiff Parameters:
 
