@@ -192,8 +192,6 @@ PixDiff.prototype = {
      * @private
      */
     getPixelDeviceRatio: function () {
-        // var ratio;
-
         return this.flow.execute(function () {
             return browser.executeScript('return window.devicePixelRatio;')
                 .then(function (devicePixelRatio) {
@@ -280,17 +278,24 @@ PixDiff.prototype = {
      * @private
      */
     getIOSPosition: function (element) {
-        return browser.executeScript(getDataObject, element.getWebElement());
-        function getDataObject() {
-            var STATUSBAR_HEIGHT = 20,
-                NAVIGATIONBAR_HEIGHT = 44,
-                TOOLBAR_HEIGHT = 44,
+        // @todo: make this a pixdiff parameter object for iOS?
+        var obj = {
+            NAVIGATIONBAR_HEIGHT: 44,
+            STATUSBAR_HEIGHT: 20,
+            TOOLBAR_HEIGHT: 44
+        };
+        return browser.executeScript(getDataObject, element.getWebElement(), obj);
+
+        function getDataObject(elm, obj) {
+            var NAVIGATIONBAR_HEIGHT = obj.NAVIGATIONBAR_HEIGHT,
+                STATUSBAR_HEIGHT = obj.STATUSBAR_HEIGHT,
+                TOOLBAR_HEIGHT = obj.TOOLBAR_HEIGHT,
                 screenHeight = window.screen.height,
                 windowInnerHeight = window.innerHeight,
                 elementPosition,
                 y;
 
-            elementPosition = arguments[0].getBoundingClientRect();
+            elementPosition = elm.getBoundingClientRect();
             /* safari */
             if ((STATUSBAR_HEIGHT + NAVIGATIONBAR_HEIGHT + TOOLBAR_HEIGHT + windowInnerHeight) === screenHeight) {
                 /* Navigationbar and Toolbar are still there due to not scrolling, or due to JS scrolling */
@@ -316,13 +321,19 @@ PixDiff.prototype = {
      * @private
      */
     getAndroidPosition: function (element) {
-        return browser.executeScript(getDataObject, element.getWebElement());
+        // @todo: make this a pixdiff parameter object for Android?
+        var obj = {
+            ADDRESSBAR_HEIGHT: 24,
+            STATUSBAR_HEIGHT: 56,
+            TOOLBAR_HEIGHT: 48
+        };
+        return browser.executeScript(getDataObject, element.getWebElement(), obj);
 
-        function getDataObject() {
-            var ADDRESSBAR_HEIGHT = 56,
-                STATUSBAR_HEIGHT = 24,
-                TOOLBAR_HEIGHT = 48,
-                elementPosition = arguments[0].getBoundingClientRect(),
+        function getDataObject(elm, obj) {
+            var ADDRESSBAR_HEIGHT = obj.ADDRESSBAR_HEIGHT,
+                STATUSBAR_HEIGHT = obj.STATUSBAR_HEIGHT,
+                TOOLBAR_HEIGHT = obj.TOOLBAR_HEIGHT,
+                elementPosition = elm.getBoundingClientRect(),
                 screenHeight = window.screen.height,
                 windowInnerHeight = window.innerHeight,
                 addressbar_current_height = (screenHeight === (STATUSBAR_HEIGHT + ADDRESSBAR_HEIGHT + windowInnerHeight + TOOLBAR_HEIGHT )) ? ADDRESSBAR_HEIGHT : 0,
@@ -447,13 +458,13 @@ PixDiff.prototype = {
                 .then(function () {
                     return browser.takeScreenshot();
                 }, function (e) {
-                        if (this.baseline) {
-                            return this.saveScreen(tag).then(function () {
-                                throw e;
-                            });
-                        }
-                        throw e;
-                    }.bind(this))
+                    if (this.baseline) {
+                        return this.saveScreen(tag).then(function () {
+                            throw e;
+                        });
+                    }
+                    throw e;
+                }.bind(this))
                 .then(function (image) {
                     tag = this.format(this.formatString, tag);
                     defaults = {

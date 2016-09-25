@@ -4,7 +4,7 @@ exports.config = {
 
     framework: 'jasmine2',
 
-    baseUrl: 'http://www.example.com',
+    baseUrl: 'http://example.wswebcreation.nl',
 
     specs: ['jasmine.spec.js'],
 

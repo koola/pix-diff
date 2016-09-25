@@ -7,7 +7,8 @@ var BlinkDiff = require('blink-diff'),
 describe('Pix-Diff', function () {
 
     var browserName = browser.browserName,
-        headerElement = element(by.css('div h1'));
+        headerElement = element(by.css('h1.page-header')),
+        alertSuccessSmall = element(by.css('.uk-alert-success'));
 
     beforeEach(function () {
         browser.get(browser.baseUrl);
@@ -99,10 +100,10 @@ describe('Pix-Diff', function () {
             browser.pixDiff = new PixDiff({
                 basePath: 'test/screenshots',
                 width: 800,
-                height: 200
+                height: 600
             });
 
-            browser.scrolledPage = browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement());
+            browser.scrolledPage = browser.executeScript('arguments[0].scrollIntoView();', alertSuccessSmall.getWebElement());
         });
 
         it('should save a scrolled screen', function () {
@@ -113,7 +114,7 @@ describe('Pix-Diff', function () {
 
         it('should save a scrolled screen region', function () {
             browser.scrolledPage.then(function () {
-                browser.pixDiff.saveRegion(headerElement, 'scrolledPageRegion');
+                browser.pixDiff.saveRegion(alertSuccessSmall, 'scrolledPageRegion');
             });
         });
     });

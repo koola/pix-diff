@@ -7,7 +7,7 @@ var expect = require('chai').expect,
 
 function CucumberSteps() {
 
-    var headerElement = element(by.css('div h1'));
+    var headerElement = element(by.css('h1.page-header'));
 
     this.Given(/^I set up the matchers environment$/, function () {
         browser.get(browser.baseUrl);

@@ -7,7 +7,8 @@ var expect = require('chai').expect,
 
 describe('Pix-Diff', function() {
 
-    var headerElement = element(by.css('div h1'));
+    var headerElement = element(by.css('h1.page-header')),
+        alertSuccessSmall = element(by.css('.uk-alert-success'));
 
     beforeEach(function () {
         browser.get(browser.baseUrl);

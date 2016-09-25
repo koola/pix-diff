@@ -2,7 +2,7 @@
 
 exports.config = {
 
-    baseUrl: 'http://www.example.com',
+    baseUrl: 'http://example.wswebcreation.nl',
 
     framework: 'custom',
 

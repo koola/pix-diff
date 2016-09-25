@@ -4,7 +4,7 @@ exports.config = {
 
     framework: 'mocha',
 
-    baseUrl: 'http://www.example.com',
+    baseUrl: 'http://example.wswebcreation.nl',
 
     specs: ['mocha.spec.js'],
 
