@@ -22,6 +22,16 @@ npm install --save-dev pix-diff
 ```
 
 ##Usage
+PixDiff can be used for:
+
+- desktop browsers (Chrome / Firefox / Safari / Internet Explorer 10/11 *!Edge not tested!*)
+- mobile / tablet browsers (Chrome / Safari on emulators / real devices) based on Appium
+
+For more information about mobile testing see the [Appium](./docs/appium.md) documentation.
+
+#### Note 1
+Some cloudservices that provide emulators / real devices in the cloud (like [Perfecto](https://www.perfectomobile.com/) or [SauceLabs](https://saucelabs.com/)) create screenshots of the complete screen (like a native screenshot). 
+The needs a different way of determining the position of an element. Pixdiff can already do this for iOS Safari, but to get this working for Android add `androidNative: true` to the PixDiff parameters. 
 
 The package can be used directly in individual tests or via ```onPrepare``` in the Protractor configuration file.
 
@@ -34,6 +44,7 @@ exports.config = {
         var PixDiff = require('pix-diff');
         browser.pixDiff = new PixDiff(
             {
+                // See `PixDiff Parameters` for more parameters
                 basePath: 'path/to/screenshots/',
                 width: 1280,
                 height: 1024
@@ -43,79 +54,10 @@ exports.config = {
 }
 ```
 
-PixDiff provides two comparison methods ```checkScreen``` and ```checkRegion``` along with Jasmine ```toMatchScreen``` and Mocha ```matchScreen``` matchers. Two helper methods ```saveScreen``` and ```saveRegion``` are provided for saving images.
+PixDiff provides two comparison methods ```checkScreen``` and ```checkRegion``` along with Jasmine ```toMatchScreen``` and Mocha ```matchScreen``` matchers. 
+Two helper methods ```saveScreen``` and ```saveRegion``` are provided for saving images.
 PixDiff can also work with Cucumber.js. There are no comparison methods provided for Cucumber.js because Cucumber.js doesn't have its own ```expect``` methods.
-
-**Jasmine Example:**
-```javascript
-describe("Example page", function() {
-
-    beforeEach(function() {
-        browser.get('http://www.example.com/');
-    });
-
-    it("should match the page", function () {
-        expect(browser.pixDiff.checkScreen('examplePage')).toMatchScreen();
-    });
-
-    it("should not match the page", function () {
-        element(By.buttonText('yes')).click();
-        expect(browser.pixDiff.checkScreen('examplePage')).not.toMatchScreen();
-    });
-
-    it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')).toMatchScreen();
-    });
-
-    it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
-            blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
-    });
-});
-```
-
-**Cucumber Example:**
-```javascript
-var expect = require('chai').expect;
-
-function CucumberSteps() {
-    this.Given(/^I load the url$/, function () {
-        return browser.get('http://www.example.com/');
-    });
-
-    this.Then(/^Pix\-Diff should match the page$/, function () {
-        return browser.pixDiff.checkScreen('examplePage')
-            .then(function (result) {
-                return expect(result.differences).to.equal(0);
-            });
-    });
-
-    this.Then(/^Pix\-Diff should not match the page$/, function () {
-        element(By.buttonText('yes')).click();
-        return browser.pixDiff.checkScreen('examplePage')
-            .then(function (result) {
-                return expect(result.differences).to.not.equal(0);
-            });
-    });
-
-    this.Then(/^Pix\-Diff should match the title$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')
-            .then(function (result) {
-                return expect(result.differences).to.equal(0);
-            });
-    });
-
-    this.Then(/^Pix\-Diff should match the title with blockout$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
-            blockOut: [{x: 10, y: 132, width: 100, height: 50}]})
-            .then(function (result) {
-                return expect(result.differences).to.equal(0);
-            });
-    });
-}
-
-module.exports = CucumberSteps;
-```
+See [Examples](./images/examples.md) for the Jasmine and CucumberJS implementation.
 
 ####PixDiff Parameters:
 
@@ -124,6 +66,7 @@ module.exports = CucumberSteps;
 * ```width``` Browser width (default: 1280)
 * ```height``` Browser height (default: 1024)
 * ```autoResize``` Auto (re)size the browser (default: true)
+* ```androidNative``` PixDiff needs to calculate element position based on a native device screenshot(default: false)
 * ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
 
 ####Function options:
@@ -194,9 +137,9 @@ Run all tests with the following command:
 npm test
 ```
 
-Run all tests by framework:
+Run all tests by framework/device:
 ```shell
-npm test -- jasmine/mocha/cucumber
+npm test -- jasmine/mocha/cucumber/iosSim/androidEmChromeDriver/androidEmADB
 ```
 
 ###Dependencies
