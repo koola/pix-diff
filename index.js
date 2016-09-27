@@ -64,6 +64,7 @@ function PixDiff(options) {
         this.browserName = camelCase(_.capabilities.browserName);
         this.platformName = _.capabilities.platformName ? camelCase(_.capabilities.platformName) : '';
         this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
+        this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot ? true : false;
 
         if (_.framework !== 'custom') {
             // Require PixDiff matchers for jasmine(2)/mocha
@@ -215,7 +216,7 @@ PixDiff.prototype = {
             return this.getElementPositionTopPage(element);
         } else if (this.isIOS()) {
             return this.getElementPositionIOS(element);
-        } else if (this.isAndroid()) {
+        } else if (this.isAndroid() && this.nativeWebScreenshot) {
             return this.getElementPositionAndroid(element);
         }
 
