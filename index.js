@@ -16,6 +16,7 @@ var BlinkDiff = require('blink-diff'),
  * @param {string} options.basePath Path to screenshots folder
  * @param {string} options.width Width of browser
  * @param {string} options.height Height of browser
+ * @param {object} options.deviceOffsets Mobile device UI offsets
  * @param {boolean} options.autoResize Automatically resize the browser
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
@@ -24,6 +25,7 @@ var BlinkDiff = require('blink-diff'),
  * @property {boolean} baseline
  * @property {int} width
  * @property {int} height
+ * @property {object} deviceOffsets
  * @property {boolean} autoResize
  * @property {string} formatOptions
  * @property {string} formatString
@@ -39,10 +41,12 @@ function PixDiff(options) {
         fs.mkdirSync(options.basePath + '/diff');
     }
 
-    this.baseline = options.baseline === true || false;
+    this.baseline = options.baseline || false;
 
     this.width = options.width || 1280;
     this.height = options.height || 1024;
+
+    this.deviceOffsets = options.deviceOffsets || {};
 
     this.autoResize = options.autoResize === false || true;
 
@@ -156,6 +160,28 @@ PixDiff.prototype = {
     },
 
     /**
+     * Check if platformName is Android
+     *
+     * @method isAndroid
+     * @return {boolean}
+     * @private
+     */
+    isAndroid: function () {
+        return this.platformName === 'android';
+    },
+
+    /**
+     * Check if platformName is iOS
+     *
+     * @method isIOS
+     * @return {boolean}
+     * @private
+     */
+    isIOS: function () {
+        return this.platformName === 'ios';
+    },
+
+    /**
      * Return the device pixel ratio (firefox always equals 1)
      *
      * @method getPixelDeviceRatio
@@ -187,7 +213,12 @@ PixDiff.prototype = {
     getElementPosition: function (element) {
         if (this.isFirefox() || this.isInternetExplorer()) {
             return this.getElementPositionTopPage(element);
+        } else if (this.isIOS()) {
+            return this.getElementPositionIOS(element);
+        } else if (this.isAndroid()) {
+            return this.getElementPositionAndroid(element);
         }
+
         return this.getElementPositionTopWindow(element);
     },
 
@@ -202,8 +233,8 @@ PixDiff.prototype = {
     getElementPositionTopPage: function (element) {
         return element.getLocation().then(function (point) {
             return {
-                x: point.x,
-                y: point.y
+                x: Math.floor(point.x),
+                y: Math.floor(point.y)
             };
         });
     },
@@ -220,8 +251,8 @@ PixDiff.prototype = {
         return browser.executeScript('return arguments[0].getBoundingClientRect();', element.getWebElement())
             .then(function (position) {
                 return {
-                    x: position.left,
-                    y: position.top
+                    x: Math.floor(position.left),
+                    y: Math.floor(position.top)
                 };
             });
     },
@@ -235,6 +266,70 @@ PixDiff.prototype = {
      */
     getBrowserDimensions: function () {
         return browser.executeScript('return { height: window.screen.height, width: window.screen.width};');
+    },
+
+    /**
+     * Get the position of a given element for the Safari browser
+     *
+     * @method getElementPositionIOS
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
+    getElementPositionIOS: function (element) {
+        function getDataObject (element, addressBarHeight, statusBarHeight, toolbarHeight) {
+            var elementPosition = element.getBoundingClientRect(),
+                screenHeight = window.screen.height,
+                windowInnerHeight = window.innerHeight,
+                y;
+
+            if (screenHeight === (addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight)) {
+                // Address bar and Toolbar are still visible due to not scrolling or via JS scrolling
+                y = statusBarHeight + addressBarHeight + elementPosition.top;
+            } else {
+                // Address bar got smaller and Toolbar disappeared due to manual scrolling
+                y = (screenHeight - windowInnerHeight) + elementPosition.top;
+            }
+
+            return {
+                x: elementPosition.left,
+                y: y
+            };
+        }
+
+        var _ = this.mergeDefaultOptions(this.deviceOffsets, { addressBar: 44, statusBar: 20, toolbar: 44 });
+
+        return browser.executeScript(getDataObject, element.getWebElement(), _.addressBar, _.statusBar, _.toolbar);
+    },
+
+    /**
+     * Get the position of a given element for the Chrome browser
+     *
+     * @method getElementPositionAndroid
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
+    getElementPositionAndroid: function (element) {
+        function getDataObject (element, addressBarHeight, statusBarHeight, toolbarHeight) {
+            var elementPosition = element.getBoundingClientRect(),
+                screenHeight = window.screen.height,
+                windowInnerHeight = window.innerHeight,
+                addressBarCurrentHeight = 0;
+
+            if (screenHeight === (addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight )) {
+                addressBarCurrentHeight = addressBarHeight;
+            }
+
+            return {
+                x: elementPosition.left,
+                y: statusBarHeight + addressBarCurrentHeight + elementPosition.top
+            };
+        }
+
+        var _ = this.mergeDefaultOptions(this.deviceOffsets, { addressBar: 24, statusBar: 56, toolbar: 48 });
+
+        return browser.executeScript(getDataObject, element.getWebElement(), _.addressBar, _.statusBar, _.toolbar);
     },
 
     /**
@@ -308,7 +403,7 @@ PixDiff.prototype = {
                     return this.getElementPosition(element);
                 }.bind(this))
                 .then(function (point) {
-                    rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
+                    rect = {height: size.height, width: size.width, x: point.x, y: point.y};
                     return browser.takeScreenshot();
                 })
                 .then(function (image) {
@@ -404,7 +499,7 @@ PixDiff.prototype = {
                     return this.getElementPosition(element);
                 }.bind(this))
                 .then(function (point) {
-                    rect = {height: size.height, width: size.width, x: Math.floor(point.x), y: Math.floor(point.y)};
+                    rect = {height: size.height, width: size.width, x: point.x, y: point.y};
                     return browser.takeScreenshot();
                 })
                 .then(function (image) {
