@@ -40,50 +40,44 @@ function PixDiff(options) {
     if (!fs.existsSync(options.basePath + '/diff') || !fs.statSync(options.basePath + '/diff').isDirectory()) {
         fs.mkdirSync(options.basePath + '/diff');
     }
-
     this.baseline = options.baseline || false;
-
     this.width = options.width || 1280;
     this.height = options.height || 1024;
-
     this.deviceOffsets = options.deviceOffsets || {};
-
     this.autoResize = options.autoResize === false || true;
-
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
-
     this.flow = browser.controlFlow();
-
     this.devicePixelRatio = 1;
 
     // initialize
     browser.getProcessedConfig().then(function (_) {
-        assert.ok(_.capabilities.browserName, 'Browser name is undefined.');
-
-        this.browserName = camelCase(_.capabilities.browserName);
-        this.platformName = _.capabilities.platformName ? camelCase(_.capabilities.platformName) : '';
+        this.platformName = _.capabilities.platformName ? _.capabilities.platformName.toLowerCase() : '';
         this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
         this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot ? true : false;
+
+        if (_.capabilities.browserName) {
+            this.browserName = camelCase(_.capabilities.browserName);
+        } else if (_.capabilities.app) {
+            this.browserName = camelCase(_.capabilities.app);
+        } else {
+            throw new Error('Browser name is undefined.');
+        }
 
         if (_.framework !== 'custom') {
             // Require PixDiff matchers for jasmine(2)/mocha
             require(path.resolve(__dirname, 'framework', _.framework));
         }
 
-        return this.getPixelDeviceRatio();
+        return this.getBrowserData();
 
-    }.bind(this)).then(function (ratio) {
-        this.devicePixelRatio = ratio;
+    }.bind(this)).then(function (size) {
+        this.devicePixelRatio = this.isFirefox() ? this.devicePixelRatio : Math.floor(size.pixelRatio);
 
-        return this.getBrowserDimensions();
-
-    }.bind(this)).then(function (dimensions) {
         if (this.platformName) {
-            this.height = dimensions.height;
-            this.width = dimensions.width;
-        }
-        else if (this.autoResize) {
+            this.height = size.height * this.devicePixelRatio;
+            this.width = size.width  * this.devicePixelRatio;
+        } else if (this.autoResize) {
             browser.driver.manage().window().setSize(this.width, this.height);
         }
     }.bind(this));
@@ -157,7 +151,7 @@ PixDiff.prototype = {
      * @private
      */
     isInternetExplorer: function () {
-        return this.browserName === 'internet explorer';
+        return this.browserName === 'internetExplorer';
     },
 
     /**
@@ -182,24 +176,24 @@ PixDiff.prototype = {
         return this.platformName === 'ios';
     },
 
-    /**
-     * Return the device pixel ratio (firefox always equals 1)
-     *
-     * @method getPixelDeviceRatio
-     * @return {integer}
-     * @private
-     */
-    getPixelDeviceRatio: function () {
-        var ratio;
-
-        return this.flow.execute(function () {
-            return browser.executeScript('return window.devicePixelRatio;')
-                .then(function (devicePixelRatio) {
-                    ratio = Math.floor(devicePixelRatio);
-                    return (ratio > 1 && !this.isFirefox()) ? ratio : this.devicePixelRatio;
-                }.bind(this));
-        }.bind(this));
-    },
+//    /**
+//     * Return the device pixel ratio (firefox always equals 1)
+//     *
+//     * @method getPixelDeviceRatio
+//     * @return {integer}
+//     * @private
+//     */
+//    getPixelDeviceRatio: function () {
+//        var ratio;
+//
+//        return this.flow.execute(function () {
+//            return browser.executeScript('return window.devicePixelRatio;')
+//                .then(function (devicePixelRatio) {
+//                    ratio = Math.floor(devicePixelRatio);
+//                    return (ratio > 1 && !this.isFirefox()) ? ratio : this.devicePixelRatio;
+//                }.bind(this));
+//        }.bind(this));
+//    },
 
     /**
      * Get the position of the element
@@ -261,12 +255,12 @@ PixDiff.prototype = {
     /**
      * Get the height and width of the browser
      *
-     * @method getDeviceDimensions
+     * @method getBrowserData
      * @returns {promise}
      * @private
      */
-    getBrowserDimensions: function () {
-        return browser.executeScript('return { height: window.screen.height, width: window.screen.width};');
+    getBrowserData: function () {
+        return browser.executeScript('return {pixelRatio: window.devicePixelRatio, height: window.screen.height, width: window.screen.width};');
     },
 
     /**
@@ -348,8 +342,7 @@ PixDiff.prototype = {
             if (e) {
                 if (!this.baseline) {
                     deferred.reject(new Error(e.message));
-                }
-                else {
+                } else {
                     deferred.reject(new Error('Image not found, saving current image as new baseline.'));
                 }
             } else {

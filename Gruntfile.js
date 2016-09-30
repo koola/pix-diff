@@ -41,6 +41,12 @@ module.exports = function(grunt) {
                 args: [
                     'test/protractorMocha.conf.js'
                 ]
+            },
+            appium: {
+                cmd: 'node_modules/.bin/protractor',
+                args: [
+                    'test/appium/protractorSimulatorIOS.conf.js'
+                ]
             }
         },
 
@@ -64,6 +70,7 @@ module.exports = function(grunt) {
     grunt.registerTask('cucumber', 'Run cucumber integration tests', ['clean:screens', 'run:cucumber']);
     grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
     grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
+    grunt.registerTask('appium', 'Run Appium tests on Saucelabs', ['clean:screens', 'run:appium']);
     grunt.registerTask('build', ['jshint:all']);
     grunt.registerTask('release', ['bump']);
     grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber']);
