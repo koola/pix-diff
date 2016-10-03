@@ -60,6 +60,8 @@ function PixDiff(options) {
         this.browserName = camelCase(_.capabilities.browserName);
         this.platformName = _.capabilities.platformName ? camelCase(_.capabilities.platformName) : '';
         this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
+        this.name = _.capabilities.name ? _.capabilities.name : '';
+        this.logName = _.capabilities.logName ? _.capabilities.logName : '';
 
         if (_.framework !== 'custom') {
             // Require PixDiff matchers for jasmine(2)/mocha
@@ -120,6 +122,8 @@ PixDiff.prototype = {
             'tag': camelCase(description),
             'browserName': this.browserName,
             'deviceName': this.deviceName,
+            'name': this.name,
+            'logName': this.logName,
             'dpr': this.devicePixelRatio,
             'width': this.width,
             'height': this.height

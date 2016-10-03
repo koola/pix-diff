@@ -174,6 +174,9 @@ The naming convention can be customized by passing the parameter ```formatImageN
 The following variables can be passed to format the string
 * ```browserName``` The browser name property from the capabilities
 * ```dpr``` The device pixel ratio
+* ```name``` The name from capabilities
+* ```logName``` The logName from capabilities
+* ```deviceName``` The deviceName from capabilities
 
 Images specified via name in the spec method will be selected according to the browsers current resolution. That is to say that multiple images can share the same name differentated by resolution.
 
