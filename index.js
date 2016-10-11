@@ -14,8 +14,8 @@ var BlinkDiff = require('blink-diff'),
  * @class PixDiff
  * @param {object} options
  * @param {string} options.basePath Path to screenshots folder
- * @param {string} options.width Width of browser
- * @param {string} options.height Height of browser
+ * @param {int} options.width Width of browser
+ * @param {int} options.height Height of browser
  * @param {boolean} options.autoResize Automatically resize the browser
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
