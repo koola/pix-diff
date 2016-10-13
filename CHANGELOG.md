@@ -1,5 +1,8 @@
 Changelog
 =========
+V1.0.14 - Merged PR #30 to add extra variables to formatImageName (credit to koningskristof)
+        - Merged PR #31 to fix constructor JSdocs (credit to abierbaum) (13/10/2016)
+
 v1.0.13 - Added auto resize option (13/09/2016)
 
 v1.0.12 - Added baseline option for auto saving not found images #21 (01/09/2016)
