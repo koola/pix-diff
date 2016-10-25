@@ -210,7 +210,7 @@ PixDiff.prototype = {
             return this.getElementPositionTopPage(element);
         } else if (this.isIOS()) {
             return this.getElementPositionIOS(element);
-        } else if (this.isAndroid() && this.nativeWebScreenshot) {
+        } else if (this.isAndroid() || this.nativeWebScreenshot) {
             return this.getElementPositionAndroid(element);
         }
 
@@ -306,25 +306,17 @@ PixDiff.prototype = {
      * @private
      */
     getElementPositionAndroid: function (element) {
-        function getDataObject (element, addressBarHeight, statusBarHeight, toolbarHeight) {
+        function getDataObject (element) {
             var elementPosition = element.getBoundingClientRect(),
                 screenHeight = window.screen.height,
-                windowInnerHeight = window.innerHeight,
-                addressBarCurrentHeight = 0;
-
-            if (screenHeight === (addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight )) {
-                addressBarCurrentHeight = addressBarHeight;
-            }
+                windowInnerHeight = window.innerHeight;
 
             return {
                 x: elementPosition.left,
-                y: statusBarHeight + addressBarCurrentHeight + elementPosition.top
+                y: (screenHeight - windowInnerHeight) + elementPosition.top
             };
         }
-
-        var _ = this.mergeDefaultOptions(this.deviceOffsets, { addressBar: 24, statusBar: 56, toolbar: 48 });
-
-        return browser.executeScript(getDataObject, element.getWebElement(), _.addressBar, _.statusBar, _.toolbar);
+        return browser.executeScript(getDataObject, element.getWebElement());
     },
 
     /**

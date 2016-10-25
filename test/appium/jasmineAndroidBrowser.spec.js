@@ -3,7 +3,7 @@
 var fs = require('fs'),
     PixDiff = require('../../');
 
-describe('Pix-Diff iOS', function () {
+describe('Pix-Diff Android', function () {
 
     var headerElement = element.all(by.css('div h2')).get(2);
 
@@ -27,16 +27,17 @@ describe('Pix-Diff iOS', function () {
             var tagName = 'examplePage';
 
             browser.pixDiff.saveScreen(tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/../screenshots/'+ tagName +'-safari-750x1334.png')).toBe(true);
+                expect(fs.existsSync(__dirname + '/../screenshots/'+ tagName +'-browser-720x1280.png')).toBe(true);
                 done();
             });
         });
 
-        it('should save the screen region', function () {
+        it('should save the screen region', function (done) {
             var tagName = 'examplePageRegion';
 
             browser.pixDiff.saveRegion(element(by.css('h1')), tagName).then(function () {
-                expect(fs.existsSync(__dirname + '/../screenshots/'+ tagName +'-safari-750x1334.png')).toBe(true);
+                expect(fs.existsSync(__dirname + '/../screenshots/'+ tagName +'-browser-720x1280.png')).toBe(true);
+                done();
             });
         });
 
@@ -57,6 +58,31 @@ describe('Pix-Diff iOS', function () {
         });
     });
 
+    describe('scroll into view', function () {
+
+        beforeEach(function () {
+            browser.pixDiff = new PixDiff({
+                basePath: 'test/screenshots'
+            });
+
+            browser.scrolledPage = browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement());
+        });
+
+        it('should save a scrolled screen', function (done) {
+            browser.scrolledPage.then(function () {
+                browser.pixDiff.saveScreen('scrolledPage');
+                done();
+            });
+        });
+
+        it('should save a scrolled screen region', function (done) {
+            browser.scrolledPage.then(function () {
+                browser.pixDiff.saveRegion(headerElement, 'scrolledPageRegion');
+                done();
+            });
+        });
+    });
+
     describe('format image name', function () {
 
         beforeEach(function () {
@@ -69,7 +95,7 @@ describe('Pix-Diff iOS', function () {
 
         it('should save screen with formatted basename', function () {
             browser.pixDiff.saveScreen('appium').then(function () {
-                expect(fs.existsSync(__dirname + '/../screenshots/TEST_appium_safari_iPhoneSimulator_dpr_2_750-1334.png')).toBe(true);
+                expect(fs.existsSync(__dirname + '/../screenshots/TEST_appium_browser_samsungGalaxyS4Emulator_dpr_2_720-1280.png')).toBe(true);
             });
         });
     });

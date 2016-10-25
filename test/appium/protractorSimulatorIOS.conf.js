@@ -6,7 +6,7 @@ exports.config = {
 
     framework: 'jasmine2',
 
-    baseUrl: 'http://www.example.com',
+    baseUrl: 'http://getbootstrap.com/2.3.2/examples/hero.html',
 
     specs: ['jasmineSafari.spec.js'],
 
