@@ -18,7 +18,8 @@ exports.config = {
         platformVersion:'4.4',
         app: 'browser',
         username: process.env.SAUCE_USERNAME,
-        accessKey: process.env.SAUCE_ACCESS_KEY
+        accessKey: process.env.SAUCE_ACCESS_KEY,
+        'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
     },
 
     onPrepare: function () {
