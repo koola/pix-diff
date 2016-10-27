@@ -19,6 +19,7 @@ exports.config = {
         app:'safari',
         username: process.env.SAUCE_USERNAME,
         accessKey: process.env.SAUCE_ACCESS_KEY,
+        build: process.env.TRAVIS_JOB_NUMBER,
         'tunnel-identifier': process.env.TRAVIS_JOB_NUMBER
     },
 
