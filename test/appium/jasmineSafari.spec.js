@@ -32,16 +32,17 @@ describe('Pix-Diff iOS', function () {
             });
         });
 
-        it('should save the screen region', function () {
+        it('should save the screen region', function (done) {
             var tagName = 'examplePageRegion';
 
             browser.pixDiff.saveRegion(element(by.css('h1')), tagName).then(function () {
                 expect(fs.existsSync(__dirname + '/../screenshots/'+ tagName +'-safari-750x1334.png')).toBe(true);
+                done();
             });
         });
 
         it('should match the page with custom matcher', function () {
-            expect(browser.pixDiff.checkScreen('examplePage')).toMatchScreen();
+            expect(browser.pixDiff.checkScreen('examplePage', {blockOut: [{x: 0, y: 0, width: 750, height: 128}]})).toMatchScreen();
         });
 
         it('should not match the page with custom matcher', function () {
@@ -53,6 +54,31 @@ describe('Pix-Diff iOS', function () {
                 fail('should not be called');
             }, function (error) {
                 expect(error.message).toContain('no such file or directory');
+            });
+        });
+    });
+
+    describe('scroll into view', function () {
+
+        beforeEach(function () {
+            browser.pixDiff = new PixDiff({
+                basePath: 'test/screenshots'
+            });
+
+            browser.scrolledPage = browser.executeScript('arguments[0].scrollIntoView();', headerElement.getWebElement());
+        });
+
+        it('should save a scrolled screen', function (done) {
+            browser.scrolledPage.then(function () {
+                browser.pixDiff.saveScreen('scrolledPage');
+                done();
+            });
+        });
+
+        it('should save a scrolled screen region', function (done) {
+            browser.scrolledPage.then(function () {
+                browser.pixDiff.saveRegion(headerElement, 'scrolledPageRegion');
+                done();
             });
         });
     });

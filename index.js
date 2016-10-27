@@ -176,25 +176,6 @@ PixDiff.prototype = {
         return this.platformName === 'ios';
     },
 
-//    /**
-//     * Return the device pixel ratio (firefox always equals 1)
-//     *
-//     * @method getPixelDeviceRatio
-//     * @return {integer}
-//     * @private
-//     */
-//    getPixelDeviceRatio: function () {
-//        var ratio;
-//
-//        return this.flow.execute(function () {
-//            return browser.executeScript('return window.devicePixelRatio;')
-//                .then(function (devicePixelRatio) {
-//                    ratio = Math.floor(devicePixelRatio);
-//                    return (ratio > 1 && !this.isFirefox()) ? ratio : this.devicePixelRatio;
-//                }.bind(this));
-//        }.bind(this));
-//    },
-
     /**
      * Get the position of the element
      * Firefox and IE make a screenshot of the complete page, not of the visbile part. The rest of the browsers make a
@@ -264,7 +245,7 @@ PixDiff.prototype = {
     },
 
     /**
-     * Get the position of a given element for the Safari browser
+     * Get the position of a given element for the IOS Safari browser
      *
      * @method getElementPositionIOS
      * @param {promise} element
@@ -278,17 +259,17 @@ PixDiff.prototype = {
                 windowInnerHeight = window.innerHeight,
                 y;
 
-            if (screenHeight === (addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight)) {
-                // Address bar and Toolbar are still visible due to not scrolling or via JS scrolling
-                y = statusBarHeight + addressBarHeight + elementPosition.top;
+            if (screenHeight === addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight) {
+                // Address bar and Toolbar still visible
+                y = statusBarHeight + addressBarHeight;
             } else {
-                // Address bar got smaller and Toolbar disappeared due to manual scrolling
-                y = (screenHeight - windowInnerHeight) + elementPosition.top;
+                // Address bar collapsed and Toolbar disappeared due to manual scrolling
+                y = screenHeight - windowInnerHeight;
             }
 
             return {
                 x: elementPosition.left,
-                y: y
+                y: y + elementPosition.top
             };
         }
 
@@ -298,7 +279,7 @@ PixDiff.prototype = {
     },
 
     /**
-     * Get the position of a given element for the Chrome browser
+     *Get the position of a given element for the Android browser
      *
      * @method getElementPositionAndroid
      * @param {promise} element
@@ -306,17 +287,25 @@ PixDiff.prototype = {
      * @private
      */
     getElementPositionAndroid: function (element) {
-        function getDataObject (element) {
-            var elementPosition = element.getBoundingClientRect(),
-                screenHeight = window.screen.height,
-                windowInnerHeight = window.innerHeight;
+        function getDataObject (element, addressBarHeight, statusBarHeight, toolbarHeight) {
+                var elementPosition = element.getBoundingClientRect(),
+                        screenHeight = window.screen.height,
+                        windowInnerHeight = window.innerHeight,
+                        addressBarCurrentHeight = 0;
 
-            return {
-                x: elementPosition.left,
-                y: (screenHeight - windowInnerHeight) + elementPosition.top
-            };
+                    if (screenHeight === (addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight )) {
+                        addressBarCurrentHeight = addressBarHeight;
+                    }
+
+                    return {
+                        x: elementPosition.left,
+                        y: statusBarHeight + addressBarCurrentHeight + elementPosition.top
+                };
         }
-        return browser.executeScript(getDataObject, element.getWebElement());
+
+        var _ = this.mergeDefaultOptions(this.deviceOffsets, { addressBar: 53, statusBar: 24, toolbar: 0 });
+
+        return browser.executeScript(getDataObject, element.getWebElement(), _.addressBar, _.statusBar, _.toolbar);
     },
 
     /**
