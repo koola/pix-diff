@@ -80,5 +80,5 @@ module.exports = function(grunt) {
     grunt.registerTask('android', 'Run Appium tests on Saucelabs', ['clean:screens', 'run:android']);
     grunt.registerTask('build', ['jshint:all']);
     grunt.registerTask('release', ['bump']);
-    grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber']);
+    grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber', 'ios', 'android']);
 };
