@@ -233,12 +233,14 @@ PixDiff.prototype = {
     /**
      * Get the height and width of the browser
      *
-     * @method getDeviceDimensions
+     * @method getBrowserDimensions
      * @returns {promise}
      * @private
      */
     getBrowserDimensions: function () {
-        return browser.executeScript('return { height: window.screen.height, width: window.screen.width};');
+        return browser.browser.driver.manage().window().getSize().then(function (size) {
+            return { height: size.height, width: size.width };
+        });
     },
 
     /**
