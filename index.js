@@ -44,7 +44,7 @@ function PixDiff(options) {
     this.width = options.width || 1280;
     this.height = options.height || 1024;
 
-    this.autoResize = options.autoResize === false || true;
+    this.autoResize = !(options.autoResize === false);
 
     this.formatOptions = options.formatImageOptions || {};
     this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}';
