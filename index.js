@@ -76,12 +76,12 @@ function PixDiff(options) {
         return this.getBrowserDimensions();
 
     }.bind(this)).then(function (dimensions) {
-        if (this.platformName) {
+        if (this.autoResize) {
+            browser.driver.manage().window().setSize(this.width, this.height);
+        }
+        else {
             this.height = dimensions.height;
             this.width = dimensions.width;
-        }
-        else if (this.autoResize) {
-            browser.driver.manage().window().setSize(this.width, this.height);
         }
     }.bind(this));
 }
