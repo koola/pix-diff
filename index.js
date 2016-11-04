@@ -238,9 +238,11 @@ PixDiff.prototype = {
      * @private
      */
     getBrowserDimensions: function () {
-        return browser.browser.driver.manage().window().getSize().then(function (size) {
-            return { height: size.height, width: size.width };
-        });
+        // we need screen.height for the appium implementation, outerHeight for the desktop implementation
+        const windowHeight = this.platformName ? 'window.screen.height' : 'window.outerHeight',
+            windowWidth = this.platformName ? 'window.screen.width' : 'window.outerWidth';
+
+        return browser.driver.executeScript(`return { height: ${windowHeight}, width: ${windowWidth}};`);
     },
 
     /**
