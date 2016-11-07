@@ -3,10 +3,12 @@ Pix-Diff
 
 A lightweight protractor plugin for image comparison
 
+[![dependencies Status](https://david-dm.org/koola/pix-diff.svg)](https://david-dm.org/koola/pix-diff)
 [![Build Status](https://travis-ci.org/koola/pix-diff.svg)](https://travis-ci.org/koola/pix-diff)
+[![Sauce Test Status](https://saucelabs.com/buildstatus/pixdiff)](https://saucelabs.com/u/pixdiff)
 [![npm version](https://badge.fury.io/js/pix-diff.svg)](http://badge.fury.io/js/pix-diff)
 
-[![NPM](https://nodei.co/npm/pix-diff.png)](https://nodei.co/npm/pix-diff/)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/pixdiff.svg)](https://saucelabs.com/u/pixdiff)
 
 ##Installation
 
@@ -22,124 +24,52 @@ npm install --save-dev pix-diff
 ```
 
 ##Usage
+Pix-Diff can be used for:
 
-The package can be used directly in individual tests or via ```onPrepare``` in the Protractor configuration file.
+- Desktop browsers (Chrome / Firefox / Safari / Internet Explorer 11 / Microsoft Edge)
+- Mobile browsers (Chrome / Safari on simulators / real devices) based on Appium
 
-**Example:**
-```javascript
-exports.config = {
-   // your config here ...
+For more information about mobile testing see the [Appium](./docs/appium.md) documentation.
 
-    onPrepare: function() {
-        var PixDiff = require('pix-diff');
-        browser.pixDiff = new PixDiff(
-            {
-                basePath: 'path/to/screenshots/',
-                width: 1280,
-                height: 1024
-            }
-        );
-    },
-}
-```
+Pix-Diff provides:
 
-PixDiff provides two comparison methods ```checkScreen``` and ```checkRegion``` along with Jasmine ```toMatchScreen``` and Mocha ```matchScreen``` matchers. Two helper methods ```saveScreen``` and ```saveRegion``` are provided for saving images.
-PixDiff can also work with Cucumber.js. There are no comparison methods provided for Cucumber.js because Cucumber.js doesn't have its own ```expect``` methods.
+- Comparison methods `checkScreen` and `checkRegion`.
+- Helper methods `saveScreen` and `saveRegion` for saving images.
 
-**Jasmine Example:**
-```javascript
-describe("Example page", function() {
+Pix-Diff can work with Jasmine and Cucumber.js. See [Examples](./docs/examples.md) for the Jasmine and CucumberJS implementation.
 
-    beforeEach(function() {
-        browser.get('http://www.example.com/');
-    });
+###saveScreen or checkScreen
+The methods `saveScreen` and `checkScreen` create a screenshot of the viewport. Be aware that there are different webdriver implementations in creating complete screenshots.
+For example:
 
-    it("should match the page", function () {
-        expect(browser.pixDiff.checkScreen('examplePage')).toMatchScreen();
-    });
+- **screenshot of visible viewport:**
+    - Chrome
+    - Safari
+    - Firefox with geckodriver (version 48 and above)
+    - Microsoft Edge
+- **screenshots of complete page**
+    - Firefox (version 47 and below)
+    - Internet Explorer (11 and below)
 
-    it("should not match the page", function () {
-        element(By.buttonText('yes')).click();
-        expect(browser.pixDiff.checkScreen('examplePage')).not.toMatchScreen();
-    });
-
-    it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')).toMatchScreen();
-    });
-
-    it("should match the title", function () {
-        expect(browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
-            blockOut: [{x: 10, y: 132, width: 100, height: 50}]})).toMatchScreen();
-    });
-});
-```
-
-**Cucumber Example:**
-```javascript
-var expect = require('chai').expect;
-
-function CucumberSteps() {
-    this.Given(/^I load the url$/, function () {
-        return browser.get('http://www.example.com/');
-    });
-
-    this.Then(/^Pix\-Diff should match the page$/, function () {
-        return browser.pixDiff.checkScreen('examplePage')
-            .then(function (result) {
-                return expect(result.differences).to.equal(0);
-            });
-    });
-
-    this.Then(/^Pix\-Diff should not match the page$/, function () {
-        element(By.buttonText('yes')).click();
-        return browser.pixDiff.checkScreen('examplePage')
-            .then(function (result) {
-                return expect(result.differences).to.not.equal(0);
-            });
-    });
-
-    this.Then(/^Pix\-Diff should match the title$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle')
-            .then(function (result) {
-                return expect(result.differences).to.equal(0);
-            });
-    });
-
-    this.Then(/^Pix\-Diff should match the title with blockout$/, function () {
-        return browser.pixDiff.checkRegion(element(By.id('title')), 'examplePageTitle', {
-            blockOut: [{x: 10, y: 132, width: 100, height: 50}]})
-            .then(function (result) {
-                return expect(result.differences).to.equal(0);
-            });
-    });
-}
-
-module.exports = CucumberSteps;
-```
+###saveElement or checkElement
+Images are cropped from the complete screenshot by using the `saveElement` or `checkRegion` methods.
+The methods will calculate the correct dimensions based upon the webdriver element selector
 
 ####PixDiff Parameters:
 
 * ```basePath``` Defines the path to the reference images that are to be compared.
 * ```baseline``` Toggles saving the screen when not found in reference images (default: false)
-* ```width``` Browser width (default: 1280)
-* ```height``` Browser height (default: 1024)
-* ```autoResize``` Auto (re)size the browser (default: true)
+* ```width``` Browser width when set resizes the browser width.
+* ```height``` Browser height when set resizes the browsers height.
 * ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
 
-####Function options:
+####Method options:
 
 * ```blockOut``` Object or list of objects with coordinates that should be blocked before comparing. (default: none)
 * ```debug``` When set, then block-out regions will be shown on the output image. (default: false)
 
-####Cropping
-Images can be cropped before they are compared by using the ```checkRegion``` function. The function will calculate the correct dimensions based upon the webdriver element selector (see example above).
-
 ####Block-Out
 Sometimes, it is necessary to block-out some specific areas in an image that should be ignored for comparisons. For example, this can be IDs or even time-labels that change with the time. Adding block-outs to images may decrease false positives and therefore stabilizes these comparisons (see example above).
-
-####Different webdriver implementation
-There is a difference in the webdriver implementation in taking screenshots. Firefox and Internet Explorer (not tested Edge yet) take a screenshot of the complete page, even if the page needs to be scrolled. Chrome and Safari only take a screenshot of the visible portion of the page.
-Keep this in mind when comparing screenshots of screens with each other.
 
 ## Conventions
 There are directory and naming conventions that must be met.
@@ -173,30 +103,24 @@ The naming convention can be customized by passing the parameter ```formatImageN
 ```
 The following variables can be passed to format the string
 * ```browserName``` The browser name property from the capabilities
+* ```deviceName``` The device name property from the capabilities
 * ```dpr``` The device pixel ratio
 
 Images specified via name in the spec method will be selected according to the browsers current resolution. That is to say that multiple images can share the same name differentated by resolution.
 
-##Documentation
-
-todo
-
 ##Tests
 
-Run all tests with the following command:
-```shell
-npm test
-```
+### Local
+- `npm test` or `npm test -- local`: Run all tests on a local machine with Chrome and Firefox (via direct connect, first run `npm run wd-update` to update the webdriver. This needs to be done once after install)
 
-Run all tests by framework:
-```shell
-npm test -- jasmine/mocha/cucumber
-```
+### Travis-ci with Sauce Labs
+- `npm test -- saucelabs`: This command is used to test the build through [Travis-ci](https://travis-ci.org/koola/pix-diff/). It runs a variety of desktop and mobile browser tests, see [here](./test/conf/protractor.saucelabs.conf.js)
 
 ###Dependencies
 * [blink-diff](https://github.com/yahoo/blink-diff)
 * [png-image](https://github.com/koola/png-image)
 * [camel-case](https://github.com/blakeembrey/camel-case)
+* [mkdirp](https://github.com/substack/node-mkdirp)
 
 ###Dev-Dependencies
 * [grunt](https://github.com/gruntjs/grunt)
@@ -205,10 +129,6 @@ npm test -- jasmine/mocha/cucumber
 * [grunt-protractor-runner](https://github.com/teerapap/grunt-protractor-runner)
 * [load-grunt-tasks](https://github.com/sindresorhus/load-grunt-tasks)
 * [protractor](https://github.com/angular/protractor)
-* [mocha](https://github.com/mochajs/mocha)
-* [chai](https://github.com/chaijs/chai)
-* [cucumber](https://github.com/cucumber/cucumber-js)
-* [protractor-cucumber-framework](https://github.com/mattfritz/protractor-cucumber-framework)
 
 ##License
 
