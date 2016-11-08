@@ -9,33 +9,35 @@ let BlinkDiff = require('blink-diff'),
 
 describe('Pix-Diff', () => {
 
+    browser.pixDiff = new PixDiff({
+        basePath: './test/baseline/desktop/',
+        diffPath: './test/',
+        width: 1366,
+        height: 768
+    });
+
     const browserName = browser.browserName,
         dpr = browser.devicePixelRatio,
         pageHeader = element(by.css('div h1')),
         subHeader = element.all(by.css('div h2')).get(2),
         tagPage = 'examplePage',
-        tagRegion = 'examplePageRegion';
+        tagRegion = 'examplePageRegion',
+        width = browser.pixDiff.width * dpr[browserName],
+        height = browser.pixDiff.height * dpr[browserName];
 
     beforeEach(() => {
-        browser.pixDiff = new PixDiff({
-            basePath: './test/baseline/desktop/',
-            diffPath: './test/',
-            width: 1366,
-            height: 768
-        });
-
         browser.get(browser.baseUrl).then(()=> browser.sleep(500));
     });
 
     it('should save the screen', () => {
         browser.pixDiff.saveScreen(tagPage).then(() => {
-            expect(fs.existsSync(`${baselinePath}/${tagPage}-${browserName}-1366x768-dpr-${dpr[browserName]}.png`)).toBe(true);
+            expect(fs.existsSync(`${baselinePath}/${tagPage}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
         });
     });
 
     it('should save the region', () => {
         browser.pixDiff.saveRegion(subHeader, tagRegion).then(() => {
-            expect(fs.existsSync(`${baselinePath}/${tagRegion}-${browserName}-1366x768-dpr-${dpr[browserName]}.png`)).toBe(true);
+            expect(fs.existsSync(`${baselinePath}/${tagRegion}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
         });
     });
 
@@ -52,7 +54,7 @@ describe('Pix-Diff', () => {
                 .then(() => browser.pixDiff.checkScreen(tagPage, {threshold: 1}))
                 .then((result) => {
                     expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagPage}-${browserName}-1366x768-dpr-${dpr[browserName]}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagPage}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
                 });
         });
 
@@ -78,7 +80,7 @@ describe('Pix-Diff', () => {
                 .then(() => browser.pixDiff.checkRegion(subHeader, tagRegion, {threshold: 1}))
                 .then((result) => {
                     expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${browserName}-1366x768-dpr-${dpr[browserName]}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
                 });
         });
 
