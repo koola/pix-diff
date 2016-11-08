@@ -321,7 +321,7 @@ class PixDiff {
         fs.access(path.join(this.basePath, this._getImageName(tag)), fs.F_OK, error => {
             if (error) {
                 if (!this.baseline) {
-                    deferred.reject(error.message);
+                    deferred.reject(error);
                 } else {
                     deferred.reject(new Error('Image not found, saving current image as new baseline.'));
                 }
