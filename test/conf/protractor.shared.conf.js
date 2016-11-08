@@ -24,7 +24,7 @@ exports.config = {
         env.clearReporters();
 
         env.addReporter(new SpecReporter({
-            displayStacktrace: 'specs',
+            displayStacktrace: 'none',
             displayFailuresSummary: false,
             displayPendingSummary: false,
             displayPendingSpec: true,
