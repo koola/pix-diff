@@ -27,7 +27,7 @@ npm install --save-dev pix-diff
 Pix-Diff can be used for:
 
 - Desktop browsers (Chrome / Firefox / Safari / Internet Explorer 11 / Microsoft Edge)
-- Mobile browsers (Chrome / Safari on simulators / real devices) based on Appium
+- Mobile browsers (Chrome / Safari on simulators / real devices) via Appium
 
 For more information about mobile testing see the [Appium](./docs/appium.md) documentation.
 
@@ -45,14 +45,14 @@ For example:
 - **screenshot of visible viewport:**
     - Chrome
     - Safari
-    - Firefox with geckodriver (version 48 and above)
+    - Firefox
     - Microsoft Edge
 - **screenshots of complete page**
     - Firefox (version 47 and below)
     - Internet Explorer (11 and below)
 
-###saveElement or checkElement
-Images are cropped from the complete screenshot by using the `saveElement` or `checkRegion` methods.
+###saveRegion or checkRegion
+Images are cropped from the complete screenshot by using the `saveRegion` or `checkRegion` methods.
 The methods will calculate the correct dimensions based upon the webdriver element selector
 
 ####PixDiff Parameters:
@@ -93,7 +93,7 @@ The ```basePath``` directory must contain all the *approved* images. You may cre
 Images should obey the following default format:
 
 ```text
-{descriptionInCamelCase}-{browserName}-{browserWidth}x{browserHeight}.png
+{descriptionInCamelCase}-{browserName}-{width}x{height}-dpr-{dpr}.png
 ```
 
 The naming convention can be customized by passing the parameter ```formatImageName``` with a format string like:
@@ -110,11 +110,11 @@ Images specified via name in the spec method will be selected according to the b
 
 ##Tests
 
-### Local
-- `npm test` or `npm test -- local`: Run all tests on a local machine with Chrome and Firefox (via direct connect, first run `npm run wd-update` to update the webdriver. This needs to be done once after install)
+#### Local
+- `npm test` or `npm test -- local`: Run all tests on a local machine with Chrome and Firefox (first run `npm run wd-update` to update the webdriver. This needs to be done once after install)
 
-### Travis-ci with Sauce Labs
-- `npm test -- saucelabs`: This command is used to test the build through [Travis-ci](https://travis-ci.org/koola/pix-diff/). It runs a variety of desktop and mobile browser tests, see [here](./test/conf/protractor.saucelabs.conf.js)
+#### Sauce Labs
+- `npm test -- saucelabs`: This command is used to test the build with [Travis-ci](https://travis-ci.org/koola/pix-diff/). It runs a variety of desktop and mobile browser tests, see [here](./test/conf/protractor.saucelabs.conf.js)
 
 ###Dependencies
 * [blink-diff](https://github.com/yahoo/blink-diff)
