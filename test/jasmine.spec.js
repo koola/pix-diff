@@ -9,35 +9,37 @@ let BlinkDiff = require('blink-diff'),
 
 describe('Pix-Diff', () => {
 
-    browser.pixDiff = new PixDiff({
-        basePath: './test/baseline/desktop/',
-        diffPath: './test/',
-        width: 1366,
-        height: 768
-    });
-
     const browserName = browser.browserName,
         dpr = browser.devicePixelRatio,
         pageHeader = element(by.css('div h1')),
         subHeader = element.all(by.css('div h2')).get(2),
         tagPage = 'examplePage',
         tagRegion = 'examplePageRegion',
-        width = browser.pixDiff.width * dpr[browserName],
-        height = browser.pixDiff.height * dpr[browserName];
+        width = 1366,
+        height = 768,
+        dprWidth = width * dpr[browserName],
+        dprHeight= height * dpr[browserName];
 
     beforeEach(() => {
+        browser.pixDiff = new PixDiff({
+            basePath: './test/baseline/desktop/',
+            diffPath: './test/',
+            width: width,
+            height: height
+        });
+
         browser.get(browser.baseUrl).then(()=> browser.sleep(500));
     });
 
     it('should save the screen', () => {
         browser.pixDiff.saveScreen(tagPage).then(() => {
-            expect(fs.existsSync(`${baselinePath}/${tagPage}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
+            expect(fs.existsSync(`${baselinePath}/${tagPage}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
         });
     });
 
     it('should save the region', () => {
         browser.pixDiff.saveRegion(subHeader, tagRegion).then(() => {
-            expect(fs.existsSync(`${baselinePath}/${tagRegion}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
+            expect(fs.existsSync(`${baselinePath}/${tagRegion}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
         });
     });
 
@@ -54,7 +56,7 @@ describe('Pix-Diff', () => {
                 .then(() => browser.pixDiff.checkScreen(tagPage, {threshold: 1}))
                 .then((result) => {
                     expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagPage}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagPage}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
                 });
         });
 
@@ -80,7 +82,7 @@ describe('Pix-Diff', () => {
                 .then(() => browser.pixDiff.checkRegion(subHeader, tagRegion, {threshold: 1}))
                 .then((result) => {
                     expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${browserName}-${width}x${height}-dpr-${dpr[browserName]}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
                 });
         });
 
@@ -89,6 +91,30 @@ describe('Pix-Diff', () => {
                 fail(new Error('This should not fail'));
             }, error => {
                 expect(error.message).toContain('no such file or directory');
+            });
+        });
+    });
+
+    describe('baseline', () => {
+
+        beforeEach(function () {
+            browser.pixDiff = new PixDiff({
+                basePath: './test/baseline/desktop/',
+                diffPath: './test/',
+                baseline: true,
+                width: width,
+                height: height
+            });
+        });
+
+        it('should save a screen region when baseline image not found', () => {
+            const tagBaseline = 'baselineRegion';
+
+            browser.pixDiff.checkScreen(tagBaseline).then(() => {
+                fail('should not be called');
+            }, (error) => {
+                expect(error.message).toContain('Image not found');
+                expect(fs.existsSync(`${baselinePath}/${tagBaseline}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
             });
         });
     });

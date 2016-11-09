@@ -459,8 +459,13 @@ class PixDiff {
         let defaults;
 
         return this._getBrowserData()
-            .then(() => this._checkImageExists(tag), (error) => { throw error.message; })
-            .then(() => browser.takeScreenshot())
+            .then(() => this._checkImageExists(tag))
+            .then(() => browser.takeScreenshot(), (error) => {
+                if (this.baseline) {
+                    return this.saveScreen(tag).then(() => { throw error; })
+                }
+                throw error;
+            })
             .then((image) => {
                 tag = this._getImageName(tag);
                 defaults = {
@@ -494,8 +499,13 @@ class PixDiff {
             defaults;
 
         return this._getBrowserData()
-            .then(() => this._checkImageExists(tag), (error) => { throw error.message; })
-            .then(() => this._getElementRectangle(element))
+            .then(() => this._checkImageExists(tag))
+            .then(() => this._getElementRectangle(element), (error) => {
+                if (this.baseline) {
+                    return this.saveScreen(tag).then(() => { throw error; })
+                }
+                throw error;
+            })
             .then((elementRect) => {
                 rect = elementRect;
                 return browser.takeScreenshot();
