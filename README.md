@@ -62,11 +62,14 @@ The methods will calculate the correct dimensions based upon the webdriver eleme
 * ```width``` Browser width when set resizes the browser width.
 * ```height``` Browser height when set resizes the browsers height.
 * ```formatImageName``` Naming format for images (default: ```"{tag}-{browserName}-{width}x{height}"```)
+* ```formatImageOptions``` Additional options to be used with ```formatImageName```
 
 ####Method options:
 
 * ```blockOut``` Object or list of objects with coordinates that should be blocked before comparing. (default: none)
 * ```debug``` When set, then block-out regions will be shown on the output image. (default: false)
+
+Additional BlinkDiff options can be passed in, see [here](https://github.com/yahoo/blink-diff#object-usage) for all parameters available.
 
 ####Block-Out
 Sometimes, it is necessary to block-out some specific areas in an image that should be ignored for comparisons. For example, this can be IDs or even time-labels that change with the time. Adding block-outs to images may decrease false positives and therefore stabilizes these comparisons (see example above).
@@ -105,6 +108,8 @@ The following variables can be passed to format the string
 * ```browserName``` The browser name property from the capabilities
 * ```deviceName``` The device name property from the capabilities
 * ```dpr``` The device pixel ratio
+* ```logName``` The logName from capabilities
+* ```name``` The name from capabilities
 
 Images specified via name in the spec method will be selected according to the browsers current resolution. That is to say that multiple images can share the same name differentated by resolution.
 
