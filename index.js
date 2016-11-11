@@ -32,6 +32,7 @@ const assert = require('assert'),
  * @property {object} mobileOffsets
  * @property {int} devicePixelRatio
  * @property {string} browserName
+ * @property {string} logName
  * @property {string} name
  * @property {string} platformName
  * @property {string} deviceName
@@ -59,17 +60,15 @@ class PixDiff {
             mkdirp.sync(this.diffPath);
         }
 
-        // Initialize
-        browser.getProcessedConfig()
-            .then(_ => {
-            // Desktop
+        browser.getProcessedConfig().then(_ => {
             this.browserName = _.capabilities.browserName ? camelCase(_.capabilities.browserName) : '';
             this.name = _.capabilities.name ? camelCase(_.capabilities.name) : '';
+            this.logName = _.capabilities.logName ? camelCase(_.capabilities.logName) : '';
             // Mobile
             this.platformName = _.capabilities.platformName ? _.capabilities.platformName.toLowerCase() : '';
             this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
             this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot ? _.capabilities.nativeWebScreenshot : false;
-            // Matchers for jasmine(2)/mocha
+
             if (_.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', _.framework));
             }
@@ -114,6 +113,7 @@ class PixDiff {
                 'tag': camelCase(tag),
                 'browserName': this.browserName,
                 'deviceName': this.deviceName,
+                'logName': this.logName,
                 'name': this.name,
                 'dpr': this.devicePixelRatio,
                 'width': this.width,
