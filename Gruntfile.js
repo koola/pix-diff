@@ -38,11 +38,22 @@ module.exports = function(grunt) {
             }
         },
 
+        conventionalChangelog: {
+            options: {
+                changelogOpts: {
+                    preset: 'angular'
+                }
+            },
+            release: {
+                src: 'CHANGELOG.md'
+            }
+        },
+
         bump: {
             options: {
                 files: ['package.json'],
                 commit: true,
-                commitMessage: 'Release v%VERSION%',
+                commitMessage: 'chore(release) v%VERSION%',
                 commitFiles: ['package.json', 'CHANGELOG.md'],
                 createTag: true,
                 tagName: 'v%VERSION%',
@@ -58,6 +69,6 @@ module.exports = function(grunt) {
     grunt.registerTask('local', 'Run desktop tests on local', ['clean:screens', 'run:local']);
     grunt.registerTask('saucelabs', 'Run all tests on Saucelabs', ['clean:screens', 'run:saucelabs']);
     grunt.registerTask('build', ['jshint:all']);
-    grunt.registerTask('release', ['bump']);
+    grunt.registerTask('release', ['conventionalChangelog', 'bump']);
     grunt.registerTask('default', ['local']);
 };

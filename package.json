@@ -15,11 +15,12 @@
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-jshint": "^1.0.0",
+    "grunt-conventional-changelog": "^6.1.0",
     "grunt-run": "^0.6.0",
+    "jasmine-spec-reporter": "^2.7.0",
     "jshint": "^2.9.2",
     "load-grunt-tasks": "^3.5.0",
-    "protractor": "^4.0.10",
-    "jasmine-spec-reporter": "^2.7.0"
+    "protractor": "^4.0.10"
   },
   "scripts": {
     "wd-update": "node_modules/.bin/webdriver-manager update",
