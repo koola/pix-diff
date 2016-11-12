@@ -16,11 +16,12 @@ const assert = require('assert'),
  * @param {object} options
  * @param {string} options.basePath Path to baseline images folder
  * @param {string} options.diffPath Path to difference folder
- * @param {string} options.baseline Save images not found in baseline
- * @param {string} options.width Width of browser
- * @param {string} options.height Height of browser
+ * @param {boolean} options.baseline Save images not found in baseline
+ * @param {int} options.width Width of browser
+ * @param {int} options.height Height of browser
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
+ * @param {object} options.offsets Mobile offsets needed for element position lookup
  *
  * @property {string} basePath
  * @property {string} diffPath
@@ -29,14 +30,14 @@ const assert = require('assert'),
  * @property {int} height
  * @property {string} formatOptions
  * @property {string} formatString
- * @property {object} mobileOffsets
+ * @property {object} offsets
  * @property {int} devicePixelRatio
  * @property {string} browserName
  * @property {string} logName
  * @property {string} name
  * @property {string} platformName
  * @property {string} deviceName
- * @property {string} nativeWebScreenshot
+ * @property {boolean} nativeWebScreenshot
  */
 class PixDiff {
     constructor(options) {
@@ -50,8 +51,11 @@ class PixDiff {
         this.height = options.height;
         this.formatOptions = options.formatImageOptions || {};
         this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}-dpr-{dpr}';
-        this.mobileOffsets = {};
+        this.offsets = options.offsets || {ios: {}, android: {}};
         this.devicePixelRatio = 1;
+
+        this.offsets.ios = this._mergeDefaultOptions(this.offsets.ios, {statusBar: 20, addressBar: 44});
+        this.offsets.android = this._mergeDefaultOptions(this.offsets.android, {statusBar: 24, addressBar: 56, toolBar: 48});
 
         if (!fs.existsSync(this.basePath) || !fs.statSync(this.basePath).isDirectory()) {
             mkdirp.sync(this.basePath);
@@ -67,7 +71,7 @@ class PixDiff {
             // Mobile
             this.platformName = _.capabilities.platformName ? _.capabilities.platformName.toLowerCase() : '';
             this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
-            this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot ? _.capabilities.nativeWebScreenshot : false;
+            this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot || false;
 
             if (_.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', _.framework));
@@ -91,7 +95,7 @@ class PixDiff {
     _mergeDefaultOptions(optionsA, optionsB) {
         optionsB = (typeof optionsB === 'object') ? optionsB : {};
 
-        Object.keys(optionsB).forEach((value) => {
+        Object.keys(optionsB).forEach(value => {
             if (!optionsA.hasOwnProperty(value)) {
                 optionsA[value] = optionsB[value];
             }
@@ -127,7 +131,7 @@ class PixDiff {
             formatString = formatString.replace(`{${value}}`, defaults[value]);
         });
 
-        return `${formatString}.png`;
+        return formatString + '.png';
     }
 
     /**
@@ -189,22 +193,19 @@ class PixDiff {
      * Get the position of the element
      * Firefox and IE take a screenshot of the complete page. Chrome takes a screenshot of the viewport.
      *
-     * @todo Refactor implementation for broader support
-     *
      * @method _getElementPosition
      * @param {promise} element
      * @return {promise}
      * @private
      */
     _getElementPosition(element) {
-        if (this._isFirefox() || this._isInternetExplorer()) {
-            return this._getElementPositionTopPage(element);
-        } else if (this._isIOS()) {
+        if (this._isIOS()) {
             return this._getElementPositionIOS(element);
-        } else if (this._isAndroid() || this.nativeWebScreenshot) {
-            return this._getElementPositionAndroid(element);
+        } else if (this._isAndroid() && this.nativeWebScreenshot) {
+            this._getElementPositionAndroid(element);
+        } else if (this._isFirefox() || this._isInternetExplorer()) {
+            return PixDiff._getElementPositionTopPage(element);
         }
-
         return this._getElementPositionTopWindow(element);
     }
 
@@ -216,13 +217,11 @@ class PixDiff {
      * @returns {promise}
      * @private
      */
-    _getElementPositionTopPage(element) {
-        return element.getLocation().then(function (point) {
-            return {
-                x: Math.floor(point.x),
-                y: Math.floor(point.y)
-            };
-        });
+     _getElementPositionTopPage(element) {
+        return element.getLocation()
+            .then(point => {
+                return {x: point.x, y: point.y};
+            });
     }
 
     /**
@@ -234,12 +233,9 @@ class PixDiff {
      * @private
      */
     _getElementPositionTopWindow(element) {
-        return browser.executeScript('return arguments[0].getBoundingClientRect();', element.getWebElement())
-            .then(function (position) {
-                return {
-                    x: Math.floor(position.left),
-                    y: Math.floor(position.top)
-                };
+        return browser.driver.executeScript('return arguments[0].getBoundingClientRect();', element.getWebElement())
+            .then(position => {
+                return {x: position.left, y: position.top};
             });
     }
 
@@ -252,62 +248,62 @@ class PixDiff {
      * @private
      */
     _getElementPositionIOS(element) {
-        function getDataObject (element, addressBarHeight, statusBarHeight, toolbarHeight) {
-            var elementPosition = element.getBoundingClientRect(),
+        function getDataObject(element, addressBar, statusBar) {
+            var
                 screenHeight = window.screen.height,
+                screenWidth = window.screen.width,
                 windowInnerHeight = window.innerHeight,
-                y;
+                rotatedScreenHeight = screenHeight > screenWidth ? screenWidth : screenHeight,
+                elementPosition = element.getBoundingClientRect(),
+                y = statusBar + addressBar + elementPosition.top;
 
-            if (screenHeight === addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight) {
-                // Address bar and Toolbar still visible
-                y = statusBarHeight + addressBarHeight;
-            } else {
-                // Address bar collapsed and Toolbar disappeared due to manual scrolling
-                y = screenHeight - windowInnerHeight;
+            if (screenHeight === windowInnerHeight || rotatedScreenHeight === windowInnerHeight) {
+                y = elementPosition.top;
             }
 
             return {
                 x: elementPosition.left,
-                y: y + elementPosition.top
+                y: y
             };
         }
 
-        var _ = this._mergeDefaultOptions(this.mobileOffsets, { addressBar: 44, statusBar: 20, toolbar: 44 });
-
-        return browser.executeScript(getDataObject, element.getWebElement(), _.addressBar, _.statusBar, _.toolbar);
+        return browser.driver.executeScript(getDataObject, element.getWebElement(),
+            this.offsets.ios.addressBar, this.offsets.ios.statusBar);
     }
 
     /**
-     * Get the position of a given element for the Android browser
-     *
-     * @method _getElementPositionAndroid
-     * @param {promise} element
-     * @returns {promise}
-     * @private
-     */
+      * Get the position of a given element for the Android devices browser
+      *
+      * @method _getElementPositionAndroid
+      * @param {promise} element
+      * @returns {promise}
+      * @private
+      */
     _getElementPositionAndroid(element) {
-        function getDataObject (element, addressBarHeight, statusBarHeight, toolbarHeight) {
-                var elementPosition = element.getBoundingClientRect(),
-                        screenHeight = window.screen.height,
-                        windowInnerHeight = window.innerHeight,
-                        addressBarCurrentHeight = 0;
+        function getDataObject(element, statusBarHeight, addressBarHeight, toolBarHeight) {
+            var elementPosition = element.getBoundingClientRect(),
+                screenHeight = window.screen.height,
+                windowInnerHeight = window.innerHeight,
+                addressBarCurrentHeight = 0;
 
-                    if (screenHeight === (addressBarHeight + statusBarHeight + toolbarHeight + windowInnerHeight )) {
-                        addressBarCurrentHeight = addressBarHeight;
-                    }
+            if (screenHeight === (statusBarHeight + addressBarHeight + windowInnerHeight + toolBarHeight)) {
+                addressBarCurrentHeight = addressBarHeight;
+            } else if (screenHeight === (statusBarHeight + addressBarHeight + windowInnerHeight)) {
+                addressBarCurrentHeight = addressBarHeight;
+            }
 
-                    return {
-                        x: elementPosition.left,
-                        y: statusBarHeight + addressBarCurrentHeight + elementPosition.top
-                };
+            return {
+                x: elementPosition.left,
+                y: statusBarHeight + addressBarCurrentHeight + elementPosition.top
+            };
         }
 
-        var _ = this._mergeDefaultOptions(this.mobileOffsets, { addressBar: 53, statusBar: 24, toolbar: 0 });
-
-        return browser.executeScript(getDataObject, element.getWebElement(), _.addressBar, _.statusBar, _.toolbar);
+        return browser.driver.executeScript(getDataObject, element.getWebElement(),
+            this.offsets.android.statusBar, this.offsets.android.addressBar, this.offsets.android.toolBar);
     }
 
-    /**
+
+        /**
      * Checks if image exists as a baseline image
      *
      * @method _checkImageExists
@@ -462,7 +458,7 @@ class PixDiff {
             .then(() => this._checkImageExists(tag))
             .then(() => browser.takeScreenshot(), (error) => {
                 if (this.baseline) {
-                    return this.saveScreen(tag).then(() => { throw error; })
+                    return this.saveScreen(tag).then(() => { throw error; });
                 }
                 throw error;
             })
@@ -502,7 +498,7 @@ class PixDiff {
             .then(() => this._checkImageExists(tag))
             .then(() => this._getElementRectangle(element), (error) => {
                 if (this.baseline) {
-                    return this.saveScreen(tag).then(() => { throw error; })
+                    return this.saveScreen(tag).then(() => { throw error; });
                 }
                 throw error;
             })
