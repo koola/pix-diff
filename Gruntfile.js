@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         },
 
         jshint: {
-            all: ['index.js', 'test/*.spec.js'],
+            all: ['index.js', 'test/*.spec.js', 'test/conf/*.conf.js'],
             options: {
                 jshintrc: '.jshintrc',
                 ignores: ['node_modules/', 'framework/']
@@ -65,7 +65,6 @@ module.exports = function(grunt) {
 
     });
 
-    //tasks
     grunt.registerTask('local', 'Run desktop tests on local', ['clean:screens', 'run:local']);
     grunt.registerTask('saucelabs', 'Run all tests on Saucelabs', ['clean:screens', 'run:saucelabs']);
     grunt.registerTask('build', ['jshint:all']);
