@@ -4,95 +4,81 @@ let BlinkDiff = require('blink-diff'),
     PixDiff = require('../'),
     fs = require('fs'),
     path = require('path'),
-    baselinePath = path.resolve(__dirname, '../test/baseline/desktop/'),
+    screenshotPath = path.resolve(__dirname, '../test/baseline/desktop/'),
     differencePath = path.resolve(__dirname, '../test/diff/');
 
 describe('Pix-Diff', () => {
 
-    const browserName = browser.browserName,
-        logName = browser.logName,
-        dpr = browser.devicePixelRatio,
-        pageHeader = element(by.css('div h1')),
-        subHeader = element.all(by.css('div h2')).get(2),
-        tagPage = 'examplePage',
-        tagRegion = 'examplePageRegion',
-        width = 1366,
-        height = 768,
-        dprWidth = width * dpr[browserName],
-        dprHeight= height * dpr[browserName];
+    const _ = browser.testConfig,
+        tagScreen = 'exampleScreen',
+        tagRegion = 'exampleRegion',
+        screenElement = element(by.css('div h1')),
+        regionElement = element.all(by.css('div h2')).get(2);
 
     beforeEach(() => {
         browser.pixDiff = new PixDiff({
             basePath: './test/baseline/desktop/',
             diffPath: './test/',
-            width: width,
-            height: height
+            width: _.width,
+            height: _.height
         });
 
         browser.get(browser.baseUrl).then(()=> browser.sleep(500));
     });
 
     it('should save the screen', () => {
-        browser.pixDiff.saveScreen(tagPage).then(() => {
-            expect(fs.existsSync(`${baselinePath}/${tagPage}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
-        });
+        browser.pixDiff.saveScreen(tagScreen)
+            .then(() => expect(fs.existsSync(`${screenshotPath}/${tagScreen}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true));
     });
 
     it('should save the region', () => {
-        browser.pixDiff.saveRegion(subHeader, tagRegion).then(() => {
-            expect(fs.existsSync(`${baselinePath}/${tagRegion}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
-        });
+        browser.pixDiff.saveRegion(regionElement, tagRegion)
+            .then(() => expect(fs.existsSync(`${screenshotPath}/${tagRegion}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true));
     });
 
     describe('compare screen', () => {
 
         it('should compare successfully with a baseline', () => {
-            browser.pixDiff.checkScreen(tagPage).then((result) => {
-                expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL);
-            });
+            browser.pixDiff.checkScreen(tagScreen)
+                .then(result => expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL));
         });
 
         it('should save a difference and fail comparing with a baseline', () => {
-            browser.executeScript('arguments[0].innerHTML = "Hello, fail";', pageHeader.getWebElement())
-                .then(() => browser.pixDiff.checkScreen(tagPage, {threshold: 1}))
-                .then((result) => {
+            browser.executeScript('arguments[0].innerHTML = "Hello, fail";', screenElement.getWebElement())
+                .then(() => browser.pixDiff.checkScreen(tagScreen, {threshold: 1}))
+                .then(result => {
                     expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagPage}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagScreen}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true);
                 });
         });
 
         it('should throw an error when no baseline is found', () => {
-            browser.pixDiff.checkScreen('noImage').then(() => {
-                fail(new Error('This should not fail'));
-            }, error => {
-                expect(error.message).toContain('no such file or directory');
-            });
+            browser.pixDiff.checkScreen('noImage')
+                .then(() => fail(new Error('This should not fail')))
+                .catch(error => expect(error.message).toContain('no such file or directory'));
         });
     });
 
     describe('compare region', () => {
 
         it('should compare successfully with a baseline', () => {
-            browser.pixDiff.checkRegion(subHeader, tagRegion).then((result) => {
-                expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL);
-            });
+            browser.pixDiff.checkRegion(regionElement, tagRegion)
+                .then(result => expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL));
         });
 
         it('should save a difference and fail comparing with a baseline', () => {
-            browser.executeScript('arguments[0].style.color = "#2d7091";', subHeader.getWebElement())
-                .then(() => browser.pixDiff.checkRegion(subHeader, tagRegion, {threshold: 1}))
-                .then((result) => {
+            browser.executeScript('arguments[0].style.color = "#2d7091";', regionElement.getWebElement())
+                .then(() => browser.pixDiff.checkRegion(regionElement, tagRegion, {threshold: 1}))
+                .then(result => {
                     expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true);
                 });
         });
 
         it('should throw an error when no baseline is found', () => {
-            browser.pixDiff.checkRegion(subHeader, 'noImage').then(() => {
-                fail(new Error('This should not fail'));
-            }, error => {
-                expect(error.message).toContain('no such file or directory');
-            });
+            browser.pixDiff.checkRegion(regionElement, 'noImage')
+                .then(() => fail(new Error('This should not fail')))
+                .catch(error => expect(error.message).toContain('no such file or directory'));
         });
     });
 
@@ -103,8 +89,8 @@ describe('Pix-Diff', () => {
                 basePath: './test/baseline/desktop/',
                 diffPath: './test/',
                 baseline: true,
-                width: width,
-                height: height,
+                width: _.width,
+                height: _.height,
                 formatImageName: '{tag}-{logName}-{width}x{height}-dpr-{dpr}'
             });
         });
@@ -112,12 +98,12 @@ describe('Pix-Diff', () => {
         it('should save a screen region when baseline image not found', () => {
             const tagBaseline = 'baselineRegion';
 
-            browser.pixDiff.checkScreen(tagBaseline).then(() => {
-                fail('should not be called');
-            }, (error) => {
-                expect(error.message).toContain('Image not found');
-                expect(fs.existsSync(`${baselinePath}/${tagBaseline}-${logName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
-            });
+            browser.pixDiff.checkScreen(tagBaseline)
+                .then(() => fail('This should not fail'))
+                .catch(error => {
+                    expect(error.message).toContain('Image not found');
+                    expect(fs.existsSync(`${screenshotPath}/${tagBaseline}-${_.logName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true);
+                });
         });
     });
 });

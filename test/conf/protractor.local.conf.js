@@ -10,19 +10,20 @@ config.devicePixelRatio = { 'chrome': 2, 'firefox': 1 };
 
 config.multiCapabilities = [
     {
-        applicationName: 'Chrome',
         browserName: 'chrome',
         logName: 'Chrome',
         maxInstances: 2,
-        shardTestFiles: true
+        shardTestFiles: true,
+        chromeOptions: {
+            args: [
+                '--disable-cache',
+                '--disable-application-cache',
+                '--disable-offline-load-stale-cache',
+                '--disk-cache-size=0',
+                '--v8-cache-options=off'
+            ]
+        }
     }
-//    {
-//        applicationName: 'firefox',
-//        browserName: 'firefox',
-//        logName: 'Firefox',
-//        maxInstances: 2,
-//        shardTestFiles: true
-//    }
 ];
 
 exports.config = config;

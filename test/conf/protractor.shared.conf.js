@@ -13,15 +13,13 @@ exports.config = {
         defaultTimeoutInterval: 120000,
         isVerbose: true,
         includeStackTrace: true,
-        print: function () {}
+        print: () => {}
     },
 
     onPrepare: function () {
         browser.ignoreSynchronization = true;
 
         let env = jasmine.getEnv();
-
-//        env.clearReporters();
 
         env.addReporter(new SpecReporter({
             displayStacktrace: 'none',
@@ -31,12 +29,19 @@ exports.config = {
             displaySpecDuration: true
         }));
 
-        return browser.getProcessedConfig()
-            .then(_ => {
-                browser.browserName = camelCase(_.capabilities.browserName);
-                browser.deviceName = camelCase(_.capabilities.name);
-                browser.logName = camelCase(_.capabilities.logName);
-                browser.devicePixelRatio = _.devicePixelRatio;
-            });
+        return browser.getProcessedConfig().then(_ => {
+            let testConfig = {
+                browserName: camelCase(_.capabilities.browserName),
+                deviceName: camelCase(_.capabilities.name),
+                logName: camelCase(_.capabilities.logName),
+                width: 1366,
+                height: 768
+            };
+            testConfig.devicePixelRatio = _.devicePixelRatio[testConfig.browserName];
+            testConfig.dprWidth = testConfig.width * testConfig.devicePixelRatio;
+            testConfig.dprHeight = testConfig.height * testConfig.devicePixelRatio;
+
+            browser.testConfig = testConfig;
+        });
     }
 };
