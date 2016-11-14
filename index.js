@@ -107,12 +107,12 @@ class PixDiff {
     /**
      * Formatted image name with description and capabilities
      *
-     * @method _getImageName
+     * @method _formatFileName
      * @param {string} tag
      * @return {string}
      * @private
      */
-    _getImageName(tag) {
+    _formatFileName(tag) {
         let defaults = {
                 'tag': camelCase(tag),
                 'browserName': this.browserName,
@@ -128,7 +128,7 @@ class PixDiff {
         defaults = this._mergeDefaultOptions(defaults, this.formatOptions);
 
         Object.keys(defaults).forEach(value => {
-            formatString = formatString.replace(`{${value}}`, defaults[value]);
+            formatString = formatString.replace('{' + value + '}', defaults[value]);
         });
 
         return formatString + '.png';
@@ -314,7 +314,7 @@ class PixDiff {
     _checkImageExists(tag) {
         var deferred = protractor.promise.defer();
 
-        fs.access(path.join(this.basePath, this._getImageName(tag)), fs.F_OK, error => {
+        fs.access(path.join(this.basePath, this._formatFileName(tag)), fs.F_OK, error => {
             if (error) {
                 if (!this.baseline) {
                     deferred.reject(error);
@@ -404,7 +404,7 @@ class PixDiff {
             .then(image => {
                 return new PNGImage({
                     imagePath: new Buffer(image, 'base64'),
-                    imageOutputPath: path.join(this.basePath, this._getImageName(tag))
+                    imageOutputPath: path.join(this.basePath, this._formatFileName(tag))
                 }).runWithPromise();
             });
     }
@@ -433,7 +433,7 @@ class PixDiff {
             .then((image) => {
                 return new PNGImage({
                     imagePath: new Buffer(image, 'base64'),
-                    imageOutputPath: path.join(this.basePath, this._getImageName(tag)),
+                    imageOutputPath: path.join(this.basePath, this._formatFileName(tag)),
                     cropImage: rect
                 }).runWithPromise();
             });
@@ -463,7 +463,7 @@ class PixDiff {
                 throw error;
             })
             .then((image) => {
-                tag = this._getImageName(tag);
+                tag = this._formatFileName(tag);
                 defaults = {
                     imageAPath: path.join(this.basePath, tag),
                     imageB: new Buffer(image, 'base64'),
@@ -507,7 +507,7 @@ class PixDiff {
                 return browser.takeScreenshot();
             })
             .then((image) => {
-                tag = this._getImageName(tag);
+                tag = this._formatFileName(tag);
                 defaults = {
                     imageAPath: path.join(this.basePath, tag),
                     imageB: new Buffer(image, 'base64'),
