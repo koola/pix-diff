@@ -19,7 +19,7 @@ exports.config = {
     onPrepare: function () {
         browser.ignoreSynchronization = true;
 
-        var env = jasmine.getEnv();
+        let env = jasmine.getEnv();
 
         env.clearReporters();
 
@@ -35,6 +35,7 @@ exports.config = {
             .then(_ => {
                 browser.browserName = camelCase(_.capabilities.browserName);
                 browser.deviceName = camelCase(_.capabilities.name);
+                browser.logName = camelCase(_.capabilities.logName);
                 browser.devicePixelRatio = _.devicePixelRatio;
             });
     }

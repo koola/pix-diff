@@ -10,6 +10,7 @@ let BlinkDiff = require('blink-diff'),
 describe('Pix-Diff', () => {
 
     const browserName = browser.browserName,
+        logName = browser.logName,
         dpr = browser.devicePixelRatio,
         pageHeader = element(by.css('div h1')),
         subHeader = element.all(by.css('div h2')).get(2),
@@ -103,7 +104,8 @@ describe('Pix-Diff', () => {
                 diffPath: './test/',
                 baseline: true,
                 width: width,
-                height: height
+                height: height,
+                formatImageName: '{tag}-{logName}-{width}x{height}-dpr-{dpr}'
             });
         });
 
@@ -114,7 +116,7 @@ describe('Pix-Diff', () => {
                 fail('should not be called');
             }, (error) => {
                 expect(error.message).toContain('Image not found');
-                expect(fs.existsSync(`${baselinePath}/${tagBaseline}-${browserName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
+                expect(fs.existsSync(`${baselinePath}/${tagBaseline}-${logName}-${dprWidth}x${dprHeight}-dpr-${dpr[browserName]}.png`)).toBe(true);
             });
         });
     });
