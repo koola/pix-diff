@@ -8,7 +8,7 @@ const SAUCE_USERNAME = process.env.SAUCE_USERNAME,
     desktopSpecs = ['../jasmine.spec.js'],
     mobileSpecs = ['../mobile.spec.js'];
 
-config.seleniumAddress = TRAVIS_JOB_NUMBER ? 'http://localhost:4445/wd/hub' : 'http://ondemand.saucelabs.com:80/wd/hub';
+config.seleniumAddress = 'http://ondemand.saucelabs.com:80/wd/hub';
 
 config.devicePixelRatio = {
     "chrome": 1,
