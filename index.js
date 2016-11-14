@@ -21,7 +21,7 @@ const assert = require('assert'),
  * @param {int} options.height Height of browser
  * @param {string} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
- * @param {object} options.offsets Mobile offsets needed for element position lookup
+ * @param {object} options.offsets Mobile offsets required for obtaining element position
  *
  * @property {string} basePath
  * @property {string} diffPath
@@ -54,14 +54,26 @@ class PixDiff {
         this.offsets = options.offsets || {ios: {}, android: {}};
         this.devicePixelRatio = 1;
 
-        this.offsets.ios = this._mergeDefaultOptions(this.offsets.ios, {statusBar: 20, addressBar: 44});
-        this.offsets.android = this._mergeDefaultOptions(this.offsets.android, {statusBar: 24, addressBar: 56, toolBar: 48});
+        if (this.offsets) {
+            assert.ok(this.offsets.ios, 'Offset key ios not found.');
+            assert.ok(this.offsets.android, 'Offset key android not found.');
+
+            this.offsets.ios = this._mergeDefaultOptions(this.offsets.ios, {statusBar: 20, addressBar: 44});
+            this.offsets.android = this._mergeDefaultOptions(this.offsets.android, {statusBar: 24, addressBar: 56, toolBar: 48});
+        }
 
         if (!fs.existsSync(this.basePath) || !fs.statSync(this.basePath).isDirectory()) {
             mkdirp.sync(this.basePath);
         }
         if (!fs.existsSync(this.diffPath) || !fs.statSync(this.diffPath).isDirectory()) {
             mkdirp.sync(this.diffPath);
+        }
+
+        if (this.width && this.height) {
+            assert.ok(Number.isInteger(this.width), 'Option width not an Integer.');
+            assert.ok(Number.isInteger(this.height), 'Option height not an Integer.');
+
+            browser.driver.manage().window().setSize(this.width, this.height)
         }
 
         browser.getProcessedConfig().then(_ => {
@@ -76,17 +88,13 @@ class PixDiff {
             if (_.framework !== 'custom') {
                 require(path.resolve(__dirname, 'framework', _.framework));
             }
-
-            if (this.width && this.height) {
-                browser.driver.manage().window().setSize(this.width, this.height);
-            }
         });
     }
 
     /**
      * Merges non-default options from optionsB into optionsA
      *
-     * @method mergeDefaultOptions
+     * @method _mergeDefaultOptions
      * @param {object} optionsA
      * @param {object} optionsB
      * @return {object}
@@ -137,7 +145,7 @@ class PixDiff {
     /**
      * Check if browser is firefox
      *
-     * @method isFirefox
+     * @method _isFirefox
      * @return {boolean}
      * @private
      */
@@ -159,7 +167,7 @@ class PixDiff {
     /**
      * Check if platformName is Android
      *
-     * @method isAndroid
+     * @method _isAndroid
      * @return {boolean}
      * @private
      */
@@ -170,7 +178,7 @@ class PixDiff {
     /**
      * Check if platformName is iOS
      *
-     * @method isIOS
+     * @method _isIOS
      * @return {boolean}
      * @private
      */
@@ -181,7 +189,7 @@ class PixDiff {
     /**
      * Check if Mobile
      *
-     * @method isAppium
+     * @method _isMobile
      * @return {boolean}
      * @private
      */
@@ -340,14 +348,14 @@ class PixDiff {
         return browser.controlFlow().execute(() => {
             function getDataObject (isMobile) {
                 return {
-                    pixelRatio: window.devicePixelRatio,
+                    devicePixelRatio: window.devicePixelRatio,
                     height: (isMobile) ? window.screen.height : window.outerHeight,
                     width: (isMobile) ? window.screen.width : window.outerWidth
                 };
             }
             return browser.executeScript(getDataObject, this._isMobile())
                 .then((screen) => {
-                    this.devicePixelRatio = this._isFirefox() ? this.devicePixelRatio : screen.pixelRatio;
+                    this.devicePixelRatio = this._isFirefox() ? this.devicePixelRatio : screen.devicePixelRatio;
                     this.width = screen.width * this.devicePixelRatio;
                     this.height = screen.height * this.devicePixelRatio;
                 });
