@@ -13,7 +13,7 @@ exports.config = {
         defaultTimeoutInterval: 120000,
         isVerbose: true,
         includeStackTrace: true,
-        print: () => {}
+        print: function () {}
     },
 
     onPrepare: function () {
