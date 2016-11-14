@@ -204,7 +204,7 @@ class PixDiff {
         } else if (this._isAndroid() && this.nativeWebScreenshot) {
             this._getElementPositionAndroid(element);
         } else if (this._isFirefox() || this._isInternetExplorer()) {
-            return PixDiff._getElementPositionTopPage(element);
+            return this._getElementPositionTopPage(element);
         }
         return this._getElementPositionTopWindow(element);
     }
