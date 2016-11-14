@@ -21,7 +21,7 @@ exports.config = {
 
         let env = jasmine.getEnv();
 
-        env.clearReporters();
+//        env.clearReporters();
 
         env.addReporter(new SpecReporter({
             displayStacktrace: 'none',
