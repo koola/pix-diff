@@ -3,8 +3,7 @@
 const assert = require('assert'),
     BlinkDiff = require('blink-diff'),
     camelCase = require('camel-case'),
-    fs = require('fs'),
-    mkdirp = require('mkdirp'),
+    fs = require('fs-extra'),
     path = require('path'),
     PNGImage = require('png-image');
 
@@ -62,12 +61,8 @@ class PixDiff {
             this.offsets.android = this._mergeDefaultOptions(this.offsets.android, {statusBar: 24, addressBar: 56, toolBar: 48});
         }
 
-        if (!fs.existsSync(this.basePath) || !fs.statSync(this.basePath).isDirectory()) {
-            mkdirp.sync(this.basePath);
-        }
-        if (!fs.existsSync(this.diffPath) || !fs.statSync(this.diffPath).isDirectory()) {
-            mkdirp.sync(this.diffPath);
-        }
+        fs.ensureDirSync(this.basePath);
+        fs.ensureDirSync(this.diffPath);
 
         if (this.width && this.height) {
             assert.ok(Number.isInteger(this.width), 'Option width not an Integer.');
