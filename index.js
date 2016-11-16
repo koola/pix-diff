@@ -18,25 +18,25 @@ const assert = require('assert'),
  * @param {boolean} options.baseline Save images not found in baseline
  * @param {int} options.width Width of browser
  * @param {int} options.height Height of browser
- * @param {string} options.formatImageOptions Custom variables for Image Name
+ * @param {object} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
- * @param {object} options.offsets Mobile offsets required for obtaining element position
+ * @param {object} options.offsets Mobile iOS/Android offsets required for obtaining element position
  *
- * @property {string} basePath
- * @property {string} diffPath
- * @property {boolean} baseline
- * @property {int} width
- * @property {int} height
- * @property {string} formatOptions
- * @property {string} formatString
- * @property {object} offsets
- * @property {int} devicePixelRatio
- * @property {string} browserName
- * @property {string} logName
- * @property {string} name
- * @property {string} platformName
- * @property {string} deviceName
- * @property {boolean} nativeWebScreenshot
+ * @property {string} basePath Directory where baseline images are read/saved
+ * @property {string} diffPath Directory where difference images are saved
+ * @property {boolean} baseline Toggle saving baseline imags if not found
+ * @property {int} width Width of browser
+ * @property {int} height Height of browser
+ * @property {object} formatOptions Flat object that holds custom options for formatString
+ * @property {string} formatString Customizable image filename naming convention
+ * @property {object} offsets Object with statusBar, addressBar and toolBar key/values
+ * @property {int} devicePixelRatio Ratio of the (vertical) size of one physical pixel on the current display device to the size of one device independent pixels(dips)
+ * @property {string} browserName Browser name from the WebDriver capabilities
+ * @property {string} logName Log name from WebDriver capabilities
+ * @property {string} name Name from WebDriver capabilities
+ * @property {string} platformName Platform name from WebDriver capabilities
+ * @property {string} deviceName Device name from WebDriver capabilities
+ * @property {boolean} nativeWebScreenshot Android native screenshot from WebDriver capabilities
  */
 class PixDiff {
     constructor(options) {
@@ -92,7 +92,7 @@ class PixDiff {
      * @method _mergeDefaultOptions
      * @param {object} optionsA
      * @param {object} optionsB
-     * @return {object}
+     * @returns {object}
      * @private
      */
     _mergeDefaultOptions(optionsA, optionsB) {
@@ -112,7 +112,7 @@ class PixDiff {
      *
      * @method _formatFileName
      * @param {string} tag
-     * @return {string}
+     * @returns {string}
      * @private
      */
     _formatFileName(tag) {
@@ -141,7 +141,7 @@ class PixDiff {
      * Check if browser is firefox
      *
      * @method _isFirefox
-     * @return {boolean}
+     * @returns {boolean}
      * @private
      */
     _isFirefox() {
@@ -152,7 +152,7 @@ class PixDiff {
      * Check if browser is internet explorer
      *
      * @method _isInternetExplorer
-     * @return {boolean}
+     * @returns {boolean}
      * @private
      */
     _isInternetExplorer() {
@@ -163,7 +163,7 @@ class PixDiff {
      * Check if platformName is Android
      *
      * @method _isAndroid
-     * @return {boolean}
+     * @returns {boolean}
      * @private
      */
     _isAndroid() {
@@ -174,7 +174,7 @@ class PixDiff {
      * Check if platformName is iOS
      *
      * @method _isIOS
-     * @return {boolean}
+     * @returns {boolean}
      * @private
      */
     _isIOS() {
@@ -185,7 +185,7 @@ class PixDiff {
      * Check if Mobile
      *
      * @method _isMobile
-     * @return {boolean}
+     * @returns {boolean}
      * @private
      */
     _isMobile() {
@@ -198,7 +198,7 @@ class PixDiff {
      *
      * @method _getElementPosition
      * @param {promise} element
-     * @return {promise}
+     * @returns {promise}
      * @private
      */
     _getElementPosition(element) {
@@ -217,7 +217,7 @@ class PixDiff {
      *
      * @method _getElementPositionTopPage
      * @param {promise} element
-     * @returns {promise}
+     * @returnss {promise}
      * @private
      */
      _getElementPositionTopPage(element) {
@@ -232,7 +232,7 @@ class PixDiff {
      *
      * @method _getElementPositionTopWindow
      * @param {promise} element
-     * @returns {promise}
+     * @returnss {promise}
      * @private
      */
     _getElementPositionTopWindow(element) {
@@ -247,7 +247,7 @@ class PixDiff {
      *
      * @method _getElementPositionIOS
      * @param {promise} element
-     * @returns {promise}
+     * @returnss {promise}
      * @private
      */
     _getElementPositionIOS(element) {
@@ -279,7 +279,7 @@ class PixDiff {
       *
       * @method _getElementPositionAndroid
       * @param {promise} element
-      * @returns {promise}
+      * @returnss {promise}
       * @private
       */
     _getElementPositionAndroid(element) {
@@ -311,7 +311,7 @@ class PixDiff {
      *
      * @method _checkImageExists
      * @param {string} tag
-     * @return {promise}
+     * @returns {promise}
      * @private
      */
     _checkImageExists(tag) {
@@ -336,7 +336,7 @@ class PixDiff {
      * Get browser instance data
      *
      * @method _getBrowserData
-     * @return {promise}
+     * @returns {promise}
      * @private
      */
     _getBrowserData() {
@@ -362,7 +362,7 @@ class PixDiff {
      *
      * @method _getElementRectangle
      * @param {Promise} element The ElementFinder to get the rectangles of
-     * @return {object} returns the correct rectangles rectangles
+     * @returns {object} returns the correct rectangles rectangles
      * @private
      */
     _getElementRectangle(element) {
@@ -397,8 +397,10 @@ class PixDiff {
      * @example
      *     browser.pixdiff.saveScreen('imageA');
      *
-     * @param {string} tag Arbitrary name
-     * @return {Promise} Image saved when the promise is resolved
+     * @param {string} tag Baseline image name
+     * @returns {promise}
+     * @reject {Error}
+     * @fulfil {null}
      * @public
      */
     saveScreen(tag) {
@@ -420,8 +422,10 @@ class PixDiff {
      *     browser.pixdiff.saveRegion(element(By.id('elementId')), 'imageA');
      *
      * @param {promise} element The ElementFinder for element lookup
-     * @param {string} tag Arbitrary name
-     * @return {promise} Image region saved when the promise is resolved
+     * @param {string} tag Baseline image name
+     * @returns {promise}
+     * @reject {Error}
+     * @fulfil {null}
      * @public
      */
     saveRegion(element, tag) {
@@ -447,11 +451,19 @@ class PixDiff {
      *
      * @method checkScreen
      * @example
-     *     browser.pixdiff.checkScreen('imageA', {debug: true});
+     *  browser.pixdiff.checkScreen('imageA', {blockOut: [{x: 0, y: 0, width: 1366, height: 30}]})
+     *      .then(result => { console.log(result.code); });
      *
-     * @param {string} tag Arbitrary name
+     * @param {string} tag Baseline image name
      * @param {object} options Non-default Blink-Diff options
-     * @return {object} result The BlinkDiff result
+     * @returns {object} result
+     * @reject {Error} - Baseline image not found
+     * @fulfil {object} - BlinkDiff result.code
+     *
+     *  - `RESULT_UNKNOWN`: 0
+     *  - `RESULT_DIFFERENT`: 1
+     *  - `RESULT_SIMILAR`: 7
+     *  - `RESULT_IDENTICAL`: 5
      * @public
      */
     checkScreen(tag, options) {
@@ -485,12 +497,20 @@ class PixDiff {
      *
      * @method checkRegion
      * @example
-     *     browser.pixdiff.checkRegion(element(By.id('elementId')), 'imageA', {debug: true});
+     *  browser.pixdiff.checkRegion(element(By.id('elementId')), 'imageA', {debug: true})
+     *      .then(result => { console.log(result.code); });
      *
      * @param {promise} element The ElementFinder for element lookup
-     * @param {string} tag Arbitrary name
+     * @param {string} tag Baseline image name
      * @param {object} options Non-default Blink-Diff options
-     * @return {object} result The BlinkDiff result
+     * @returns {object} result
+     * @reject {Error} - Baseline image not found
+     * @fulfil {object} - BlinkDiff `result.code`
+     *
+     *  - `RESULT_UNKNOWN`: `0`
+     *  - `RESULT_DIFFERENT`: `1`
+     *  - `RESULT_SIMILAR`: `7`
+     *  - `RESULT_IDENTICAL`: `5`
      * @public
      */
     checkRegion(element, tag, options) {
