@@ -3,20 +3,12 @@ dist: trusty
 
 language: node_js
 
+language: node_js
 node_js:
-  - "stable"
+  - '6'
 
 addons:
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
-
-before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
+  sauce_connect: true
 
 script:
-  - npm run wd-update
-  - npm test
+  - npm test -- saucelabs

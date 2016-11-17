@@ -2,5 +2,5 @@
 .idea
 node_modules/
 npm-debug.log
-tmp/
-test/screenshots/
+test/baseline/
+test/diff/

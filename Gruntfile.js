@@ -9,38 +9,51 @@ module.exports = function(grunt) {
         clean: {
             screens: {
                 src: [
-                    'test/screenshots/*',
-                    '!test/screenshots/exampleFail*.png'
+                    'test/baseline/',
+                    'test/diff'
                 ]
             }
         },
 
         jshint: {
-            all: ['index.js', 'test/**/*.spec.js', 'test/**/*.steps.js'],
+            all: ['index.js', 'test/*.spec.js', 'test/conf/*.conf.js'],
             options: {
                 jshintrc: '.jshintrc',
                 ignores: ['node_modules/', 'framework/']
             }
         },
 
+        jsdoc2md: {
+            oneOutputFile: {
+                src: 'index.js',
+                dest: 'docs/index.md'
+            }
+        },
+
         run: {
-            cucumber: {
+            local: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
-                    'test/protractorCucumber.conf.js'
+                    'test/conf/protractor.local.conf.js'
                 ]
             },
-            jasmine: {
+            saucelabs: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
-                    'test/protractorJasmine.conf.js'
+                    'test/conf/protractor.saucelabs.conf.js'
                 ]
+            }
+        },
+
+        conventionalChangelog: {
+            options: {
+                changelogOpts: {
+                    preset: 'angular',
+                    releaseCount: 0
+                }
             },
-            mocha: {
-                cmd: 'node_modules/.bin/protractor',
-                args: [
-                    'test/protractorMocha.conf.js'
-                ]
+            release: {
+                src: 'CHANGELOG.md'
             }
         },
 
@@ -48,8 +61,8 @@ module.exports = function(grunt) {
             options: {
                 files: ['package.json'],
                 commit: true,
-                commitMessage: 'Release v%VERSION%',
-                commitFiles: ['package.json', 'CHANGELOG.md'],
+                commitMessage: 'chore(release) v%VERSION%',
+                commitFiles: ['package.json', 'CHANGELOG.md', 'docs/**/*.md'],
                 createTag: true,
                 tagName: 'v%VERSION%',
                 tagMessage: 'Version %VERSION%',
@@ -60,11 +73,9 @@ module.exports = function(grunt) {
 
     });
 
-    //tasks
-    grunt.registerTask('cucumber', 'Run cucumber integration tests', ['clean:screens', 'run:cucumber']);
-    grunt.registerTask('jasmine', 'Run Jasmine integration tests', ['clean:screens', 'run:jasmine']);
-    grunt.registerTask('mocha', 'Run Mocha integration tests', ['clean:screens', 'run:mocha']);
-    grunt.registerTask('build', ['jshint:all']);
-    grunt.registerTask('release', ['bump']);
-    grunt.registerTask('default', ['jasmine', 'mocha', 'cucumber']);
+    grunt.registerTask('local', 'Run desktop tests on local', ['clean:screens', 'run:local']);
+    grunt.registerTask('saucelabs', 'Run all tests on Saucelabs', ['clean:screens', 'run:saucelabs']);
+    grunt.registerTask('build', ['jshint:all', 'local']);
+    grunt.registerTask('release', ['jsdoc2md', 'conventionalChangelog', 'bump']);
+    grunt.registerTask('default', ['local']);
 };
