@@ -1,6 +1,6 @@
 {
   "name": "pix-diff",
-  "version": "1.1.16",
+  "version": "1.1.15",
   "description": "Protractor plugin for image comparison",
   "main": "index.js",
   "dependencies": {
@@ -15,7 +15,7 @@
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-jshint": "^1.0.0",
-    "grunt-conventional-changelog": "^6.1.0",
+    "grunt-conventional-changelog": "^1.2.0",
     "grunt-jsdoc-to-markdown": "^2.0.0",
     "grunt-run": "^0.6.0",
     "jasmine-spec-reporter": "^2.7.0",

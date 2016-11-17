@@ -1,4 +1,4 @@
-<a name="1.1.14"></a>
+<a name="1.1.15"></a>
 ## [1.1.14](https://github.com/koola/pix-diff/compare/v1.0.14...v1.1.14) (2016-11-17)
 
 
