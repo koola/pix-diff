@@ -1,36 +1,80 @@
-Changelog
-=========
-V1.0.14 - Merged PR #30 to add extra variables to formatImageName (credit to koningskristof)
-        - Merged PR #31 to fix constructor JSdocs (credit to abierbaum) (13/10/2016)
+<a name="1.1.14"></a>
+## [1.1.14](https://github.com/koola/pix-diff/compare/v1.0.14...v1.1.14) (2016-11-17)
 
-v1.0.13 - Added auto resize option (13/09/2016)
 
-v1.0.12 - Added baseline option for auto saving not found images #21 (01/09/2016)
 
-v1.0.11 - Merged PR #19 to add cucumber support (credit to wswebcreation)
+<a name="1.0.14"></a>
+## [1.0.14](https://github.com/koola/pix-diff/compare/v1.0.13...v1.0.14) (2016-10-13)
 
-v1.0.10 - Fix not resolving path to framework during initialisation #14
-        - Update dependencies
 
-v1.0.9 - Add Mocha chai matcher (22/04/2016)
 
-v1.0.8 - Fixed protractors capabilities issues (credit to msviha)
-       - Added formatImageName option for custom image naming
-       - Diff directory now created automatically
-       - Image tag is now strict camel case for better readability (7/4/2016)
+<a name="1.0.13"></a>
+## [1.0.13](https://github.com/koola/pix-diff/compare/v1.0.12...v1.0.13) (2016-09-23)
 
-v1.0.7 - Merged PR #5 to resolve issue on SauceLabs (18/12/2015)
 
-v1.0.6 - Rename custom matchers to avoid naming conflict with Jasmine toMatch (04/11/2015)
 
-v1.0.5 - Add Jasmine 2 custom matchers (10/07/2015)
+<a name="1.0.12"></a>
+## [1.0.12](https://github.com/koola/pix-diff/compare/v1.0.11...v1.0.12) (2016-09-01)
 
-v1.0.4 - Fix writing diff when sub-directories are under base path (30/12/2014)
 
-v1.0.3 - Added tests (28/12/2014)
 
-v1.0.2 - Added image save methods (17/12/2014)
+<a name="1.0.11"></a>
+## [1.0.11](https://github.com/koola/pix-diff/compare/v1.0.10...v1.0.11) (2016-08-23)
 
-v1.0.1 - Add missing percentage sign and documentation (12/12/2014)
 
-v1.0.0 - Initial release (11/12/2014)
+
+<a name="1.0.10"></a>
+## [1.0.10](https://github.com/koola/pix-diff/compare/v1.0.9...v1.0.10) (2016-05-17)
+
+
+
+<a name="1.0.9"></a>
+## [1.0.9](https://github.com/koola/pix-diff/compare/v1.0.8...v1.0.9) (2016-04-22)
+
+
+
+<a name="1.0.8"></a>
+## [1.0.8](https://github.com/koola/pix-diff/compare/v1.0.7...v1.0.8) (2016-04-19)
+
+
+
+<a name="1.0.7"></a>
+## [1.0.7](https://github.com/koola/pix-diff/compare/v1.0.6...v1.0.7) (2015-12-17)
+
+
+
+<a name="1.0.6"></a>
+## [1.0.6](https://github.com/koola/pix-diff/compare/v1.0.5...v1.0.6) (2015-11-04)
+
+
+
+<a name="1.0.5"></a>
+## [1.0.5](https://github.com/koola/pix-diff/compare/v1.0.4...v1.0.5) (2015-07-10)
+
+
+
+<a name="1.0.4"></a>
+## [1.0.4](https://github.com/koola/pix-diff/compare/v1.0.3...v1.0.4) (2014-12-30)
+
+
+
+<a name="1.0.3"></a>
+## [1.0.3](https://github.com/koola/pix-diff/compare/v1.0.2...v1.0.3) (2014-12-28)
+
+
+
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/koola/pix-diff/compare/v1.0.1...v1.0.2) (2014-12-17)
+
+
+
+<a name="1.0.1"></a>
+## [1.0.1](https://github.com/koola/pix-diff/compare/v1.0.0...v1.0.1) (2014-12-12)
+
+
+
+<a name="1.0.0"></a>
+# 1.0.0 (2014-12-11)
+
+
+

@@ -1,6 +1,6 @@
 {
   "name": "pix-diff",
-  "version": "1.0.14",
+  "version": "1.1.15",
   "description": "Protractor plugin for image comparison",
   "main": "index.js",
   "dependencies": {
