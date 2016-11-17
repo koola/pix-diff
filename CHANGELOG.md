@@ -1,5 +1,10 @@
+<a name="1.1.16"></a>
+## [1.1.16](https://github.com/koola/pix-diff/compare/v1.1.15...v1.1.16) (2016-11-17)
+
+
+
 <a name="1.1.15"></a>
-## [1.1.14](https://github.com/koola/pix-diff/compare/v1.0.14...v1.1.14) (2016-11-17)
+## [1.1.15](https://github.com/koola/pix-diff/compare/v1.0.14...v1.1.15) (2016-11-17)
 
 
 
