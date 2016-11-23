@@ -68,7 +68,7 @@ class PixDiff {
             assert.ok(Number.isInteger(this.width), 'Option width not an Integer.');
             assert.ok(Number.isInteger(this.height), 'Option height not an Integer.');
 
-            browser.driver.manage().window().setSize(this.width, this.height)
+            browser.driver.manage().window().setSize(this.width, this.height);
         }
 
         browser.getProcessedConfig().then(_ => {
