@@ -3,6 +3,42 @@
   "version": "1.1.16",
   "description": "Protractor plugin for image comparison",
   "main": "index.js",
+  "scripts": {
+    "test": "node_modules/.bin/grunt",
+    "wd-update": "node_modules/.bin/webdriver-manager update"
+  },
+  "contributors": [
+    "Wim Selles <w.selles@rn.rabobank.nl>",
+    "ottorun <yoos.mhoma@gmail.com>",
+    "Nikki Erwin Ramirez <nikki.ramirez@viseo.com>",
+    "Allen Bierbaum <abierbaum@gmail.com>",
+    "wswebcreation <wim@wswebcreation.nl>",
+    "Nathan Grant <natey1@gmail.com>",
+    "koningskristof <koningskristof@gmail.com>",
+    "nickwerline <nickwerline@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koola/pix-diff.git"
+  },
+  "keywords": [
+    "image-diff",
+    "image-comparison",
+    "protractor",
+    "blink-diff",
+    "screenshot",
+    "pix",
+    "diff",
+    "difference",
+    "comparison",
+    "compare"
+  ],
+  "author": "Koola",
+  "license": "MIT",
+  "engines": {
+    "npm": ">=3.0.0",
+    "node": ">=4.6.0"
+  },
   "dependencies": {
     "blink-diff": "1.0.12",
     "camel-case": "1.2.2",
@@ -16,34 +52,14 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-conventional-changelog": "^6.1.0",
+    "grunt-githooks": "^0.6.0",
     "grunt-jsdoc-to-markdown": "^2.0.0",
+    "grunt-npm": "0.0.2",
     "grunt-run": "^0.6.0",
     "jasmine-spec-reporter": "^2.7.0",
     "jshint": "^2.9.2",
     "load-grunt-tasks": "^3.5.0",
-    "protractor": "^4.0.10"
-  },
-  "scripts": {
-    "wd-update": "node_modules/.bin/webdriver-manager update",
-    "test": "node_modules/.bin/grunt"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/koola/pix-diff.git"
-  },
-  "keywords": [
-    "image-diff",
-    "pix",
-    "blink",
-    "image",
-    "diff",
-    "difference",
-    "compare"
-  ],
-  "author": "Koola",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/koola/pix-diff/issues"
-  },
-  "homepage": "https://github.com/koola/pix-diff"
+    "protractor": "^4.0.10",
+    "validate-commit-msg": "^2.8.2"
+  }
 }
