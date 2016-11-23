@@ -1,7 +1,8 @@
 Examples
 ========
 
-**Configuration file setup:**
+## Configuration file setup:
+Load it from the Protractor configuration file
 ```javascript
 exports.config = {
    // your config here ...
@@ -20,7 +21,8 @@ exports.config = {
 }
 ```
 
-**Jasmine**
+## Jasmine
+Load it in a spec file
 ```javascript
 const pixDiff = require('pix-diff');
 
@@ -48,9 +50,8 @@ describe("Example page", function() {
 });
 ```
 
-**Cucumber**
-
-***Steps file:***
+## Cucumber
+Load it in a step file
 ```javascript
 const expect = require('chai').expect,
       pixDiff = require('pix-diff');
@@ -82,7 +83,7 @@ function CucumberSteps() {
 module.exports = CucumberSteps;
 ```
 
-***Feature file:***
+Feature file:
 ```javascript
 Feature: Pix-Diff
 
