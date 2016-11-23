@@ -1,13 +1,13 @@
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = grunt => {
 
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
 
         clean: {
-            screens: {
+            images: {
                 src: [
                     'test/baseline/',
                     'test/diff'
@@ -57,6 +57,12 @@ module.exports = function(grunt) {
             }
         },
 
+        contributors: {
+            options: {
+                commit: false
+            }
+        },
+
         bump: {
             options: {
                 files: ['package.json'],
@@ -69,13 +75,31 @@ module.exports = function(grunt) {
                 push: true,
                 pushTo: 'origin'
             }
+        },
+
+        githooks: {
+            all: {
+                options: {
+                    command: 'node'
+                },
+                'pre-commit': 'node_modules/validate-commit-msg'
+            }
         }
 
     });
 
-    grunt.registerTask('local', 'Run desktop tests on local', ['clean:screens', 'run:local']);
-    grunt.registerTask('saucelabs', 'Run all tests on Saucelabs', ['clean:screens', 'run:saucelabs']);
+    grunt.registerTask('local', 'Run desktop tests on local', ['clean:images', 'run:local']);
+    grunt.registerTask('saucelabs', 'Run all tests on Saucelabs', ['clean:images', 'run:saucelabs']);
     grunt.registerTask('build', ['jshint:all', 'local']);
-    grunt.registerTask('release', ['jsdoc2md', 'bump-only', 'changelog', 'bump-commit']);
+    grunt.registerTask('release', 'Docs, bump and push to GitHub', (type) => {
+        grunt.task.run(
+            [
+                'jsdoc2md',
+                'contributors',
+                `bump-only:${type || 'patch'}`,
+                'conventionalChangelog',
+                'bump-commit'
+            ]);
+    });
     grunt.registerTask('default', ['local']);
 };
