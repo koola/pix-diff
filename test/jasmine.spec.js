@@ -36,6 +36,11 @@ describe('Pix-Diff', () => {
             .then(() => expect(fs.existsSync(`${screenshotPath}/${tagRegion}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true));
     });
 
+    it('should get static variables', () => {
+        expect(PixDiff.THRESHOLD_PIXEL).toEqual('pixel');
+        expect(PixDiff.THRESHOLD_PERCENT).toEqual('percent');
+    });
+
     describe('compare screen', () => {
 
         it('should compare successfully with a baseline', () => {

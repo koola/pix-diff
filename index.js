@@ -87,6 +87,30 @@ class PixDiff {
     }
 
     /**
+     * Threshold-type for pixel
+     *
+     * @static
+     * @property THRESHOLD_PIXEL
+     * @type {string}
+     * @public
+     */
+    static get THRESHOLD_PIXEL() {
+        return BlinkDiff.THRESHOLD_PIXEL;
+    }
+
+    /**
+     * Threshold-type for percent of all pixels
+     *
+     * @static
+     * @property THRESHOLD_PERCENT
+     * @type {string}
+     * @public
+     */
+    static get THRESHOLD_PERCENT() {
+        return BlinkDiff.THRESHOLD_PERCENT;
+    }
+
+    /**
      * Merges non-default options from optionsB into optionsA
      *
      * @method _mergeDefaultOptions
