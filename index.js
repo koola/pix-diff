@@ -2,7 +2,7 @@
 
 const assert = require('assert'),
     BlinkDiff = require('blink-diff'),
-    camelCase = require('camel-case'),
+    camelCase = require('./lib/camelCase'),
     fs = require('fs-extra'),
     path = require('path'),
     PNGImage = require('png-image');
@@ -241,7 +241,7 @@ class PixDiff {
      *
      * @method _getElementPositionTopPage
      * @param {promise} element
-     * @returnss {promise}
+     * @returns {promise}
      * @private
      */
      _getElementPositionTopPage(element) {
@@ -256,7 +256,7 @@ class PixDiff {
      *
      * @method _getElementPositionTopWindow
      * @param {promise} element
-     * @returnss {promise}
+     * @returns {promise}
      * @private
      */
     _getElementPositionTopWindow(element) {
@@ -271,7 +271,7 @@ class PixDiff {
      *
      * @method _getElementPositionIOS
      * @param {promise} element
-     * @returnss {promise}
+     * @returns {promise}
      * @private
      */
     _getElementPositionIOS(element) {
@@ -303,7 +303,7 @@ class PixDiff {
       *
       * @method _getElementPositionAndroid
       * @param {promise} element
-      * @returnss {promise}
+      * @returns {promise}
       * @private
       */
     _getElementPositionAndroid(element) {
@@ -457,11 +457,11 @@ class PixDiff {
 
         return this._getBrowserData()
             .then(() => this._getElementRectangle(element))
-            .then((elementRect) => {
+            .then(elementRect => {
                 rect = elementRect;
                 return browser.takeScreenshot();
             })
-            .then((image) => {
+            .then(image => {
                 return new PNGImage({
                     imagePath: new Buffer(image, 'base64'),
                     imageOutputPath: path.join(this.basePath, this._formatFileName(tag)),
@@ -495,13 +495,13 @@ class PixDiff {
 
         return this._getBrowserData()
             .then(() => this._checkImageExists(tag))
-            .then(() => browser.takeScreenshot(), (error) => {
+            .then(() => browser.takeScreenshot(), error => {
                 if (this.baseline) {
                     return this.saveScreen(tag).then(() => { throw error; });
                 }
                 throw error;
             })
-            .then((image) => {
+            .then(image => {
                 tag = this._formatFileName(tag);
                 defaults = {
                     imageAPath: path.join(this.basePath, tag),
@@ -511,7 +511,7 @@ class PixDiff {
                 };
                 return new BlinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
             })
-            .then((result) => {
+            .then(result => {
                 return result;
             });
     }
@@ -549,11 +549,11 @@ class PixDiff {
                 }
                 throw error;
             })
-            .then((elementRect) => {
+            .then(elementRect => {
                 rect = elementRect;
                 return browser.takeScreenshot();
             })
-            .then((image) => {
+            .then(image => {
                 tag = this._formatFileName(tag);
                 defaults = {
                     imageAPath: path.join(this.basePath, tag),
@@ -564,7 +564,7 @@ class PixDiff {
                 };
                 return new BlinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
             })
-            .then((result) => {
+            .then(result => {
                 return result;
             });
     }
