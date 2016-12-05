@@ -16,7 +16,7 @@ module.exports = grunt => {
         },
 
         jshint: {
-            all: ['index.js', 'test/*.spec.js', 'test/conf/*.conf.js'],
+            all: ['index.js', 'lib/*.js', 'test/*.spec.js', 'test/conf/*.conf.js'],
             options: {
                 jshintrc: '.jshintrc',
                 ignores: ['node_modules/', 'framework/']
@@ -75,17 +75,7 @@ module.exports = grunt => {
                 push: true,
                 pushTo: 'origin'
             }
-        },
-
-        githooks: {
-            all: {
-                options: {
-                    command: 'node'
-                },
-                'pre-commit': 'node_modules/validate-commit-msg'
-            }
         }
-
     });
 
     grunt.registerTask('local', 'Run desktop tests on local', ['clean:images', 'run:local']);
