@@ -1,7 +1,7 @@
 'use strict';
 
 const SpecReporter = require('jasmine-spec-reporter'),
-    camelCase = require('camel-case');
+    camelCase = require('../../lib/camelCase');
 
 exports.config = {
     baseUrl: 'http://getbootstrap.com/2.3.2/examples/hero.html',
