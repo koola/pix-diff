@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert'),
-    BlinkDiff = require('blink-diff'),
+    PixelDiff = require('pixel-diff'),
     camelCase = require('./lib/camelCase'),
     fs = require('fs-extra'),
     path = require('path'),
@@ -95,7 +95,7 @@ class PixDiff {
      * @public
      */
     static get THRESHOLD_PIXEL() {
-        return BlinkDiff.THRESHOLD_PIXEL;
+        return PixelDiff.THRESHOLD_PIXEL;
     }
 
     /**
@@ -107,7 +107,7 @@ class PixDiff {
      * @public
      */
     static get THRESHOLD_PERCENT() {
-        return BlinkDiff.THRESHOLD_PERCENT;
+        return PixelDiff.THRESHOLD_PERCENT;
     }
 
     /**
@@ -482,7 +482,7 @@ class PixDiff {
      * @param {object} options Non-default Blink-Diff options
      * @returns {object} result
      * @reject {Error} - Baseline image not found
-     * @fulfil {object} - BlinkDiff result.code
+     * @fulfil {object} - PixelDiff result.code
      *
      *  - `RESULT_UNKNOWN`: 0
      *  - `RESULT_DIFFERENT`: 1
@@ -507,9 +507,9 @@ class PixDiff {
                     imageAPath: path.join(this.basePath, tag),
                     imageB: new Buffer(image, 'base64'),
                     imageOutputPath: path.join(this.diffPath, path.basename(tag)),
-                    imageOutputLimit: BlinkDiff.OUTPUT_DIFFERENT
+                    imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT
                 };
-                return new BlinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+                return new PixelDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
             })
             .then(result => {
                 return result;
@@ -529,7 +529,7 @@ class PixDiff {
      * @param {object} options Non-default Blink-Diff options
      * @returns {object} result
      * @reject {Error} - Baseline image not found
-     * @fulfil {object} - BlinkDiff `result.code`
+     * @fulfil {object} - PixelDiff `result.code`
      *
      *  - `RESULT_UNKNOWN`: `0`
      *  - `RESULT_DIFFERENT`: `1`
@@ -559,10 +559,10 @@ class PixDiff {
                     imageAPath: path.join(this.basePath, tag),
                     imageB: new Buffer(image, 'base64'),
                     imageOutputPath: path.join(this.diffPath, path.basename(tag)),
-                    imageOutputLimit: BlinkDiff.OUTPUT_DIFFERENT,
+                    imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT,
                     cropImageB: rect
                 };
-                return new BlinkDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+                return new PixelDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
             })
             .then(result => {
                 return result;

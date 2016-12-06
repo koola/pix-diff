@@ -1,6 +1,6 @@
 'use strict';
 
-var BlinkDiff = require('blink-diff'),
+var PixelDiff = require('pixel-diff'),
     util = require('util');
 
 beforeEach(function() {
@@ -11,7 +11,7 @@ beforeEach(function() {
             this.message = function () {
                 return util.format("Image is visibly different by %s pixels, %s %", result.differences, percent);
             };
-            return ((result.code === BlinkDiff.RESULT_IDENTICAL) || (result.code === BlinkDiff.RESULT_SIMILAR));
+            return ((result.code === PixelDiff.RESULT_IDENTICAL) || (result.code === PixelDiff.RESULT_SIMILAR));
         }
     });
 });

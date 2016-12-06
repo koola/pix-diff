@@ -40,7 +40,7 @@
     "node": ">=4.6.0"
   },
   "dependencies": {
-    "blink-diff": "1.0.12",
+    "pixel-diff": "1.0.1",
     "fs-extra": "1.0.0",
     "png-image": "1.0.1"
   },

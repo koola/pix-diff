@@ -1,6 +1,6 @@
 'use strict';
 
-let BlinkDiff = require('blink-diff'),
+let PixelDiff = require('pixel-diff'),
     PixDiff = require('../'),
     fs = require('fs'),
     path = require('path'),
@@ -45,14 +45,14 @@ describe('Pix-Diff', () => {
 
         it('should compare successfully with a baseline', () => {
             browser.pixDiff.checkScreen(tagScreen)
-                .then(result => expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL));
+                .then(result => expect(result.code).toEqual(PixelDiff.RESULT_IDENTICAL));
         });
 
         it('should save a difference and fail comparing with a baseline', () => {
             browser.executeScript('arguments[0].innerHTML = "Hello, fail";', screenElement.getWebElement())
                 .then(() => browser.pixDiff.checkScreen(tagScreen, {threshold: 1}))
                 .then(result => {
-                    expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
+                    expect(result.code).toBe(PixelDiff.RESULT_DIFFERENT);
                     expect(fs.existsSync(`${differencePath}/${tagScreen}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true);
                 });
         });
@@ -68,14 +68,14 @@ describe('Pix-Diff', () => {
 
         it('should compare successfully with a baseline', () => {
             browser.pixDiff.checkRegion(regionElement, tagRegion)
-                .then(result => expect(result.code).toEqual(BlinkDiff.RESULT_IDENTICAL));
+                .then(result => expect(result.code).toEqual(PixelDiff.RESULT_IDENTICAL));
         });
 
         it('should save a difference and fail comparing with a baseline', () => {
             browser.executeScript('arguments[0].style.color = "#2d7091";', regionElement.getWebElement())
                 .then(() => browser.pixDiff.checkRegion(regionElement, tagRegion, {threshold: 1}))
                 .then(result => {
-                    expect(result.code).toBe(BlinkDiff.RESULT_DIFFERENT);
+                    expect(result.code).toBe(PixelDiff.RESULT_DIFFERENT);
                     expect(fs.existsSync(`${differencePath}/${tagRegion}-${_.browserName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true);
                 });
         });
