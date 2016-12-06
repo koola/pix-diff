@@ -45,16 +45,16 @@
     "png-image": "1.0.1"
   },
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-bump": "^0.8.0",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-conventional-changelog": "^6.1.0",
-    "grunt-jsdoc-to-markdown": "^2.0.0",
-    "grunt-npm": "^0.0.2",
-    "grunt-run": "^0.6.0",
-    "jasmine-spec-reporter": "^2.7.0",
-    "load-grunt-tasks": "^3.5.0",
-    "protractor": "^4.0.10"
+    "grunt": "1.0.1",
+    "grunt-bump": "0.8.0",
+    "grunt-contrib-clean": "1.0.0",
+    "grunt-contrib-jshint": "1.0.0",
+    "grunt-conventional-changelog": "6.1.0",
+    "grunt-jsdoc-to-markdown": "2.0.0",
+    "grunt-npm": "0.0.2",
+    "grunt-run": "0.6.0",
+    "jasmine-spec-reporter": "2.7.0",
+    "load-grunt-tasks": "3.5.0",
+    "protractor": "4.0.10"
   }
 }

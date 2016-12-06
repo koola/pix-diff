@@ -59,7 +59,7 @@ module.exports = grunt => {
 
         contributors: {
             options: {
-                commit: false
+                commitMessage: 'chore(npm) update contributors'
             }
         },
 
