@@ -49,6 +49,12 @@ PixDiff
 | deviceName | <code>string</code> | Device name from WebDriver capabilities |
 | nativeWebScreenshot | <code>boolean</code> | Android native screenshot from WebDriver capabilities |
 
+
+* [PixDiff](#PixDiff)
+    * [new PixDiff(options)](#new_PixDiff_new)
+    * [.THRESHOLD_PIXEL](#PixDiff.THRESHOLD_PIXEL) : <code>string</code>
+    * [.THRESHOLD_PERCENT](#PixDiff.THRESHOLD_PERCENT) : <code>string</code>
+
 <a name="new_PixDiff_new"></a>
 
 ### new PixDiff(options)
@@ -64,6 +70,32 @@ PixDiff
 | options.formatImageOptions | <code>object</code> | Custom variables for Image Name |
 | options.formatImageName | <code>string</code> | Custom format image name |
 | options.offsets | <code>object</code> | Mobile iOS/Android offsets required for obtaining element position |
+
+<a name="PixDiff.THRESHOLD_PIXEL"></a>
+
+### PixDiff.THRESHOLD_PIXEL : <code>string</code>
+Threshold-type for pixel
+
+**Kind**: static property of <code>[PixDiff](#PixDiff)</code>  
+**Access:** public  
+**Properties**
+
+| Name |
+| --- |
+| THRESHOLD_PIXEL | 
+
+<a name="PixDiff.THRESHOLD_PERCENT"></a>
+
+### PixDiff.THRESHOLD_PERCENT : <code>string</code>
+Threshold-type for percent of all pixels
+
+**Kind**: static property of <code>[PixDiff](#PixDiff)</code>  
+**Access:** public  
+**Properties**
+
+| Name |
+| --- |
+| THRESHOLD_PERCENT | 
 
 <a name="saveScreen"></a>
 
@@ -111,7 +143,7 @@ Runs the comparison against the screen
 **Returns**: <code>object</code> - result  
 **Access:** public  
 **Reject**: <code>Error</code> - Baseline image not found  
-**Fulfil**: <code>object</code> - BlinkDiff result.code
+**Fulfil**: <code>object</code> - PixelDiff result.code
 
  - `RESULT_UNKNOWN`: 0
  - `RESULT_DIFFERENT`: 1
@@ -137,7 +169,7 @@ Runs the comparison against a region
 **Returns**: <code>object</code> - result  
 **Access:** public  
 **Reject**: <code>Error</code> - Baseline image not found  
-**Fulfil**: <code>object</code> - BlinkDiff `result.code`
+**Fulfil**: <code>object</code> - PixelDiff `result.code`
 
  - `RESULT_UNKNOWN`: `0`
  - `RESULT_DIFFERENT`: `1`

@@ -1,3 +1,13 @@
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/koola/pix-diff/compare/v1.1.16...v1.2.0) (2016-12-07)
+
+
+### Features
+
+* **threshold:** add blinkdiff threshold getters ([3a3ff8e](https://github.com/koola/pix-diff/commit/3a3ff8e))
+
+
+
 <a name="1.1.16"></a>
 ## [1.1.16](https://github.com/koola/pix-diff/compare/v1.1.15...v1.1.16) (2016-11-17)
 
