@@ -17,9 +17,10 @@ A lightweight protractor plugin for image comparison
 You can:
 
 - Compare screens / regions against a baseline
-- Block out multiple regions per comparison
-- Pass-through non-default options to the image comparison engine
-- Seamlessly compare desktop / mobile screens
+- Pass-through any non-default Pixel-diff options
+- Seamlessly compare desktop and mobile screens
+
+Comparisons are based on [Pixel-Diff](https://github.com/koola/pixel-diff)
 
 ## Installation
 
@@ -66,7 +67,7 @@ Add tests for any new or changed functionality. Lint and test your code using
 
 - [x] Add Appium support
 - [ ] Add documentation for Appium
-- [ ] Update general documentation
+- [x] Update general documentation
 - [ ] Update Jasmine/Mocha matchers
 
 ## License
