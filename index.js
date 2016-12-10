@@ -545,7 +545,7 @@ class PixDiff {
             .then(() => this._checkImageExists(tag))
             .then(() => this._getElementRectangle(element), (error) => {
                 if (this.baseline) {
-                    return this.saveScreen(tag).then(() => { throw error; });
+                    return this.saveRegion(element, tag).then(() => { throw error; });
                 }
                 throw error;
             })
