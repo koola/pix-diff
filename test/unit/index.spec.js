@@ -2,7 +2,6 @@
 
 const Promise = require('promise'),
     PixDiff = require('../../'),
-    PNGImage = require('pngjs-image'),
     fs = require('fs'),
     chai = require('chai'),
     chaiAsPromised = require('chai-as-promised'),
@@ -66,7 +65,9 @@ describe('Pix-Diff', () => {
         });
 
         it('should have the right values for offsets', () => {
-            expect(this.instance.offsets).to.be.empty;
+            expect(this.instance.offsets).to.be.an('object');
+            expect(this.instance.offsets.ios).to.deep.equal({statusBar: 20, addressBar: 44});
+            expect(this.instance.offsets.android).to.deep.equal({statusBar: 24, addressBar: 56, toolBar: 48});
         });
 
         it('should have the right values for devicePixelRatio', () => {
@@ -98,12 +99,8 @@ describe('Pix-Diff', () => {
             });
         });
 
-        it('should have offsets', () => {
+        it('should have custom offsets', () => {
             expect(this.instance.offsets.ios).to.deep.equal({statusBar: 10, addressBar: 44});
-        });
-
-        it('should not have android offsets', () => {
-            expect(this.instance.offsets.android).to.be.undefined;
         });
     });
 
@@ -130,12 +127,8 @@ describe('Pix-Diff', () => {
             });
         });
 
-        it('should have offsets', () => {
+        it('should have custom offsets', () => {
             expect(this.instance.offsets.android).to.deep.equal({statusBar: 24, addressBar: 56, toolBar: 50});
-        });
-
-        it('should not have iOS offsets', () => {
-            expect(this.instance.offsets.ios).to.be.undefined;
         });
     });
 });
