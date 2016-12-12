@@ -53,12 +53,8 @@ class PixDiff {
         this.offsets = options.offsets || {};
         this.devicePixelRatio = 1;
 
-        if (this.offsets.ios) {
-            this.offsets.ios = Object.assign({statusBar: 20, addressBar: 44}, this.offsets.ios);
-        }
-        if (this.offsets.android) {
-            this.offsets.android = Object.assign({statusBar: 24, addressBar: 56, toolBar: 48}, this.offsets.android);
-        }
+        this.offsets.ios = Object.assign({statusBar: 20, addressBar: 44}, this.offsets.ios);
+        this.offsets.android = Object.assign({statusBar: 24, addressBar: 56, toolBar: 48}, this.offsets.android);
 
         fs.ensureDirSync(this.basePath);
         fs.ensureDirSync(this.diffPath);
@@ -155,7 +151,7 @@ class PixDiff {
      * @method _formatCapabilities
      * @private
      */
-        _formatCapabilities() {
+     _formatCapabilities() {
         return browser.getProcessedConfig().then(_ => {
             this.browserName = _.capabilities.browserName ? camelCase(_.capabilities.browserName) : '';
             this.name = _.capabilities.name ? camelCase(_.capabilities.name) : '';
