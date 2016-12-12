@@ -45,8 +45,10 @@ Refer to [docs](./docs/) for [conventions](./docs/conventions.md) and examples.
 
 ## Tests
 
+- `npm test`: Execute jshint, unit and local tests.
+
 #### Local
-- `npm test` or `npm test -- local`: Run all tests on a local machine with
+- `npm test -- local`: Run all tests on a local machine with
 Chrome and Firefox.
 
 Be sure to first run `npm run wd-update` to update the webdriver at least once
@@ -65,9 +67,6 @@ Add tests for any new or changed functionality. Lint and test your code using
 
 ## TODO
 
-- [x] Add Appium support
-- [ ] Add documentation for Appium
-- [x] Update general documentation
 - [ ] Update Jasmine/Mocha matchers
 
 ## License
