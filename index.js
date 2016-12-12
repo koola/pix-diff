@@ -50,15 +50,14 @@ class PixDiff {
         this.height = options.height;
         this.formatOptions = options.formatImageOptions || {};
         this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}-dpr-{dpr}';
-        this.offsets = options.offsets || {ios: {}, android: {}};
+        this.offsets = options.offsets || {};
         this.devicePixelRatio = 1;
 
-        if (this.offsets) {
-            assert.ok(this.offsets.ios, 'Offset key ios not found.');
-            assert.ok(this.offsets.android, 'Offset key android not found.');
-
-            this.offsets.ios = this._mergeDefaultOptions(this.offsets.ios, {statusBar: 20, addressBar: 44});
-            this.offsets.android = this._mergeDefaultOptions(this.offsets.android, {statusBar: 24, addressBar: 56, toolBar: 48});
+        if (this.offsets.ios) {
+            this.offsets.ios = Object.assign({statusBar: 20, addressBar: 44}, this.offsets.ios);
+        }
+        if (this.offsets.android) {
+            this.offsets.android = Object.assign({statusBar: 24, addressBar: 56, toolBar: 48}, this.offsets.android);
         }
 
         fs.ensureDirSync(this.basePath);
@@ -71,19 +70,7 @@ class PixDiff {
             browser.driver.manage().window().setSize(this.width, this.height);
         }
 
-        browser.getProcessedConfig().then(_ => {
-            this.browserName = _.capabilities.browserName ? camelCase(_.capabilities.browserName) : '';
-            this.name = _.capabilities.name ? camelCase(_.capabilities.name) : '';
-            this.logName = _.capabilities.logName ? camelCase(_.capabilities.logName) : '';
-            // Mobile
-            this.platformName = _.capabilities.platformName ? _.capabilities.platformName.toLowerCase() : '';
-            this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
-            this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot || false;
-
-            if (_.framework !== 'custom') {
-                require(path.resolve(__dirname, 'framework', _.framework));
-            }
-        });
+        this._formatCapabilities();
     }
 
     /**
@@ -159,6 +146,28 @@ class PixDiff {
         });
 
         return formatString + '.png';
+    }
+
+
+    /**
+     * Formats the webdriver capabilities and sets defaults
+     *
+     * @method _formatCapabilities
+     * @private
+     */
+        _formatCapabilities() {
+        return browser.getProcessedConfig().then(_ => {
+            this.browserName = _.capabilities.browserName ? camelCase(_.capabilities.browserName) : '';
+            this.name = _.capabilities.name ? camelCase(_.capabilities.name) : '';
+            this.logName = _.capabilities.logName ? camelCase(_.capabilities.logName) : '';
+            this.platformName = _.capabilities.platformName ? _.capabilities.platformName.toLowerCase() : '';
+            this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
+            this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot || false;
+
+            if (_.framework !== 'custom') {
+                require(path.resolve(__dirname, 'framework', _.framework));
+            }
+        });
     }
 
     /**
@@ -545,7 +554,7 @@ class PixDiff {
             .then(() => this._checkImageExists(tag))
             .then(() => this._getElementRectangle(element), (error) => {
                 if (this.baseline) {
-                    return this.saveScreen(tag).then(() => { throw error; });
+                    return this.saveRegion(element, tag).then(() => { throw error; });
                 }
                 throw error;
             })

@@ -31,6 +31,13 @@ module.exports = grunt => {
         },
 
         run: {
+            unit: {
+                cmd: 'node_modules/.bin/_mocha',
+                args: [
+                    '-R', 'spec',
+                    'test/unit/index.spec.js'
+                ]
+            },
             local: {
                 cmd: 'node_modules/.bin/protractor',
                 args: [
@@ -78,9 +85,10 @@ module.exports = grunt => {
         }
     });
 
+    grunt.registerTask('unit', 'Run unit tests', ['run:unit']);
     grunt.registerTask('local', 'Run desktop tests on local', ['clean:images', 'run:local']);
     grunt.registerTask('saucelabs', 'Run all tests on Saucelabs', ['clean:images', 'run:saucelabs']);
-    grunt.registerTask('build', ['jshint:all', 'local']);
+    grunt.registerTask('build', ['jshint:all', 'unit', 'local']);
     grunt.registerTask('release', 'Docs, bump and push to GitHub', (type) => {
         grunt.task.run(
             [
@@ -91,5 +99,5 @@ module.exports = grunt => {
                 'bump-commit'
             ]);
     });
-    grunt.registerTask('default', ['local']);
+    grunt.registerTask('default', ['build']);
 };
