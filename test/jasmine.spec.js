@@ -10,6 +10,7 @@ let PixelDiff = require('pixel-diff'),
 describe('Pix-Diff', () => {
 
     const _ = browser.testConfig,
+        tagPage = 'examplePage',
         tagScreen = 'exampleScreen',
         tagRegion = 'exampleRegion',
         screenElement = element(by.css('div h1')),
@@ -109,6 +110,24 @@ describe('Pix-Diff', () => {
                     expect(error.message).toContain('Image not found');
                     expect(fs.existsSync(`${screenshotPath}/${tagBaseline}-${_.logName}-${_.dprWidth}x${_.dprHeight}-dpr-${_.devicePixelRatio}.png`)).toBe(true);
                 });
+        });
+    });
+
+    describe('save page', () => {
+
+        beforeEach(() => {
+            browser.pixDiff = new PixDiff({
+                basePath: './test/baseline/desktop/',
+                diffPath: './test/',
+                width: 800,
+                height: 270,
+                formatImageName: '{tag}-{browserName}-dpr-{dpr}'
+            });
+        });
+
+        it('should save a composition', () => {
+            browser.pixDiff.savePage(tagPage, 1000)
+                .then(() => expect(fs.existsSync(`${screenshotPath}/${tagPage}-${_.browserName}-dpr-${_.devicePixelRatio}.png`)).toBe(true));
         });
     });
 });

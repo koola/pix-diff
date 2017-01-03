@@ -53,5 +53,5 @@
     "node"          : true,
     "jasmine"       : true,
 
-    "predef": [ "browser", "element", "by", "protractor", "window" ]
+    "predef": [ "browser", "element", "by", "protractor", "window", "document" ]
 }

@@ -31,6 +31,9 @@ const assert = require('assert'),
  * @property {string} formatString Customizable image filename naming convention
  * @property {object} offsets Object with statusBar, addressBar and toolBar key/values
  * @property {int} devicePixelRatio Ratio of the (vertical) size of one physical pixel on the current display device to the size of one device independent pixels(dips)
+ * @property {int} innerHeight Viewport height
+ * @property {int} pageWidth Full page width
+ * @property {int} pageHeight Full page height
  * @property {string} browserName Browser name from the WebDriver capabilities
  * @property {string} logName Log name from WebDriver capabilities
  * @property {string} name Name from WebDriver capabilities
@@ -52,6 +55,9 @@ class PixDiff {
         this.formatString = options.formatImageName || '{tag}-{browserName}-{width}x{height}-dpr-{dpr}';
         this.offsets = options.offsets || {};
         this.devicePixelRatio = 1;
+        this.innerHeight = 0;
+        this.pageWidth = 0;
+        this.pageHeight = 0;
 
         this.offsets.ios = Object.assign({statusBar: 20, addressBar: 44}, this.offsets.ios);
         this.offsets.android = Object.assign({statusBar: 24, addressBar: 56, toolBar: 48}, this.offsets.android);
@@ -151,7 +157,7 @@ class PixDiff {
      * @method _formatCapabilities
      * @private
      */
-     _formatCapabilities() {
+    _formatCapabilities() {
         return browser.getProcessedConfig().then(_ => {
             this.browserName = _.capabilities.browserName ? camelCase(_.capabilities.browserName) : '';
             this.name = _.capabilities.name ? camelCase(_.capabilities.name) : '';
@@ -164,6 +170,18 @@ class PixDiff {
                 require(path.resolve(__dirname, 'framework', _.framework));
             }
         });
+    }
+
+    /**
+     * Promise sleep for pre-determined time
+     *
+     * @method _sleep
+     * @param {int} time in milliseconds (default: 1000)
+     * @returns {Promise}
+     * @private
+     */
+    _sleep(time) {
+        return new Promise(resolve => setTimeout(resolve, time || 1000));
     }
 
     /**
@@ -249,7 +267,7 @@ class PixDiff {
      * @returns {promise}
      * @private
      */
-     _getElementPositionTopPage(element) {
+    _getElementPositionTopPage(element) {
         return element.getLocation()
             .then(point => {
                 return {x: point.x, y: point.y};
@@ -304,13 +322,13 @@ class PixDiff {
     }
 
     /**
-      * Get the position of a given element for the Android devices browser
-      *
-      * @method _getElementPositionAndroid
-      * @param {promise} element
-      * @returns {promise}
-      * @private
-      */
+     * Get the position of a given element for the Android devices browser
+     *
+     * @method _getElementPositionAndroid
+     * @param {promise} element
+     * @returns {promise}
+     * @private
+     */
     _getElementPositionAndroid(element) {
         function getDataObject(element, statusBarHeight, addressBarHeight, toolBarHeight) {
             var elementPosition = element.getBoundingClientRect(),
@@ -335,7 +353,7 @@ class PixDiff {
     }
 
 
-        /**
+    /**
      * Checks if image exists as a baseline image
      *
      * @method _checkImageExists
@@ -374,7 +392,10 @@ class PixDiff {
                 return {
                     devicePixelRatio: window.devicePixelRatio,
                     height: (isMobile) ? window.screen.height : window.outerHeight,
-                    width: (isMobile) ? window.screen.width : window.outerWidth
+                    width: (isMobile) ? window.screen.width : window.outerWidth,
+                    innerHeight: window.innerHeight,
+                    scrollHeight: document.body.scrollHeight,
+                    scrollWidth: document.body.scrollWidth
                 };
             }
             return browser.executeScript(getDataObject, this._isMobile())
@@ -382,6 +403,9 @@ class PixDiff {
                     this.devicePixelRatio = this._isFirefox() ? this.devicePixelRatio : screen.devicePixelRatio;
                     this.width = screen.width * this.devicePixelRatio;
                     this.height = screen.height * this.devicePixelRatio;
+                    this.innerHeight = screen.innerHeight * this.devicePixelRatio;
+                    this.pageWidth = screen.scrollWidth * this.devicePixelRatio;
+                    this.pageHeight = screen.scrollHeight * this.devicePixelRatio;
                 });
         });
     }
@@ -416,6 +440,46 @@ class PixDiff {
                 });
 
                 return rect;
+            });
+    }
+
+    /**
+     * Saves an image of the whole page
+     *
+     * @method savePage
+     * @example
+     *     browser.pixdiff.savePage('imageA');
+     *
+     * @param {string} tag Baseline image name
+     * @param {int} scrollSleep Time between scrolls in milliseconds (default: 1000)
+     * @returns {Promise}
+     * @reject {Error}
+     * @fulfil {null}
+     * @public
+     */
+    savePage(tag, scrollSleep) {
+        let screens = [];
+
+        return this._getBrowserData()
+            .then(() => {
+                return [...Array(Math.ceil(this.pageHeight / this.innerHeight)).keys()].reduce((promise, i) => {
+                    return promise.then(() => browser.driver.executeScript(`window.scrollTo(0, + ${(this.innerHeight / this.devicePixelRatio) * i});`))
+                        .then(() => this._sleep(scrollSleep || 1000))
+                        .then(() => browser.takeScreenshot())
+                        .then(image => {
+                            screens.push(new Buffer(image, 'base64'));
+                        });
+                }, Promise.resolve());
+            })
+            .then(() => {
+                let offset = (this.innerHeight * screens.length) - this.pageHeight;
+                this.width = this.pageWidth;
+                this.height = this.pageHeight;
+                return new PNGImage({
+                    imagePath: screens,
+                    imageOutputPath: path.join(this.basePath, this._formatFileName(tag)),
+                    composeOffset: offset
+                }).compose();
             });
     }
 
