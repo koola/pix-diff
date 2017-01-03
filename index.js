@@ -460,6 +460,9 @@ class PixDiff {
     savePage(tag, scrollSleep) {
         let screens = [];
 
+        if (this._isFirefox() || this._isInternetExplorer()) {
+            return this.saveScreen(tag);
+        }
         return this._getBrowserData()
             .then(() => {
                 return [...Array(Math.ceil(this.pageHeight / this.innerHeight)).keys()].reduce((promise, i) => {
@@ -472,13 +475,12 @@ class PixDiff {
                 }, Promise.resolve());
             })
             .then(() => {
-                let offset = (this.innerHeight * screens.length) - this.pageHeight;
                 this.width = this.pageWidth;
                 this.height = this.pageHeight;
                 return new PNGImage({
                     imagePath: screens,
                     imageOutputPath: path.join(this.basePath, this._formatFileName(tag)),
-                    composeOffset: offset
+                    composeOffset: (this.innerHeight * screens.length) - this.pageHeight
                 }).compose();
             });
     }
