@@ -166,8 +166,9 @@ class PixDiff {
             this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
             this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot || false;
 
-            if (_.framework !== 'custom') {
-                require(path.resolve(__dirname, 'framework', _.framework));
+            let framework = _.framework ? _.framework.toLowerCase() : 'jasmine2';
+            if (['jasmine', 'jasmine2', 'mocha'].indexOf(framework) >= 0) {
+                require(path.resolve(__dirname, 'framework', framework));
             }
         });
     }

@@ -17,8 +17,7 @@ let capabilities = caps => {
         capabilities: Object.assign({
             browserName: 'Chrome',
             name: 'test name',
-            logName: 'test logger',
-            framework: 'custom'
+            logName: 'test logger'
         }, caps || {})
     })
 };
