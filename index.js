@@ -108,9 +108,7 @@ class PixDiff {
      * @returns {object}
      * @private
      */
-    _mergeDefaultOptions(optionsA, optionsB) {
-        optionsB = (typeof optionsB === 'object') ? optionsB : {};
-
+    _mergeDefaultOptions(optionsA, optionsB = {}) {
         Object.keys(optionsB).forEach(value => {
             if (!optionsA.hasOwnProperty(value)) {
                 optionsA[value] = optionsB[value];
@@ -177,12 +175,12 @@ class PixDiff {
      * Promise sleep for pre-determined time
      *
      * @method _sleep
-     * @param {int} time in milliseconds (default: 1000)
+     * @param {int} timeout in milliseconds (default: 1000)
      * @returns {Promise}
      * @private
      */
-    _sleep(time) {
-        return new Promise(resolve => setTimeout(resolve, time || 1000));
+    _sleep(timeout = 1000) {
+        return new Promise(resolve => setTimeout(resolve, timeout));
     }
 
     /**
@@ -245,8 +243,8 @@ class PixDiff {
      * Firefox and IE take a screenshot of the complete page. Chrome takes a screenshot of the viewport.
      *
      * @method _getElementPosition
-     * @param {promise} element
-     * @returns {promise}
+     * @param {Promise} element
+     * @returns {Promise}
      * @private
      */
     _getElementPosition(element) {
@@ -264,8 +262,8 @@ class PixDiff {
      * Get the position of a given element according to the TOP of the PAGE
      *
      * @method _getElementPositionTopPage
-     * @param {promise} element
-     * @returns {promise}
+     * @param {Promise} element
+     * @returns {Promise}
      * @private
      */
     _getElementPositionTopPage(element) {
@@ -279,8 +277,8 @@ class PixDiff {
      * Get the position of a given element according to the TOP of the WINDOW
      *
      * @method _getElementPositionTopWindow
-     * @param {promise} element
-     * @returns {promise}
+     * @param {Promise} element
+     * @returns {Promise}
      * @private
      */
     _getElementPositionTopWindow(element) {
@@ -294,14 +292,13 @@ class PixDiff {
      * Get the position of a given element for the IOS Safari browser
      *
      * @method _getElementPositionIOS
-     * @param {promise} element
-     * @returns {promise}
+     * @param {Promise} element
+     * @returns {Promise}
      * @private
      */
     _getElementPositionIOS(element) {
         function getDataObject(element, addressBar, statusBar) {
-            var
-                screenHeight = window.screen.height,
+            var screenHeight = window.screen.height,
                 screenWidth = window.screen.width,
                 windowInnerHeight = window.innerHeight,
                 rotatedScreenHeight = screenHeight > screenWidth ? screenWidth : screenHeight,
@@ -326,8 +323,8 @@ class PixDiff {
      * Get the position of a given element for the Android devices browser
      *
      * @method _getElementPositionAndroid
-     * @param {promise} element
-     * @returns {promise}
+     * @param {Promise} element
+     * @returns {Promise}
      * @private
      */
     _getElementPositionAndroid(element) {
@@ -359,56 +356,48 @@ class PixDiff {
      *
      * @method _checkImageExists
      * @param {string} tag
-     * @returns {promise}
+     * @returns {Promise}
      * @private
      */
     _checkImageExists(tag) {
-        var deferred = protractor.promise.defer();
-
-        fs.access(path.join(this.basePath, this._formatFileName(tag)), fs.F_OK, error => {
-            if (error) {
-                if (!this.baseline) {
-                    deferred.reject(error);
+        return new Promise((resolve, reject) => {
+            fs.access(path.join(this.basePath, this._formatFileName(tag)), fs.F_OK, error => {
+                if (error) {
+                    reject(!this.baseline ? error : new Error('Image not found, saving current image as new baseline.'));
                 } else {
-                    deferred.reject(new Error('Image not found, saving current image as new baseline.'));
+                    resolve();
                 }
-            } else {
-                deferred.fulfill();
-            }
+            });
         });
-
-        return deferred.promise;
     }
 
     /**
      * Get browser instance data
      *
      * @method _getBrowserData
-     * @returns {promise}
+     * @returns {Promise}
      * @private
      */
     _getBrowserData() {
-        return browser.controlFlow().execute(() => {
-            function getDataObject (isMobile) {
-                return {
-                    devicePixelRatio: window.devicePixelRatio,
-                    height: (isMobile) ? window.screen.height : window.outerHeight,
-                    width: (isMobile) ? window.screen.width : window.outerWidth,
-                    innerHeight: window.innerHeight,
-                    scrollHeight: document.body.scrollHeight,
-                    scrollWidth: document.body.scrollWidth
-                };
-            }
-            return browser.executeScript(getDataObject, this._isMobile())
-                .then((screen) => {
-                    this.devicePixelRatio = this._isFirefox() ? this.devicePixelRatio : screen.devicePixelRatio;
-                    this.width = screen.width * this.devicePixelRatio;
-                    this.height = screen.height * this.devicePixelRatio;
-                    this.innerHeight = screen.innerHeight * this.devicePixelRatio;
-                    this.pageWidth = screen.scrollWidth * this.devicePixelRatio;
-                    this.pageHeight = screen.scrollHeight * this.devicePixelRatio;
-                });
-        });
+        function getDataObject (isMobile) {
+            return {
+                devicePixelRatio: window.devicePixelRatio,
+                height: (isMobile) ? window.screen.height : window.outerHeight,
+                width: (isMobile) ? window.screen.width : window.outerWidth,
+                innerHeight: window.innerHeight,
+                scrollHeight: document.body.scrollHeight,
+                scrollWidth: document.body.scrollWidth
+            };
+        }
+        return browser.executeScript(getDataObject, this._isMobile())
+            .then(screen => {
+                this.devicePixelRatio = this._isFirefox() ? this.devicePixelRatio : screen.devicePixelRatio;
+                this.width = screen.width * this.devicePixelRatio;
+                this.height = screen.height * this.devicePixelRatio;
+                this.innerHeight = screen.innerHeight * this.devicePixelRatio;
+                this.pageWidth = screen.scrollWidth * this.devicePixelRatio;
+                this.pageHeight = screen.scrollHeight * this.devicePixelRatio;
+            });
     }
 
     /**
@@ -445,6 +434,53 @@ class PixDiff {
     }
 
     /**
+     * Scrolls the page and takes screenshots
+     *
+     * @method _takeScreenshots
+     * @param {int} scrollTimeout Time between scrolls in milliseconds (default: 1000)
+     * @returns {Promise}
+     * @private
+     */
+    _takeScreenshots(scrollTimeout) {
+        let screens = [];
+
+        return this._getBrowserData()
+            .then(() => {
+                return [...Array(Math.ceil(this.pageHeight / this.innerHeight)).keys()].reduce((promise, i) => {
+                    return promise.then(() => browser.driver.executeScript(`window.scrollTo(0, + ${(this.innerHeight / this.devicePixelRatio) * i});`))
+                        .then(() => this._sleep(scrollTimeout))
+                        .then(() => browser.takeScreenshot())
+                        .then(image => {
+                            screens.push(new Buffer(image, 'base64'));
+                        });
+                }, Promise.resolve());
+            })
+            .then(() => Promise.resolve(screens));
+    }
+
+    /**
+     * Runs comparison against baseline screenshot with defaults
+     *
+     * @method _runComparison
+     * @param {string} tag Baseline image name
+     * @param {PNGImage} image Screenshot image
+     * @param {object} defaults Default Pixel-Diff options
+     * @param {object} options Non-default Pixel-Diff options
+     * @returns {Promise}
+     * @private
+     */
+    _runComparison(tag, image, defaults = {}, options = {}) {
+        defaults = Object.assign({
+            imageAPath: path.join(this.basePath, tag),
+            imageB: new Buffer(image, 'base64'),
+            imageOutputPath: path.join(this.diffPath, path.basename(tag)),
+            imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT
+        }, defaults);
+
+        return new PixelDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
+    }
+
+    /**
      * Saves an image of the whole page
      *
      * @method savePage
@@ -452,37 +488,27 @@ class PixDiff {
      *     browser.pixdiff.savePage('imageA');
      *
      * @param {string} tag Baseline image name
-     * @param {int} scrollSleep Time between scrolls in milliseconds (default: 1000)
+     * @param {int} scrollTimeout Time between scrolls in milliseconds (default: 1000)
      * @returns {Promise}
      * @reject {Error}
      * @fulfil {null}
      * @public
      */
-    savePage(tag, scrollSleep) {
-        let screens = [];
-
+    savePage(tag, scrollTimeout) {
         if (this._isFirefox() || this._isInternetExplorer()) {
             return this.saveScreen(tag);
         }
-        return this._getBrowserData()
-            .then(() => {
-                return [...Array(Math.ceil(this.pageHeight / this.innerHeight)).keys()].reduce((promise, i) => {
-                    return promise.then(() => browser.driver.executeScript(`window.scrollTo(0, + ${(this.innerHeight / this.devicePixelRatio) * i});`))
-                        .then(() => this._sleep(scrollSleep || 1000))
-                        .then(() => browser.takeScreenshot())
-                        .then(image => {
-                            screens.push(new Buffer(image, 'base64'));
-                        });
-                }, Promise.resolve());
-            })
-            .then(() => {
+        return this._takeScreenshots(scrollTimeout)
+            .then(screens => {
                 this.width = this.pageWidth;
                 this.height = this.pageHeight;
-                return new PNGImage({
+                let png = new PNGImage({
                     imagePath: screens,
                     imageOutputPath: path.join(this.basePath, this._formatFileName(tag)),
                     composeOffset: (this.innerHeight * screens.length) - this.pageHeight
-                }).compose();
+                });
+
+                return png.compose().then(png.writeImage);
             });
     }
 
@@ -494,7 +520,7 @@ class PixDiff {
      *     browser.pixdiff.saveScreen('imageA');
      *
      * @param {string} tag Baseline image name
-     * @returns {promise}
+     * @returns {Promise}
      * @reject {Error}
      * @fulfil {null}
      * @public
@@ -517,9 +543,9 @@ class PixDiff {
      * @example
      *     browser.pixdiff.saveRegion(element(By.id('elementId')), 'imageA');
      *
-     * @param {promise} element The ElementFinder for element lookup
+     * @param {Promise} element The ElementFinder for element lookup
      * @param {string} tag Baseline image name
-     * @returns {promise}
+     * @returns {Promise}
      * @reject {Error}
      * @fulfil {null}
      * @public
@@ -543,6 +569,43 @@ class PixDiff {
     }
 
     /**
+     * Runs the comparison against the page
+     *
+     * @method checkPage
+     * @example
+     *  browser.pixdiff.checkScreen('imageA', {blockOut: [{x: 0, y: 0, width: 1366, height: 30}]})
+     *      .then(result => { console.log(result.code); });
+     *
+     * @param {string} tag Baseline image name
+     * @param {object} options Non-default Blink-Diff options
+     * @returns {object} result
+     * @reject {Error} - Baseline image not found
+     * @fulfil {object} - PixelDiff result.code
+     *
+     *  - `RESULT_UNKNOWN`: 0
+     *  - `RESULT_DIFFERENT`: 1
+     *  - `RESULT_SIMILAR`: 7
+     *  - `RESULT_IDENTICAL`: 5
+     * @public
+     */
+    checkPage(tag, options) {
+        if (this._isFirefox() || this._isInternetExplorer()) {
+            return this.checkScreen(tag);
+        }
+        return this._takeScreenshots()
+            .then(screens => {
+                this.width = this.pageWidth;
+                this.height = this.pageHeight;
+                let png = new PNGImage({
+                    imagePath: screens,
+                    composeOffset: (this.innerHeight * screens.length) - this.pageHeight
+                });
+                return png.compose().then(png.toBuffer);
+            })
+            .then(image => this._runComparison(this._formatFileName(tag), image, options));
+    }
+
+    /**
      * Runs the comparison against the screen
      *
      * @method checkScreen
@@ -563,8 +626,6 @@ class PixDiff {
      * @public
      */
     checkScreen(tag, options) {
-        let defaults;
-
         return this._getBrowserData()
             .then(() => this._checkImageExists(tag))
             .then(() => browser.takeScreenshot(), error => {
@@ -573,19 +634,7 @@ class PixDiff {
                 }
                 throw error;
             })
-            .then(image => {
-                tag = this._formatFileName(tag);
-                defaults = {
-                    imageAPath: path.join(this.basePath, tag),
-                    imageB: new Buffer(image, 'base64'),
-                    imageOutputPath: path.join(this.diffPath, path.basename(tag)),
-                    imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT
-                };
-                return new PixelDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
-            })
-            .then(result => {
-                return result;
-            });
+            .then(image => this._runComparison(this._formatFileName(tag), image, options));
     }
 
     /**
@@ -596,7 +645,7 @@ class PixDiff {
      *  browser.pixdiff.checkRegion(element(By.id('elementId')), 'imageA', {debug: true})
      *      .then(result => { console.log(result.code); });
      *
-     * @param {promise} element The ElementFinder for element lookup
+     * @param {Promise} element The ElementFinder for element lookup
      * @param {string} tag Baseline image name
      * @param {object} options Non-default Blink-Diff options
      * @returns {object} result
@@ -610,8 +659,7 @@ class PixDiff {
      * @public
      */
     checkRegion(element, tag, options) {
-        let rect,
-            defaults;
+        let defaults = {};
 
         return this._getBrowserData()
             .then(() => this._checkImageExists(tag))
@@ -621,24 +669,11 @@ class PixDiff {
                 }
                 throw error;
             })
-            .then(elementRect => {
-                rect = elementRect;
+            .then(rect => {
+                defaults.cropImageB = rect;
                 return browser.takeScreenshot();
             })
-            .then(image => {
-                tag = this._formatFileName(tag);
-                defaults = {
-                    imageAPath: path.join(this.basePath, tag),
-                    imageB: new Buffer(image, 'base64'),
-                    imageOutputPath: path.join(this.diffPath, path.basename(tag)),
-                    imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT,
-                    cropImageB: rect
-                };
-                return new PixelDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
-            })
-            .then(result => {
-                return result;
-            });
+            .then(image => this._runComparison(this._formatFileName(tag), image, defaults, options));
     }
 }
 

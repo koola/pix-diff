@@ -125,9 +125,20 @@ describe('Pix-Diff', () => {
             });
         });
 
-        it('should save a composition', () => {
-            browser.pixDiff.savePage(tagPage, 1000)
+        it('should save successfully', () => {
+            browser.pixDiff.savePage(tagPage)
                 .then(() => expect(fs.existsSync(`${screenshotPath}/${tagPage}-${_.browserName}-dpr-${_.devicePixelRatio}.png`)).toBe(true));
+        });
+
+        it('should compare successfully with a baseline', () => {
+            browser.pixDiff.checkPage(tagPage)
+                .then(result => expect(result.code).toEqual(PixelDiff.RESULT_IDENTICAL));
+        });
+
+        it('should not compare successfully with a baseline', () => {
+            browser.executeScript('arguments[0].innerHTML = "Hello, fail";', screenElement.getWebElement())
+                .then(() => browser.pixDiff.checkPage(tagPage))
+                .then(result => expect(result.code).toBe(PixelDiff.RESULT_DIFFERENT));
         });
     });
 });
