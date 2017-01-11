@@ -1,6 +1,7 @@
 'use strict';
 
-const SpecReporter = require('jasmine-spec-reporter'),
+const PixDiff = require('../../'),
+    SpecReporter = require('jasmine-spec-reporter'),
     camelCase = require('../../lib/camelCase');
 
 exports.config = {
@@ -28,6 +29,8 @@ exports.config = {
             displayPendingSpec: true,
             displaySpecDuration: true
         }));
+
+        PixDiff.loadMatchers();
 
         return browser.getProcessedConfig().then(_ => {
             let testConfig = {

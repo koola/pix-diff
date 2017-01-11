@@ -1,10 +1,10 @@
 'use strict';
 
-let PixelDiff = require('pixel-diff'),
+const PixelDiff = require('pixel-diff'),
     PixDiff = require('../'),
     fs = require('fs'),
-    path = require('path'),
-    screenshotPath = path.resolve(__dirname, '../test/baseline/desktop/'),
+    path = require('path');
+let screenshotPath = path.resolve(__dirname, '../test/baseline/desktop/'),
     differencePath = path.resolve(__dirname, '../test/diff/');
 
 describe('Pix-Diff', () => {
@@ -47,6 +47,10 @@ describe('Pix-Diff', () => {
         it('should compare successfully with a baseline', () => {
             browser.pixDiff.checkScreen(tagScreen)
                 .then(result => expect(result.code).toEqual(PixelDiff.RESULT_IDENTICAL));
+        });
+
+        it('should compare successfully with a baseline and matcher', () => {
+            expect(browser.pixDiff.checkScreen(tagScreen)).toPass();
         });
 
         it('should save a difference and fail comparing with a baseline', () => {
