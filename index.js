@@ -80,6 +80,9 @@ class PixDiff {
      *
      * @static
      * @method loadMatchers
+     * @example
+     *      const pixDiff = require('pix-diff');
+     *      pixDiff.loadMatchers();
      * @public
      */
     static loadMatchers() {
@@ -89,6 +92,54 @@ class PixDiff {
                 require(path.resolve(__dirname, 'framework', framework));
             }
         });
+    }
+
+    /**
+     * Unknown result of the comparison
+     *
+     * @static
+     * @property RESULT_UNKNOWN
+     * @type {int}
+     * @public
+     */
+    static get RESULT_UNKNOWN() {
+        return PixelDiff.RESULT_UNKNOWN;
+    }
+
+    /**
+     * The images are too different
+     *
+     * @static
+     * @property RESULT_DIFFERENT
+     * @type {int}
+     * @public
+     */
+    static get RESULT_DIFFERENT() {
+        return PixelDiff.RESULT_DIFFERENT;
+    }
+
+    /**
+     * The images are very similar, but still below the threshold
+     *
+     * @static
+     * @property RESULT_SIMILAR
+     * @type {int}
+     * @public
+     */
+    static get RESULT_SIMILAR() {
+        return PixelDiff.RESULT_SIMILAR;
+    }
+
+    /**
+     * The images are identical (or near identical)
+     *
+     * @static
+     * @property RESULT_IDENTICAL
+     * @type {int}
+     * @public
+     */
+    static get RESULT_IDENTICAL() {
+        return PixelDiff.RESULT_IDENTICAL;
     }
 
     /**
