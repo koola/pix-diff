@@ -24,6 +24,18 @@ let capabilities = caps => {
 
 describe('Pix-Diff', () => {
 
+    describe('Static methods', () => {
+
+        it('should get variables', () => {
+            expect(PixDiff.THRESHOLD_PIXEL).to.equal('pixel');
+            expect(PixDiff.THRESHOLD_PERCENT).to.equal('percent');
+            expect(PixDiff.RESULT_UNKNOWN).to.equal(0);
+            expect(PixDiff.RESULT_DIFFERENT).to.equal(1);
+            expect(PixDiff.RESULT_SIMILAR).to.equal(7);
+            expect(PixDiff.RESULT_IDENTICAL).to.equal(5);
+        });
+    });
+
     describe('Default values', () => {
 
         browser.getProcessedConfig = capabilities;
