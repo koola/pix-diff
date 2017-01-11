@@ -76,6 +76,22 @@ class PixDiff {
     }
 
     /**
+     * Load matchers for pix-diff
+     *
+     * @static
+     * @method loadMatchers
+     * @public
+     */
+    static loadMatchers() {
+        return browser.getProcessedConfig().then(_ => {
+            let framework = _.framework ? _.framework.toLowerCase() : 'jasmine2';
+            if (['jasmine', 'jasmine2', 'mocha'].indexOf(framework) >= 0) {
+                require(path.resolve(__dirname, 'framework', framework));
+            }
+        });
+    }
+
+    /**
      * Threshold-type for pixel
      *
      * @static
@@ -163,11 +179,6 @@ class PixDiff {
             this.platformName = _.capabilities.platformName ? _.capabilities.platformName.toLowerCase() : '';
             this.deviceName = _.capabilities.deviceName ? camelCase(_.capabilities.deviceName) : '';
             this.nativeWebScreenshot = _.capabilities.nativeWebScreenshot || false;
-
-            let framework = _.framework ? _.framework.toLowerCase() : 'jasmine2';
-            if (['jasmine', 'jasmine2', 'mocha'].indexOf(framework) >= 0) {
-                require(path.resolve(__dirname, 'framework', framework));
-            }
         });
     }
 
@@ -573,7 +584,7 @@ class PixDiff {
      *
      * @method checkPage
      * @example
-     *  browser.pixdiff.checkScreen('imageA', {blockOut: [{x: 0, y: 0, width: 1366, height: 30}]})
+     *  browser.pixdiff.checkPage('imageA')
      *      .then(result => { console.log(result.code); });
      *
      * @param {string} tag Baseline image name
@@ -588,7 +599,7 @@ class PixDiff {
      *  - `RESULT_IDENTICAL`: 5
      * @public
      */
-    checkPage(tag, options) {
+    checkPage(tag, options = {}) {
         if (this._isFirefox() || this._isInternetExplorer()) {
             return this.checkScreen(tag);
         }
@@ -625,7 +636,7 @@ class PixDiff {
      *  - `RESULT_IDENTICAL`: 5
      * @public
      */
-    checkScreen(tag, options) {
+    checkScreen(tag, options = {}) {
         return this._getBrowserData()
             .then(() => this._checkImageExists(tag))
             .then(() => browser.takeScreenshot(), error => {
@@ -658,7 +669,7 @@ class PixDiff {
      *  - `RESULT_IDENTICAL`: `5`
      * @public
      */
-    checkRegion(element, tag, options) {
+    checkRegion(element, tag, options = {}) {
         let defaults = {};
 
         return this._getBrowserData()

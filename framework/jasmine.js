@@ -1,17 +1,16 @@
 'use strict';
 
-var PixelDiff = require('pixel-diff'),
-    util = require('util');
+const PixelDiff = require('pixel-diff');
 
-beforeEach(function() {
+beforeEach(() => {
     this.addMatchers({
-        toMatchScreen: function () {
+        toPass: () => {
             var result = this.actual,
                 percent = +((result.differences / result.dimension) * 100).toFixed(2);
-            this.message = function () {
-                return util.format("Image is visibly different by %s pixels, %s %", result.differences, percent);
+            this.message = () => {
+                return `Image is visibly different by ${result.differences} pixels, ${percent}%`;
             };
-            return ((result.code === PixelDiff.RESULT_IDENTICAL) || (result.code === PixelDiff.RESULT_SIMILAR));
+            return (result.code === PixelDiff.RESULT_IDENTICAL) || (result.code === PixelDiff.RESULT_SIMILAR);
         }
     });
 });
