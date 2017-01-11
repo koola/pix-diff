@@ -7,9 +7,9 @@ Load it from the Protractor configuration file
 exports.config = {
    // your config here ...
 
-    onPrepare: function() {
-        const pixDiff = require('pix-diff');
-        browser.pixDiff = new pixDiff(
+    onPrepare: () => {
+        const PixDiff = require('pix-diff');
+        browser.pixDiff = new PixDiff(
             {
                 basePath: 'path/to/baseline/',
                 diffPath: 'path/to/diff/',
@@ -24,12 +24,13 @@ exports.config = {
 ## Jasmine
 Load it in a spec file
 ```javascript
-const pixDiff = require('pix-diff');
+const PixDiff = require('pix-diff');
+PixDiff.loadMatchers();
 
-describe("Example page", function() {
+describe("Example page", () => {
 
-    beforeEach(function() {
-        browser.pixDiff = new pixDiff({
+    beforeEach(() => {
+        browser.pixDiff = new PixDiff({
             basePath: './test/desktop/',
             diffPath: './diff/'
         });
@@ -37,15 +38,51 @@ describe("Example page", function() {
     });
 
     it("should match the page", () => {
-        expect(browser.pixDiff.checkScreen('examplePage')).toMatchScreen();
+        expect(browser.pixDiff.checkScreen('examplePage')).toPass();
     });
 
     it("should match the page title", () => {
-        expect(browser.pixDiff.checkRegion(element(by.css('h1')), 'exampleRegion')).toMatchScreen();
+        expect(browser.pixDiff.checkRegion(element(by.css('h1')), 'exampleRegion')).toPass();
     });
 
     it("should not match the page title", () => {
-        expect(browser.pixDiff.checkRegion(element(by.cc('a')), 'exampleRegion')).not.toMatchScreen();
+        expect(browser.pixDiff.checkRegion(element(by.cc('a')), 'exampleRegion')).not.toPass();
+    });
+});
+```
+With no Jasmine matchers
+```javascript
+const PixDiff = require('pix-diff');
+
+describe("Example page", () => {
+
+    beforeEach(() => {
+        browser.pixDiff = new PixDiff({
+            basePath: './test/desktop/',
+            diffPath: './diff/'
+        });
+        browser.get('http://www.example.com/');
+    });
+
+    it("should match the page", () => {
+        browser.pixDiff.checkScreen('examplePage')
+          .then(result => {
+              expect(result.code).toEqual(PixDiff.RESULT_IDENTICAL);
+          });
+    });
+
+    it("should match the page title", () => {
+        browser.pixDiff.checkRegion(element(by.css('h1')), 'exampleRegion')
+          .then(result => {
+              expect(result.code).toEqual(PixDiff.RESULT_IDENTICAL);
+          });
+    });
+
+    it("should not match the page title", () => {
+        browser.pixDiff.checkRegion(element(by.cc('a')), 'exampleRegion')
+          .then(result => {
+              expect(result.code).toEqual(PixDiff.RESULT_DIFFERENT);
+          });
     });
 });
 ```
@@ -54,11 +91,11 @@ describe("Example page", function() {
 Load it in a step file
 ```javascript
 const expect = require('chai').expect,
-      pixDiff = require('pix-diff');
+      PixDiff = require('pix-diff');
 
 function CucumberSteps() {
 
-    browser.pixDiff = new pixDiff({
+    browser.pixDiff = new PixDiff({
         basePath: './test/desktop/',
         diffPath: './diff/'
     });

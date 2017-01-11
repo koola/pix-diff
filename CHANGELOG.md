@@ -1,3 +1,20 @@
+<a name="1.2.1"></a>
+## [1.2.1](https://github.com/koola/pix-diff/compare/v1.2.0...v1.2.1) (2017-01-11)
+
+
+### Bug Fixes
+
+* **code:** add firefox support ([ad035fe](https://github.com/koola/pix-diff/commit/ad035fe))
+* **code:** default load when framework is undefined ([0e8b0eb](https://github.com/koola/pix-diff/commit/0e8b0eb))
+
+
+### Features
+
+* **checkPage:** ability to check page ([ae4ff86](https://github.com/koola/pix-diff/commit/ae4ff86))
+* **savePage:** ability to save page ([5d4e6f2](https://github.com/koola/pix-diff/commit/5d4e6f2))
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/koola/pix-diff/compare/v1.1.16...v1.2.0) (2016-12-07)
 
