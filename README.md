@@ -67,10 +67,10 @@ Add tests for any new or changed functionality. Lint and test your code using
 
 ## TODO
 
-- [ ] Update Jasmine/Mocha matchers
+- [x] Update Jasmine/Mocha matchers
 
 ## License
 
 Licensed under the MIT license.
 
-Copyright (c) 2016 Koola.
+Copyright (c) 2017 Koola.
