@@ -36,8 +36,7 @@
   "author": "Koola",
   "license": "MIT",
   "engines": {
-    "npm": ">=3.0.0",
-    "node": ">=4.6.0"
+    "node": ">=6.9.2"
   },
   "dependencies": {
     "pixel-diff": "1.0.1",
