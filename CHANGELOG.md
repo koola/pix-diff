@@ -1,8 +1,3 @@
-<a name="1.2.2"></a>
-## [1.2.2](https://github.com/koola/pix-diff/compare/v1.2.1...v1.2.2) (2017-01-12)
-
-
-
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/koola/pix-diff/compare/v1.2.0...v1.2.1) (2017-01-11)
 
