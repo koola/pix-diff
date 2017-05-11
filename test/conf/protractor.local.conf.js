@@ -16,6 +16,8 @@ config.multiCapabilities = [
         shardTestFiles: true,
         chromeOptions: {
             args: [
+                'enable-automation',
+                '--disable-infobars',
                 '--disable-cache',
                 '--disable-application-cache',
                 '--disable-offline-load-stale-cache',
