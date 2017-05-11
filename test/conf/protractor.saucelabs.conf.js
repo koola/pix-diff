@@ -36,7 +36,7 @@ config.multiCapabilities = [
     },
     {
         name: 'iPad',
-        appiumVersion: '1.6.0',
+        appiumVersion: '1.6.4',
         browserName: 'Safari',
         deviceName: 'iPad Simulator',
         platformName: 'iOS',
