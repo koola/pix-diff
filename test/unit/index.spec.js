@@ -33,6 +33,9 @@ describe('Pix-Diff', () => {
             expect(PixDiff.RESULT_DIFFERENT).to.equal(1);
             expect(PixDiff.RESULT_SIMILAR).to.equal(7);
             expect(PixDiff.RESULT_IDENTICAL).to.equal(5);
+            expect(PixDiff.OUTPUT_DIFFERENT).to.equal(10);
+            expect(PixDiff.OUTPUT_SIMILAR).to.equal(20);
+            expect(PixDiff.OUTPUT_ALL).to.equal(100);
         });
     });
 

@@ -167,6 +167,42 @@ class PixDiff {
     }
 
     /**
+     * Create output when images are different
+     *
+     * @static
+     * @property OUTPUT_DIFFERENT
+     * @type {int}
+     * @public
+     */
+    static get OUTPUT_DIFFERENT() {
+        return PixelDiff.OUTPUT_DIFFERENT;
+    }
+
+    /**
+     * Create output when images are similar or different
+     *
+     * @static
+     * @property OUTPUT_SIMILAR
+     * @type {int}
+     * @public
+     */
+    static get OUTPUT_SIMILAR() {
+        return PixelDiff.OUTPUT_SIMILAR;
+    }
+
+    /**
+     * Force output of all comparisons
+     *
+     * @static
+     * @property OUTPUT_ALL
+     * @type {int}
+     * @public
+     */
+    static get OUTPUT_ALL() {
+        return PixelDiff.OUTPUT_ALL;
+    }
+
+    /**
      * Merges non-default options from optionsB into optionsA
      *
      * @method _mergeDefaultOptions
@@ -535,9 +571,11 @@ class PixDiff {
         defaults = Object.assign({
             imageAPath: path.join(this.basePath, tag),
             imageB: new Buffer(image, 'base64'),
-            imageOutputPath: path.join(this.diffPath, path.basename(tag)),
-            imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT
+            imageOutputPath: path.join(this.diffPath, path.basename(tag))
         }, defaults);
+        options = Object.assign({
+            imageOutputLimit: PixelDiff.OUTPUT_DIFFERENT
+        }, options);
 
         return new PixelDiff(this._mergeDefaultOptions(defaults, options)).runWithPromise();
     }
