@@ -67,7 +67,7 @@ Add tests for any new or changed functionality. Lint and test your code using
 
 ## TODO
 
-- [x] Update Jasmine/Mocha matchers
+- [ ] Update documentation
 
 ## License
 

@@ -639,7 +639,7 @@ class PixDiff {
      *      .then(result => { console.log(result.code); });
      *
      * @param {string} tag Baseline image name
-     * @param {object} options Non-default Blink-Diff options
+     * @param {object} options Non-default Pixel-Diff options
      * @returns {object} result
      * @reject {Error} - Baseline image not found
      * @fulfil {object} - PixelDiff result.code
@@ -676,7 +676,7 @@ class PixDiff {
      *      .then(result => { console.log(result.code); });
      *
      * @param {string} tag Baseline image name
-     * @param {object} options Non-default Blink-Diff options
+     * @param {object} options Non-default Pixel-Diff options
      * @returns {object} result
      * @reject {Error} - Baseline image not found
      * @fulfil {object} - PixelDiff result.code
@@ -709,7 +709,7 @@ class PixDiff {
      *
      * @param {Promise} element The ElementFinder for element lookup
      * @param {string} tag Baseline image name
-     * @param {object} options Non-default Blink-Diff options
+     * @param {object} options Non-default Pixel-Diff options
      * @returns {object} result
      * @reject {Error} - Baseline image not found
      * @fulfil {object} - PixelDiff `result.code`
