@@ -67,7 +67,7 @@ Add tests for any new or changed functionality. Lint and test your code using
 
 ## TODO
 
-- [ ] Update documentation
+- [ ] Enable FF after [#4253](https://github.com/angular/protractor/issues/4253) is fixed
 
 ## License
 
