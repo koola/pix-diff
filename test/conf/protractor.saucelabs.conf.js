@@ -5,13 +5,13 @@ let SauceLabs = require('saucelabs');
 
 const SAUCE_USERNAME = process.env.SAUCE_USERNAME;
 const SAUCE_ACCESS_KEY = process.env.SAUCE_ACCESS_KEY;
-const travisBuild = process.env.TRAVIS_JOB_NUMBER;
+const TRAVIS_JOB_ID = process.env.TRAVIS_JOB_NUMBER;
 const desktopSpecs = ['../desktop.spec.js'];
-//const mobileSpecs = ['../mobile.spec.js'];
+const mobileSpecs = ['../mobile.spec.js'];
 
 let JOB_ID;
 
-config.seleniumAddress = travisBuild ? 'http://localhost:4445/wd/hub' : 'http://ondemand.saucelabs.com:80/wd/hub';
+config.seleniumAddress = 'http://ondemand.saucelabs.com:80/wd/hub';
 
 config.devicePixelRatio = {
     'chrome': 1,
@@ -22,36 +22,38 @@ config.devicePixelRatio = {
 };
 
 config.multiCapabilities = [
-//    {
-//        name: 'iPhone',
-//        browserName: 'Safari',
-//        deviceName: 'iPhone Simulator',
-//        platformName: 'iOS',
-//        platformVersion: '10.0',
-//        logName: 'iPhone 6 Simulator Safari',
-//        username: SAUCE_USERNAME,
-//        accessKey: SAUCE_ACCESS_KEY,
-//        build: travisBuild,
-//        'tunnel-identifier': travisBuild,
-//        shardTestFiles: true,
-//
-//        specs: mobileSpecs
-//    },
-//    {
-//        name: 'iPad',
-//        appiumVersion: '1.6.4',
-//        browserName: 'Safari',
-//        deviceName: 'iPad Simulator',
-//        platformName: 'iOS',
-//        platformVersion: '10.0',
-//        logName: 'iPad Air 2 Simulator Safari',
-//        username: SAUCE_USERNAME,
-//        accessKey: SAUCE_ACCESS_KEY,
-//        build: travisBuild,
-//        'tunnel-identifier': travisBuild,
-//        shardTestFiles: true,
-//        specs: mobileSpecs
-//    },
+    {
+        name: 'iPhone',
+        appiumVersion: "1.6.3",
+        browserName: 'Safari',
+        deviceName: "iPhone 6 Simulator",
+        deviceOrientation: "portrait",
+        platformName: 'iOS',
+        platformVersion: '10.0',
+        logName: 'iPhone 6 Simulator Safari',
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
+        shardTestFiles: true,
+        specs: mobileSpecs
+    },
+    {
+        name: 'iPad',
+        appiumVersion: "1.6.3",
+        browserName: 'Safari',
+        deviceName: "iPad Air 2 Simulator",
+        deviceOrientation: "portrait",
+        platformName: 'iOS',
+        platformVersion: '10.0',
+        logName: 'iPad Air 2 Simulator Safari',
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
+        shardTestFiles: true,
+        specs: mobileSpecs
+    },
     {
         name: 'Chrome',
         browserName: 'chrome',
@@ -61,8 +63,8 @@ config.multiCapabilities = [
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
-        build: travisBuild,
-        'tunnel-identifier': travisBuild,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -75,8 +77,8 @@ config.multiCapabilities = [
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
-        build: travisBuild,
-        'tunnel-identifier': travisBuild,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -89,8 +91,8 @@ config.multiCapabilities = [
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
-        build: travisBuild,
-        'tunnel-identifier': travisBuild,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -103,8 +105,8 @@ config.multiCapabilities = [
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
-        build: travisBuild,
-        'tunnel-identifier': travisBuild,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -117,8 +119,8 @@ config.multiCapabilities = [
         screenResolution: '1600x1200',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
-        build: travisBuild,
-        'tunnel-identifier': travisBuild,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -131,8 +133,8 @@ config.multiCapabilities = [
         screenResolution: '1600x1200',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
-        build: travisBuild,
-        'tunnel-identifier': travisBuild,
+        build: TRAVIS_JOB_ID,
+        'tunnel-identifier': TRAVIS_JOB_ID,
         shardTestFiles: true,
         specs: desktopSpecs
     }
