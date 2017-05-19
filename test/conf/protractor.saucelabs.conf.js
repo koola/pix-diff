@@ -6,7 +6,7 @@ let SauceLabs = require('saucelabs');
 const SAUCE_USERNAME = process.env.SAUCE_USERNAME;
 const SAUCE_ACCESS_KEY = process.env.SAUCE_ACCESS_KEY;
 const travisBuild = process.env.TRAVIS_JOB_NUMBER;
-const desktopSpecs = ['../jasmine.spec.js'];
+const desktopSpecs = ['../desktop.spec.js'];
 //const mobileSpecs = ['../mobile.spec.js'];
 
 let JOB_ID;
@@ -57,7 +57,7 @@ config.multiCapabilities = [
         browserName: 'chrome',
         platform: 'Windows 10',
         version: 'latest',
-        logName: 'Chrome latest',
+        logName: 'Chrome ',
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
@@ -71,7 +71,7 @@ config.multiCapabilities = [
         browserName: 'firefox',
         platform: 'Windows 10',
         version: 'latest',
-        logName: 'Firefox latest',
+        logName: 'Firefox ',
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
@@ -99,7 +99,7 @@ config.multiCapabilities = [
         browserName: 'MicrosoftEdge',
         platform: 'Windows 10',
         version: 'latest',
-        logName: 'Microsoft Edge latest',
+        logName: 'Microsoft Edge ',
         screenResolution: '1400x1050',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
@@ -113,7 +113,7 @@ config.multiCapabilities = [
         browserName: 'safari',
         platform: 'OS X 10.11',
         version: '9',
-        logName: 'Safari 9',
+        logName: 'Safari ',
         screenResolution: '1600x1200',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
@@ -127,7 +127,7 @@ config.multiCapabilities = [
         browserName: 'safari',
         platform: 'OS X 10.11',
         version: '10',
-        logName: 'Safari 10',
+        logName: 'Safari ',
         screenResolution: '1600x1200',
         username: SAUCE_USERNAME,
         accessKey: SAUCE_ACCESS_KEY,
