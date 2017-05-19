@@ -58,7 +58,7 @@
     "load-grunt-tasks": "3.5.0",
     "mocha": "3.2.0",
     "promise": "7.1.1",
-    "protractor": "5.1.1",
+    "protractor": "5.1.0",
     "saucelabs": "1.4.0"
   }
 }
