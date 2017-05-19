@@ -45,6 +45,7 @@ exports.config = {
             testConfig.dprHeight = testConfig.height * testConfig.devicePixelRatio;
 
             browser.testConfig = testConfig;
+            browser.isChrome = testConfig.browserName === 'chrome';
         });
     }
 };
