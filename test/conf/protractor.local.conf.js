@@ -4,7 +4,7 @@ let config = require('./protractor.shared.conf.js').config;
 
 config.directConnect = true;
 
-config.specs = ['../jasmine.spec.js'];
+config.specs = ['../desktop.spec.js'];
 
 config.devicePixelRatio = { 'chrome': 2, 'firefox': 1 };
 

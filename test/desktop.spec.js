@@ -111,7 +111,7 @@ describe('Pix-Diff', () => {
         });
     });
 
-    describe('save page', () => {
+    (browser.isChrome? xdescribe: describe)('save page', () => {
 
         beforeEach(() => {
             browser.pixDiff = new PixDiff({
