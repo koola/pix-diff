@@ -1,12 +1,15 @@
 'use strict';
 
 let config = require('./protractor.shared.conf.js').config;
+let SauceLabs = require('saucelabs');
 
-const sauceUsername = process.env.SAUCE_USERNAME,
-    sauceAccessKey = process.env.SAUCE_ACCESS_KEY,
-    travisBuild = process.env.TRAVIS_JOB_NUMBER,
-    desktopSpecs = ['../jasmine.spec.js'],
-    mobileSpecs = ['../mobile.spec.js'];
+const SAUCE_USERNAME = process.env.SAUCE_USERNAME;
+const SAUCE_ACCESS_KEY = process.env.SAUCE_ACCESS_KEY;
+const travisBuild = process.env.TRAVIS_JOB_NUMBER;
+const desktopSpecs = ['../jasmine.spec.js'];
+//const mobileSpecs = ['../mobile.spec.js'];
+
+let JOB_ID;
 
 config.seleniumAddress = travisBuild ? 'http://localhost:4445/wd/hub' : 'http://ondemand.saucelabs.com:80/wd/hub';
 
@@ -26,12 +29,12 @@ config.multiCapabilities = [
 //        platformName: 'iOS',
 //        platformVersion: '10.0',
 //        logName: 'iPhone 6 Simulator Safari',
-//        username: sauceUsername,
-//        accessKey: sauceAccessKey,
+//        username: SAUCE_USERNAME,
+//        accessKey: SAUCE_ACCESS_KEY,
 //        build: travisBuild,
 //        'tunnel-identifier': travisBuild,
 //        shardTestFiles: true,
-//        passed: true,
+//
 //        specs: mobileSpecs
 //    },
 //    {
@@ -42,12 +45,11 @@ config.multiCapabilities = [
 //        platformName: 'iOS',
 //        platformVersion: '10.0',
 //        logName: 'iPad Air 2 Simulator Safari',
-//        username: sauceUsername,
-//        accessKey: sauceAccessKey,
+//        username: SAUCE_USERNAME,
+//        accessKey: SAUCE_ACCESS_KEY,
 //        build: travisBuild,
 //        'tunnel-identifier': travisBuild,
 //        shardTestFiles: true,
-//        passed: true,
 //        specs: mobileSpecs
 //    },
     {
@@ -57,29 +59,27 @@ config.multiCapabilities = [
         version: 'latest',
         logName: 'Chrome latest',
         screenResolution: '1400x1050',
-        username: sauceUsername,
-        accessKey: sauceAccessKey,
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
         build: travisBuild,
         'tunnel-identifier': travisBuild,
         shardTestFiles: true,
-        passed: true,
         specs: desktopSpecs
     },
-//    {
-//        name: 'Firefox',
-//        browserName: 'firefox',
-//        platform: 'Windows 10',
-//        version: 'latest',
-//        logName: 'Firefox latest',
-//        screenResolution: '1400x1050',
-//        username: sauceUsername,
-//        accessKey: sauceAccessKey,
-//        build: travisBuild,
-//        'tunnel-identifier': travisBuild,
-//        shardTestFiles: true,
-//        passed: true,
-//        specs: desktopSpecs
-//    },
+    {
+        name: 'Firefox',
+        browserName: 'firefox',
+        platform: 'Windows 10',
+        version: 'latest',
+        logName: 'Firefox latest',
+        screenResolution: '1400x1050',
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
+        build: travisBuild,
+        'tunnel-identifier': travisBuild,
+        shardTestFiles: true,
+        specs: desktopSpecs
+    },
     {
         name: 'Internet Explorer',
         browserName: 'internet explorer',
@@ -87,12 +87,11 @@ config.multiCapabilities = [
         version: '11.0',
         logName: 'Internet Explorer 11',
         screenResolution: '1400x1050',
-        username: sauceUsername,
-        accessKey: sauceAccessKey,
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
         build: travisBuild,
         'tunnel-identifier': travisBuild,
         shardTestFiles: true,
-        passed: true,
         specs: desktopSpecs
     },
     {
@@ -102,12 +101,11 @@ config.multiCapabilities = [
         version: 'latest',
         logName: 'Microsoft Edge latest',
         screenResolution: '1400x1050',
-        username: sauceUsername,
-        accessKey: sauceAccessKey,
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
         build: travisBuild,
         'tunnel-identifier': travisBuild,
         shardTestFiles: true,
-        passed: true,
         specs: desktopSpecs
     },
     {
@@ -117,12 +115,11 @@ config.multiCapabilities = [
         version: '9',
         logName: 'Safari 9',
         screenResolution: '1600x1200',
-        username: sauceUsername,
-        accessKey: sauceAccessKey,
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
         build: travisBuild,
         'tunnel-identifier': travisBuild,
         shardTestFiles: true,
-        passed: true,
         specs: desktopSpecs
     },
     {
@@ -132,14 +129,34 @@ config.multiCapabilities = [
         version: '10',
         logName: 'Safari 10',
         screenResolution: '1600x1200',
-        username: sauceUsername,
-        accessKey: sauceAccessKey,
+        username: SAUCE_USERNAME,
+        accessKey: SAUCE_ACCESS_KEY,
         build: travisBuild,
         'tunnel-identifier': travisBuild,
         shardTestFiles: true,
-        passed: true,
         specs: desktopSpecs
     }
 ];
+
+config.onComplete = function () {
+    return browser.getSession().then(session => {
+        JOB_ID = session.getId();
+    });
+};
+
+config.onCleanUp = function (exitCode) {
+    const saucelabs = new SauceLabs({
+        username: SAUCE_USERNAME,
+        password: SAUCE_ACCESS_KEY
+    });
+
+    return new Promise((resolve, reject) => {
+        saucelabs.updateJob(JOB_ID, {
+                passed: exitCode === 0
+            },
+            () => resolve(),
+            error => reject('Error:', error));
+    });
+};
 
 exports.config = config;
