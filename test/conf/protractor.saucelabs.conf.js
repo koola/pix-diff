@@ -68,20 +68,20 @@ config.multiCapabilities = [
         shardTestFiles: true,
         specs: desktopSpecs
     },
-    {
-        name: 'Firefox',
-        browserName: 'firefox',
-        platform: 'Windows 10',
-        version: 'latest',
-        logName: 'Firefox ',
-        screenResolution: '1400x1050',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
-        shardTestFiles: true,
-        specs: desktopSpecs
-    },
+//    {
+//        name: 'Firefox',
+//        browserName: 'firefox',
+//        platform: 'Windows 10',
+//        version: 'latest',
+//        logName: 'Firefox ',
+//        screenResolution: '1400x1050',
+//        username: SAUCE_USERNAME,
+//        accessKey: SAUCE_ACCESS_KEY,
+//        build: TRAVIS_JOB_ID,
+//        'tunnel-identifier': TRAVIS_JOB_ID,
+//        shardTestFiles: true,
+//        specs: desktopSpecs
+//    },
     {
         name: 'Internet Explorer',
         browserName: 'internet explorer',

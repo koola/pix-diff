@@ -16,11 +16,11 @@ describe('Pix-Diff', () => {
         devices = {
             iPhone: {
                 blockOut : [{x: 0, y: 0, width: 750, height: 40}],
-                name:'iPhoneSimulator-safari-750x1334-dpr-2'
+                name:'iPhone6Simulator-safari-750x1334-dpr-2'
             },
             iPad: {
                 blockOut : [{x: 0, y: 0, width: 1536, height: 40}],
-                name:'iPadSimulator-safari-1536x2048-dpr-2'
+                name:'iPadAir2Simulator-safari-1536x2048-dpr-2'
             }
         };
 
