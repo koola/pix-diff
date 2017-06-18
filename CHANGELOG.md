@@ -1,10 +1,15 @@
+<a name="2.0.1"></a>
+## [2.0.1](https://github.com/koola/pix-diff/compare/v2.0.0...v2.0.1) (2017-06-18)
+
+
+### Bug Fixes
+
+* **code:** [#54](https://github.com/koola/pix-diff/issues/54) merge non-default options ([afaa786](https://github.com/koola/pix-diff/commit/afaa786))
+
+
+
 <a name="2.0.0"></a>
-# [2.0.0](https://github.com/koola/pix-diff/compare/v1.2.2...v2.0.0) (2017-01-13)
-
-
-
-<a name="1.2.2"></a>
-## [1.2.2](https://github.com/koola/pix-diff/compare/v1.2.1...v1.2.2) (2017-01-12)
+# [2.0.0](https://github.com/koola/pix-diff/compare/v1.2.1...v2.0.0) (2017-01-13)
 
 
 

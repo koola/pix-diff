@@ -67,6 +67,9 @@ PixDiff
     * [.RESULT_IDENTICAL](#PixDiff.RESULT_IDENTICAL) : <code>int</code>
     * [.THRESHOLD_PIXEL](#PixDiff.THRESHOLD_PIXEL) : <code>string</code>
     * [.THRESHOLD_PERCENT](#PixDiff.THRESHOLD_PERCENT) : <code>string</code>
+    * [.OUTPUT_DIFFERENT](#PixDiff.OUTPUT_DIFFERENT) : <code>int</code>
+    * [.OUTPUT_SIMILAR](#PixDiff.OUTPUT_SIMILAR) : <code>int</code>
+    * [.OUTPUT_ALL](#PixDiff.OUTPUT_ALL) : <code>int</code>
 
 <a name="new_PixDiff_new"></a>
 
@@ -162,6 +165,45 @@ Threshold-type for percent of all pixels
 | --- |
 | THRESHOLD_PERCENT | 
 
+<a name="PixDiff.OUTPUT_DIFFERENT"></a>
+
+### PixDiff.OUTPUT_DIFFERENT : <code>int</code>
+Create output when images are different
+
+**Kind**: static property of <code>[PixDiff](#PixDiff)</code>  
+**Access:** public  
+**Properties**
+
+| Name |
+| --- |
+| OUTPUT_DIFFERENT | 
+
+<a name="PixDiff.OUTPUT_SIMILAR"></a>
+
+### PixDiff.OUTPUT_SIMILAR : <code>int</code>
+Create output when images are similar or different
+
+**Kind**: static property of <code>[PixDiff](#PixDiff)</code>  
+**Access:** public  
+**Properties**
+
+| Name |
+| --- |
+| OUTPUT_SIMILAR | 
+
+<a name="PixDiff.OUTPUT_ALL"></a>
+
+### PixDiff.OUTPUT_ALL : <code>int</code>
+Force output of all comparisons
+
+**Kind**: static property of <code>[PixDiff](#PixDiff)</code>  
+**Access:** public  
+**Properties**
+
+| Name |
+| --- |
+| OUTPUT_ALL | 
+
 <a name="savePage"></a>
 
 ## savePage(tag, scrollTimeout) ⇒ <code>Promise</code>
@@ -237,7 +279,7 @@ Runs the comparison against the page
 | Param | Type | Description |
 | --- | --- | --- |
 | tag | <code>string</code> | Baseline image name |
-| options | <code>object</code> | Non-default Blink-Diff options |
+| options | <code>object</code> | Non-default Pixel-Diff options |
 
 **Example**  
 ```js
@@ -263,7 +305,7 @@ Runs the comparison against the screen
 | Param | Type | Description |
 | --- | --- | --- |
 | tag | <code>string</code> | Baseline image name |
-| options | <code>object</code> | Non-default Blink-Diff options |
+| options | <code>object</code> | Non-default Pixel-Diff options |
 
 **Example**  
 ```js
@@ -290,7 +332,7 @@ Runs the comparison against a region
 | --- | --- | --- |
 | element | <code>Promise</code> | The ElementFinder for element lookup |
 | tag | <code>string</code> | Baseline image name |
-| options | <code>object</code> | Non-default Blink-Diff options |
+| options | <code>object</code> | Non-default Pixel-Diff options |
 
 **Example**  
 ```js
