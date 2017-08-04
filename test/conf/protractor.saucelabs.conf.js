@@ -1,15 +1,13 @@
 'use strict';
 
 let config = require('./protractor.shared.conf.js').config;
-let SauceLabs = require('saucelabs');
 
-const SAUCE_USERNAME = process.env.SAUCE_USERNAME;
-const SAUCE_ACCESS_KEY = process.env.SAUCE_ACCESS_KEY;
-const TRAVIS_JOB_ID = process.env.TRAVIS_JOB_NUMBER;
 const desktopSpecs = ['../desktop.spec.js'];
 const mobileSpecs = ['../mobile.spec.js'];
 
-let JOB_ID;
+config.sauceUser = process.env.SAUCE_USERNAME;
+config.sauceKey = process.env.SAUCE_ACCESS_KEY;
+config.sauceBuild = process.env.TRAVIS_JOB_NUMBER;
 
 config.seleniumAddress = 'http://ondemand.saucelabs.com:80/wd/hub';
 
@@ -31,10 +29,7 @@ config.multiCapabilities = [
         platformName: 'iOS',
         platformVersion: '10.0',
         logName: 'iPhone 6 Simulator Safari',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: mobileSpecs
     },
@@ -47,10 +42,7 @@ config.multiCapabilities = [
         platformName: 'iOS',
         platformVersion: '10.0',
         logName: 'iPad Air 2 Simulator Safari',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: mobileSpecs
     },
@@ -61,10 +53,7 @@ config.multiCapabilities = [
         version: 'latest',
         logName: 'Chrome ',
         screenResolution: '1400x1050',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -75,10 +64,7 @@ config.multiCapabilities = [
 //        version: 'latest',
 //        logName: 'Firefox ',
 //        screenResolution: '1400x1050',
-//        username: SAUCE_USERNAME,
-//        accessKey: SAUCE_ACCESS_KEY,
-//        build: TRAVIS_JOB_ID,
-//        'tunnel-identifier': TRAVIS_JOB_ID,
+//        'tunnel-identifier': config.sauceBuild,
 //        shardTestFiles: true,
 //        specs: desktopSpecs
 //    },
@@ -89,10 +75,7 @@ config.multiCapabilities = [
         version: '11.0',
         logName: 'IE ',
         screenResolution: '1400x1050',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -103,10 +86,7 @@ config.multiCapabilities = [
         version: 'latest',
         logName: 'Microsoft Edge ',
         screenResolution: '1400x1050',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -117,10 +97,7 @@ config.multiCapabilities = [
         version: '9',
         logName: 'Safari #1 ',
         screenResolution: '1600x1200',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: desktopSpecs
     },
@@ -131,34 +108,10 @@ config.multiCapabilities = [
         version: '10',
         logName: 'Safari #2 ',
         screenResolution: '1600x1200',
-        username: SAUCE_USERNAME,
-        accessKey: SAUCE_ACCESS_KEY,
-        build: TRAVIS_JOB_ID,
-        'tunnel-identifier': TRAVIS_JOB_ID,
+        'tunnel-identifier': config.sauceBuild,
         shardTestFiles: true,
         specs: desktopSpecs
     }
 ];
-
-config.onComplete = function () {
-    return browser.getSession().then(session => {
-        JOB_ID = session.getId();
-    });
-};
-
-config.onCleanUp = function (exitCode) {
-    const saucelabs = new SauceLabs({
-        username: SAUCE_USERNAME,
-        password: SAUCE_ACCESS_KEY
-    });
-
-    return new Promise((resolve, reject) => {
-        saucelabs.updateJob(JOB_ID, {
-                passed: exitCode === 0
-            },
-            () => resolve(),
-            error => reject('Error:', error));
-    });
-};
 
 exports.config = config;
