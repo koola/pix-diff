@@ -9,8 +9,6 @@ config.sauceUser = process.env.SAUCE_USERNAME;
 config.sauceKey = process.env.SAUCE_ACCESS_KEY;
 config.sauceBuild = process.env.TRAVIS_JOB_NUMBER;
 
-config.seleniumAddress = 'http://ondemand.saucelabs.com:80/wd/hub';
-
 config.devicePixelRatio = {
     'chrome': 1,
     'firefox': 1,
