@@ -35,7 +35,6 @@ exports.config = {
         return browser.getProcessedConfig().then(_ => {
             let testConfig = {
                 browserName: camelCase(_.capabilities.browserName),
-                deviceName: camelCase(_.capabilities.name),
                 logName: camelCase(_.capabilities.logName),
                 width: 1366,
                 height: 768

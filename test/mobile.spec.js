@@ -1,10 +1,11 @@
 'use strict';
 
-const PixDiff = require('../'),
-    fs = require('fs'),
-    path = require('path');
-let screenshotPath = path.resolve(__dirname, '../test/baseline/mobile/'),
-    differencePath = path.resolve(__dirname, '../test/diff/');
+const PixDiff = require('../');
+const fs = require('fs');
+const path = require('path');
+
+let screenshotPath = path.resolve(__dirname, '../test/baseline/mobile/');
+let differencePath = path.resolve(__dirname, '../test/diff/');
 
 describe('Pix-Diff', () => {
 
@@ -14,13 +15,13 @@ describe('Pix-Diff', () => {
         screenElement = element(by.css('div h1')),
         regionElement = element.all(by.css('div h2')).get(2),
         devices = {
-            iPhone: {
+            iPhone6SimulatorSafari: {
                 blockOut : [{x: 0, y: 0, width: 750, height: 40}],
-                name:'iPhone6Simulator-safari-750x1334-dpr-2'
+                name:`${_.logName}-750x1334-dpr-2`
             },
-            iPad: {
+            iPadAir2SimulatorSafari: {
                 blockOut : [{x: 0, y: 0, width: 1536, height: 40}],
-                name:'iPadAir2Simulator-safari-1536x2048-dpr-2'
+                name:`${_.logName}-1536x2048-dpr-2`
             }
         };
 
@@ -28,7 +29,7 @@ describe('Pix-Diff', () => {
         browser.pixDiff = new PixDiff({
             basePath: './test/baseline/mobile/',
             diffPath: './test/',
-            formatImageName: '{tag}-{deviceName}-{browserName}-{width}x{height}-dpr-{dpr}'
+            formatImageName: '{tag}-{logName}-{width}x{height}-dpr-{dpr}'
         });
 
         browser.get(browser.baseUrl).then(()=> browser.sleep(500));
@@ -36,19 +37,19 @@ describe('Pix-Diff', () => {
 
     it('should save the screen', () => {
         browser.pixDiff.saveScreen(tagScreen)
-            .then(() => expect(fs.existsSync(`${screenshotPath}/${tagScreen}-${devices[_.deviceName].name}.png`)).toBe(true));
+            .then(() => expect(fs.existsSync(`${screenshotPath}/${tagScreen}-${devices[_.logName].name}.png`)).toBe(true));
     });
 
     it('should save the region', () => {
         browser.executeScript('arguments[0].scrollIntoView();', regionElement.getWebElement())
             .then(() => browser.pixDiff.saveRegion(regionElement, tagRegion))
-            .then(() => expect(fs.existsSync(`${screenshotPath}/${tagRegion}-${devices[_.deviceName].name}.png`)).toBe(true));
+            .then(() => expect(fs.existsSync(`${screenshotPath}/${tagRegion}-${devices[_.logName].name}.png`)).toBe(true));
     });
 
     describe('compare screen', () => {
 
         it('should compare successfully with a baseline', () => {
-            browser.pixDiff.checkScreen(tagScreen, {blockOut: devices[_.deviceName].blockOut})
+            browser.pixDiff.checkScreen(tagScreen, {blockOut: devices[_.logName].blockOut})
                 .then(result => expect(result.code).toEqual(PixDiff.RESULT_IDENTICAL));
         });
 
@@ -57,7 +58,7 @@ describe('Pix-Diff', () => {
                 .then(() => browser.pixDiff.checkScreen(tagScreen, {threshold: 1}))
                 .then(result => {
                     expect(result.code).toBe(PixDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagScreen}-${devices[_.deviceName].name}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagScreen}-${devices[_.logName].name}.png`)).toBe(true);
                 });
         });
 
@@ -81,7 +82,7 @@ describe('Pix-Diff', () => {
                 .then(() => browser.pixDiff.checkRegion(regionElement, tagRegion, {threshold: 1}))
                 .then(result => {
                     expect(result.code).toBe(PixDiff.RESULT_DIFFERENT);
-                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${devices[_.deviceName].name}.png`)).toBe(true);
+                    expect(fs.existsSync(`${differencePath}/${tagRegion}-${devices[_.logName].name}.png`)).toBe(true);
                 });
         });
 
