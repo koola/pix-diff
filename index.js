@@ -24,7 +24,7 @@ const assert = require('assert'),
  *
  * @property {string} basePath Directory where baseline images are read/saved
  * @property {string} diffPath Directory where difference images are saved
- * @property {boolean} baseline Toggle saving baseline imags if not found
+ * @property {boolean} baseline Toggle saving baseline images if not found
  * @property {int} width Width of browser
  * @property {int} height Height of browser
  * @property {object} formatOptions Flat object that holds custom options for formatString
@@ -567,7 +567,7 @@ class PixDiff {
      * @returns {Promise}
      * @private
      */
-    _runComparison(tag, image, defaults = {}, options = {}) {
+    _runComparison(tag, image, defaults, options) {
         defaults = Object.assign({
             imageAPath: path.join(this.basePath, tag),
             imageB: new Buffer(image, 'base64'),
@@ -702,7 +702,7 @@ class PixDiff {
                 });
                 return png.compose().then(png.toBuffer);
             })
-            .then(image => this._runComparison(this._formatFileName(tag), image, options));
+            .then(image => this._runComparison(this._formatFileName(tag), image, {}, options));
     }
 
     /**
@@ -734,7 +734,7 @@ class PixDiff {
                 }
                 throw error;
             })
-            .then(image => this._runComparison(this._formatFileName(tag), image, options));
+            .then(image => this._runComparison(this._formatFileName(tag), image, {}, options));
     }
 
     /**
