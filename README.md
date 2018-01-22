@@ -3,6 +3,7 @@ Pix-Diff
 
 A lightweight protractor plugin for image comparison
 
+[![Join the chat](https://badges.gitter.im/pix-diff/lobby.svg)](https://gitter.im/pix-diff/lobby)
 [![dependencies Status](https://david-dm.org/koola/pix-diff.svg)](https://david-dm.org/koola/pix-diff)
 [![Build Status](https://travis-ci.org/koola/pix-diff.svg)](https://travis-ci.org/koola/pix-diff)
 [![Sauce Test Status](https://saucelabs.com/buildstatus/pixdiff)](https://saucelabs.com/u/pixdiff)
