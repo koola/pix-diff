@@ -1,4 +1,4 @@
-Pix-Diff
+![pixdifflogo](https://user-images.githubusercontent.com/4948196/36881658-3025ea94-1e0a-11e8-9508-e4966337fcfa.png)
 ==========
 
 A lightweight protractor plugin for image comparison
