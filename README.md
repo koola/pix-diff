@@ -3,13 +3,10 @@
 
 A lightweight protractor plugin for image comparison
 
-[![Join the chat](https://badges.gitter.im/pix-diff/lobby.svg)](https://gitter.im/pix-diff/lobby)
 [![dependencies Status](https://david-dm.org/koola/pix-diff.svg)](https://david-dm.org/koola/pix-diff)
 [![Build Status](https://travis-ci.org/koola/pix-diff.svg)](https://travis-ci.org/koola/pix-diff)
 [![Sauce Test Status](https://saucelabs.com/buildstatus/pixdiff)](https://saucelabs.com/u/pixdiff)
 [![npm version](https://badge.fury.io/js/pix-diff.svg)](https://www.npmjs.com/package/pix-diff)
-
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/pixdiff.svg)](https://saucelabs.com/u/pixdiff)
 
 ## What can it do?
 
@@ -74,4 +71,4 @@ Add tests for any new or changed functionality. Lint and test your code using
 
 Licensed under the MIT license.
 
-Copyright (c) 2018 Koola.
+Copyright (c) 2019 koola.
