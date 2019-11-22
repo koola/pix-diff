@@ -18,6 +18,7 @@ const assert = require('assert'),
  * @param {boolean} options.baseline Save images not found in baseline
  * @param {int} options.width Width of browser
  * @param {int} options.height Height of browser
+ * @param {object} options.browser A protractor browser instance
  * @param {object} options.formatImageOptions Custom variables for Image Name
  * @param {string} options.formatImageName Custom format image name
  * @param {object} options.offsets Mobile iOS/Android offsets required for obtaining element position
@@ -25,6 +26,7 @@ const assert = require('assert'),
  * @property {string} basePath Directory where baseline images are read/saved
  * @property {string} diffPath Directory where difference images are saved
  * @property {boolean} baseline Toggle saving baseline images if not found
+ * @property {object} browser A protractor browser instance
  * @property {int} width Width of browser
  * @property {int} height Height of browser
  * @property {object} formatOptions Flat object that holds custom options for formatString
@@ -49,6 +51,7 @@ class PixDiff {
         this.basePath = path.normalize(options.basePath);
         this.diffPath = path.join(path.normalize(options.diffPath), 'diff');
         this.baseline = options.baseline || false;
+        this.browser = options.browser || browser;
         this.width = options.width;
         this.height = options.height;
         this.formatOptions = options.formatImageOptions || {};
@@ -69,7 +72,7 @@ class PixDiff {
             assert.ok(Number.isInteger(this.width), 'Option width not an Integer.');
             assert.ok(Number.isInteger(this.height), 'Option height not an Integer.');
 
-            browser.driver.manage().window().setSize(this.width, this.height);
+            this.browser.driver.manage().window().setSize(this.width, this.height);
         }
 
         this._formatCapabilities();
@@ -85,8 +88,10 @@ class PixDiff {
      *      pixDiff.loadMatchers();
      * @public
      */
-    static loadMatchers() {
-        return browser.getProcessedConfig().then(_ => {
+    static loadMatchers(optionalBrowser) {
+        let usedBrowser = optionalBrowser || browser;
+
+        return usedBrowser.getProcessedConfig().then(_ => {
             let framework = _.framework ? _.framework.toLowerCase() : 'jasmine2';
             if (['jasmine', 'jasmine2', 'mocha'].indexOf(framework) >= 0) {
                 require(path.resolve(__dirname, 'framework', framework));
@@ -259,7 +264,7 @@ class PixDiff {
      * @private
      */
     _formatCapabilities() {
-        return browser.getProcessedConfig().then(_ => {
+        return this.browser.getProcessedConfig().then(_ => {
             this.browserName = _.capabilities.browserName ? camelCase(_.capabilities.browserName) : '';
             this.name = _.capabilities.name ? camelCase(_.capabilities.name) : '';
             this.logName = _.capabilities.logName ? camelCase(_.capabilities.logName) : '';
@@ -380,7 +385,7 @@ class PixDiff {
      * @private
      */
     _getElementPositionTopWindow(element) {
-        return browser.driver.executeScript('return arguments[0].getBoundingClientRect();', element.getWebElement())
+        return this.browser.driver.executeScript('return arguments[0].getBoundingClientRect();', element.getWebElement())
             .then(position => {
                 return {x: position.left, y: position.top};
             });
@@ -413,7 +418,7 @@ class PixDiff {
             };
         }
 
-        return browser.driver.executeScript(getDataObject, element.getWebElement(),
+        return this.browser.driver.executeScript(getDataObject, element.getWebElement(),
             this.offsets.ios.addressBar, this.offsets.ios.statusBar);
     }
 
@@ -444,7 +449,7 @@ class PixDiff {
             };
         }
 
-        return browser.driver.executeScript(getDataObject, element.getWebElement(),
+        return this.browser.driver.executeScript(getDataObject, element.getWebElement(),
             this.offsets.android.statusBar, this.offsets.android.addressBar, this.offsets.android.toolBar);
     }
 
@@ -487,7 +492,7 @@ class PixDiff {
                 scrollWidth: document.body.scrollWidth
             };
         }
-        return browser.executeScript(getDataObject, this._isMobile())
+        return this.browser.executeScript(getDataObject, this._isMobile())
             .then(screen => {
                 this.devicePixelRatio = this._isFirefox() ? this.devicePixelRatio : screen.devicePixelRatio;
                 this.width = screen.width * this.devicePixelRatio;
@@ -545,9 +550,9 @@ class PixDiff {
         return this._getBrowserData()
             .then(() => {
                 return [...Array(Math.ceil(this.pageHeight / this.innerHeight)).keys()].reduce((promise, i) => {
-                    return promise.then(() => browser.driver.executeScript(`window.scrollTo(0, + ${(this.innerHeight / this.devicePixelRatio) * i});`))
+                    return promise.then(() => this.browser.driver.executeScript(`window.scrollTo(0, + ${(this.innerHeight / this.devicePixelRatio) * i});`))
                         .then(() => this._sleep(scrollTimeout))
-                        .then(() => browser.takeScreenshot())
+                        .then(() => this.browser.takeScreenshot())
                         .then(image => {
                             screens.push(new Buffer(image, 'base64'));
                         });
@@ -627,7 +632,7 @@ class PixDiff {
      */
     saveScreen(tag) {
         return this._getBrowserData()
-            .then(() => browser.takeScreenshot())
+            .then(() => this.browser.takeScreenshot())
             .then(image => {
                 return new PNGImage({
                     imagePath: new Buffer(image, 'base64'),
@@ -657,7 +662,7 @@ class PixDiff {
             .then(() => this._getElementRectangle(element))
             .then(elementRect => {
                 rect = elementRect;
-                return browser.takeScreenshot();
+                return this.browser.takeScreenshot();
             })
             .then(image => {
                 return new PNGImage({
@@ -728,7 +733,7 @@ class PixDiff {
     checkScreen(tag, options = {}) {
         return this._getBrowserData()
             .then(() => this._checkImageExists(tag))
-            .then(() => browser.takeScreenshot(), error => {
+            .then(() => this.browser.takeScreenshot(), error => {
                 if (this.baseline) {
                     return this.saveScreen(tag).then(() => { throw error; });
                 }
@@ -771,7 +776,7 @@ class PixDiff {
             })
             .then(rect => {
                 defaults.cropImageB = rect;
-                return browser.takeScreenshot();
+                return this.browser.takeScreenshot();
             })
             .then(image => this._runComparison(this._formatFileName(tag), image, defaults, options));
     }
